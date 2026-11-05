@@ -1,64 +1,224 @@
 <section class="home">
-  <!-- Hero Section -->
+  <!-- Band 1: Light Hero with Atmospheric Violet-Yellow Halo -->
   <div class="hero">
     <div class="container hero__content">
-      <div class="hero__badge">Sistema de Atención al Usuario (SIAU)</div>
+      <div class="hero__eyebrow-row">
+        <span class="eyebrow-pill">Sistema de Atención al Usuario (SIAU)</span>
+      </div>
+
       <h1 class="hero__title">
-        Bienvenido a <span>MiPQR</span>
+        Gestión y trazabilidad PQR<br />
+        <span>con transparencia clínica.</span>
       </h1>
+
       <p class="hero__subtitle">
-        Plataforma oficial de la <strong>Clínica Dolormed</strong> para la radicación,
-        gestión y seguimiento transparente de sus Peticiones, Quejas, Reclamos y Sugerencias.
+        Plataforma oficial de la <strong>Clínica Dolormed</strong> para la radicación digital,
+        clasificación SIAU y seguimiento verificable de sus Peticiones, Quejas, Reclamos y Sugerencias.
       </p>
 
       <div class="hero__actions">
-        <a routerLink="/registro-pqr" class="btn btn-primary">
-          Radicar Solicitud
+        <a routerLink="/registro-pqr" class="btn btn-lg btn-primary">
+          Radicar Solicitud &rarr;
         </a>
-        <a routerLink="/consulta" class="btn btn-outline-accent">
+        <a routerLink="/consulta" class="btn btn-lg btn-outline">
           Consultar por Código
         </a>
+      </div>
+
+      <!-- Live UI Product Preview (Light shell + Dark Obsidian card) -->
+      <div class="hero-preview" aria-label="Vista previa en vivo del seguimiento de solicitudes">
+        <div class="hero-preview__bar">
+          <div class="hero-preview__dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="hero-preview__url">mipqr.dolormed.co/consulta?codigo=PQR-2026-0104</span>
+          <span class="eyebrow-pill">Trazabilidad en vivo</span>
+        </div>
+
+        <div class="hero-preview__body">
+          <div class="card-obsidian preview-obsidian">
+            <div class="preview-obsidian__top">
+              <div>
+                <span class="preview-obsidian__code">PQR-2026-0104</span>
+                <p class="preview-obsidian__subject">Solicitud de copia de historia clínica completa</p>
+              </div>
+              <span class="preview-obsidian__pill">En gestión</span>
+            </div>
+            <div class="preview-obsidian__steps">
+              <div class="preview-step preview-step--done">
+                <span class="preview-step__dot"></span>
+                <span>01 Radicada</span>
+              </div>
+              <div class="preview-step preview-step--done">
+                <span class="preview-step__dot"></span>
+                <span>02 Clasificada SIAU</span>
+              </div>
+              <div class="preview-step preview-step--active">
+                <span class="preview-step__dot"></span>
+                <span>03 Área Médica</span>
+              </div>
+              <div class="preview-step">
+                <span class="preview-step__dot"></span>
+                <span>04 Respuesta Oficial</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Cards de Acceso Rápido -->
-  <div class="container services">
-    <div class="services__grid">
-      <div class="card service-card">
-        <h3 class="service-card__title">Radicación Digital</h3>
-        <p class="service-card__desc">
-          Presente su solicitud en línea en pocos minutos y reciba un código único de seguimiento para su control.
+  <!-- Band 2: Light 2-Column Feature & Module Explorer Section -->
+  <div class="light-band">
+    <div class="container explorer-grid">
+      <div class="explorer-intro">
+        <span class="eyebrow-pill">Flujos de Atención</span>
+        <h2 class="explorer-intro__title">
+          Una consola unificada para pacientes y equipo clínico
+        </h2>
+        <p class="explorer-intro__desc">
+          Cada solicitud recibe un identificador alfanumérico único y atraviesa un flujo auditable
+          desde su recepción hasta el cierre formal.
         </p>
-        <a routerLink="/registro-pqr" class="btn btn-sm btn-accent mt-4">
-          Comenzar trámite
-        </a>
+
+        <div class="accordion-list" role="list">
+          <div class="accordion-row" role="listitem">
+            <span class="accordion-row__dot"></span>
+            <span class="accordion-row__name">Radicación Digital</span>
+            <span class="accordion-row__meta">Formulario guiado en 3 pasos</span>
+          </div>
+          <div class="accordion-row" role="listitem">
+            <span class="accordion-row__dot"></span>
+            <span class="accordion-row__name">Consulta por Código</span>
+            <span class="accordion-row__meta">Sin necesidad de iniciar sesión</span>
+          </div>
+          <div class="accordion-row" role="listitem">
+            <span class="accordion-row__dot"></span>
+            <span class="accordion-row__name">Bandeja SIAU</span>
+            <span class="accordion-row__meta">Control por rol y responsable</span>
+          </div>
+        </div>
       </div>
 
-      <div class="card service-card">
-        <h3 class="service-card__title">Consulta de Trazabilidad</h3>
-        <p class="service-card__desc">
-          Verifique el estado actual, el profesional asignado y el historial cronológico de atención de su caso.
+      <div class="services__grid">
+        <div class="card-marketing service-card">
+          <div class="service-card__top">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="12" y1="18" x2="12" y2="12" />
+                <line x1="9" y1="15" x2="15" y2="15" />
+              </svg>
+            </div>
+            <span class="eyebrow-pill">Paso 01</span>
+          </div>
+          <h3 class="service-card__title">Radicación Digital</h3>
+          <p class="service-card__desc">
+            Presente su solicitud en línea en pocos minutos y reciba un código único de seguimiento para su control.
+          </p>
+          <a routerLink="/registro-pqr" class="btn btn-sm btn-primary mt-4">
+            Comenzar trámite &rarr;
+          </a>
+        </div>
+
+        <div class="card-marketing service-card">
+          <div class="service-card__top">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
+            <span class="eyebrow-pill">Tiempo Real</span>
+          </div>
+          <h3 class="service-card__title">Consulta de Trazabilidad</h3>
+          <p class="service-card__desc">
+            Verifique el estado actual, el profesional asignado y el historial cronológico de atención de su caso.
+          </p>
+          <a routerLink="/consulta" class="btn btn-sm btn-outline mt-4">
+            Consultar estado
+          </a>
+        </div>
+
+        <div class="card-marketing service-card service-card--wide">
+          <div class="service-card__top">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+              </svg>
+            </div>
+            <span class="eyebrow-pill">Panel Institucional</span>
+          </div>
+          <h3 class="service-card__title">Gestión SIAU y Procesos</h3>
+          <p class="service-card__desc">
+            Bandeja administrativa para clasificación, asignación de responsables y emisión de respuestas oportunas.
+          </p>
+          <div>
+            @if (!authService.isAuthenticated()) {
+              <a routerLink="/login" class="btn btn-sm btn-outline mt-4">
+                Acceso institucional &rarr;
+              </a>
+            } @else {
+              <a routerLink="/bandeja" class="btn btn-sm btn-primary mt-4">
+                Ir a la bandeja &rarr;
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Band 3: Full-Width Dark Obsidian Showcase Band (DESIGN.md Dark Section Rules) -->
+  <div class="dark-band">
+    <div class="container">
+      <div class="dark-band__header">
+        <span class="eyebrow-pill eyebrow-pill--dark">Respaldo Institucional</span>
+        <h2 class="dark-band__title">
+          Atención oportuna con <span>seguimiento claro</span>
+        </h2>
+        <p class="dark-band__subtitle">
+          Cada cambio de estado, asignación y respuesta oficial queda registrado para consulta del solicitante y del equipo clínico.
         </p>
-        <a routerLink="/consulta" class="btn btn-sm btn-outline mt-4">
-          Consultar estado
-        </a>
       </div>
 
-      <div class="card service-card">
-        <h3 class="service-card__title">Gestión SIAU y Procesos</h3>
-        <p class="service-card__desc">
-          Bandeja administrativa para clasificación, asignación de responsables y emisión de respuestas oportunas.
-        </p>
-        @if (!authService.isAuthenticated()) {
-          <a routerLink="/login" class="btn btn-sm btn-outline mt-4">
-            Acceso institucional
-          </a>
-        } @else {
-          <a routerLink="/bandeja" class="btn btn-sm btn-primary mt-4">
-            Ir a la bandeja
-          </a>
-        }
+      <div class="obsidian-bento">
+        <article class="card-obsidian bento-card">
+          <div class="bento-card__code">
+            <span class="bento-card__prompt">radicado</span>
+            <code>PQR-2026-0108</code>
+          </div>
+          <h3 class="bento-card__title">Código Único de Seguimiento</h3>
+          <p class="bento-card__desc">
+            Generación automática al radicar para consulta directa sin trámites presenciales en ventanilla.
+          </p>
+        </article>
+
+        <article class="card-obsidian bento-card">
+          <div class="bento-card__code">
+            <span class="bento-card__prompt">atención</span>
+            <code>4 Perfiles Clínicos</code>
+          </div>
+          <h3 class="bento-card__title">Gestión por Áreas y Roles</h3>
+          <p class="bento-card__desc">
+            Coordinación clara entre Solicitante, Analista SIAU, Responsable de Proceso y Dirección.
+          </p>
+        </article>
+
+        <article class="card-obsidian bento-card">
+          <div class="bento-card__code">
+            <span class="bento-card__prompt">etapas</span>
+            <code>6 Estados del Caso</code>
+          </div>
+          <h3 class="bento-card__title">Historial Completo</h3>
+          <p class="bento-card__desc">
+            Registro cronológico de cada avance con responsable asignado, estado actual y respuesta formal.
+          </p>
+        </article>
       </div>
     </div>
   </div>
