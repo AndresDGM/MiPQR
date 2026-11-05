@@ -1,15 +1,28 @@
 <header class="navbar">
-  <div class="navbar__container">
+  <div class="container navbar__container">
     <a routerLink="/" class="navbar__brand">
-      <div class="navbar__logo-icon">PQR</div>
+      <div class="navbar__logo" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.25" stroke="currentColor" stroke-width="1.5" />
+          <rect x="9" y="1.5" width="5.5" height="5.5" rx="1.25" fill="#6c47ff" />
+          <rect x="1.5" y="9" width="5.5" height="5.5" rx="1.25" stroke="currentColor" stroke-width="1.5" />
+          <rect x="9" y="9" width="5.5" height="5.5" rx="1.25" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+      </div>
       <div class="navbar__brand-text">
         <span class="navbar__title">MiPQR</span>
+        <span class="navbar__divider" aria-hidden="true">/</span>
         <span class="navbar__subtitle">Clínica Dolormed</span>
       </div>
     </a>
 
-    <nav class="navbar__nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar__link">
+    <nav class="navbar__nav" aria-label="Navegación principal">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="navbar__link"
+      >
         Inicio
       </a>
 
@@ -41,18 +54,21 @@
 
     <div class="navbar__actions">
       @if (!authService.isAuthenticated()) {
-        <a routerLink="/registro-solicitante" class="btn btn-sm btn-outline">
-          Registrarme
-        </a>
-        <a routerLink="/login" class="btn btn-sm btn-primary">
+        <a routerLink="/login" class="btn btn-sm btn-outline">
           Iniciar Sesión
         </a>
+        <a routerLink="/registro-solicitante" class="btn btn-sm btn-primary">
+          Registrarme
+        </a>
       } @else {
-        <div class="navbar__user-info">
+        <div class="navbar__user-chip">
+          <span class="navbar__user-avatar" aria-hidden="true">
+            {{ authService.currentUser()?.nombre?.slice(0, 1) }}
+          </span>
           <span class="navbar__user-name">{{ authService.currentUser()?.nombre }}</span>
-          <span class="navbar__user-role badge">{{ authService.userRol() }}</span>
+          <span class="eyebrow-pill navbar__role-pill">{{ authService.userRol() }}</span>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-danger" (click)="logout()">
+        <button type="button" class="btn btn-sm btn-outline" (click)="logout()">
           Cerrar Sesión
         </button>
       }

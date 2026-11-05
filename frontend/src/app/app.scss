@@ -6,17 +6,63 @@
   min-height: 100vh;
 }
 
-.app-shell {
-  flex: 1;
+/* Announcement Banner (DESIGN.md: #131316, #ffffff Geist 500 13px, #d9d9de inline link, 8px 0px padding) */
+.announcement-banner {
+  background-color: $color-void-black;
+  color: $color-pure-white;
+  padding: 8px 0;
+  font-family: $font-geist;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: rgba(255, 255, 255, 0.06) 0px -1px 0px 0px inset;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: $radius-pill;
+    background-color: $color-electric-violet;
+    box-shadow: 0 0 8px rgba(108, 71, 255, 0.9);
+    flex-shrink: 0;
+  }
+
+  &__text {
+    color: $color-pure-white;
+    letter-spacing: -0.01em;
+  }
+
+  &__link {
+    color: $color-hairline;
+    font-weight: 500;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-pure-white;
+    }
+  }
 }
 
+.app-shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dark Institutional Footer (#131316 / #212126 rules: inset white shimmer, Stone & Slate Mid hierarchy, Cyan Spark accent) */
 .app-footer {
-  background: linear-gradient(135deg, $color-dark 0%, color-mix(in srgb, $color-primary 55%, $color-dark) 100%);
-  border-top: 3px solid $color-accent;
-  color: $color-white;
-  padding: 1.75rem 1rem;
-  border-top: 1px solid rgba($color-white, 0.1);
+  background-color: $color-void-black;
+  color: $color-stone;
+  padding: 36px 0;
   margin-top: auto;
+  box-shadow: rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset;
 }
 
 .footer-content {
@@ -24,25 +70,73 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 24px;
   font-size: 0.8125rem;
 }
 
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 6px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 }
 
 .footer-title {
-  font-weight: 700;
-  color: $color-white;
+  font-weight: 600;
+  color: $color-pure-white;
+  letter-spacing: -0.015em;
 }
 
 .footer-copy {
-  opacity: 0.7;
+  color: $color-slate-mid;
+  font-size: 0.75rem;
 }
 
-.footer-links {
-  opacity: 0.7;
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+
+  @media (max-width: 720px) {
+    align-items: flex-start;
+  }
+}
+
+.footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  a {
+    color: $color-stone;
+    font-weight: 500;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-pure-white;
+    }
+  }
+}
+
+.footer-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: $color-slate-mid;
+
+  &__spark {
+    width: 6px;
+    height: 6px;
+    border-radius: $radius-pill;
+    background-color: $color-cyan-spark;
+    box-shadow: 0 0 8px rgba(93, 227, 255, 0.65);
+  }
 }

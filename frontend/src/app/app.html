@@ -1,15 +1,43 @@
+<div class="announcement-banner" role="region" aria-label="Aviso institucional">
+  <div class="container announcement-banner__inner">
+    <span class="announcement-banner__dot" aria-hidden="true"></span>
+    <span class="announcement-banner__text">
+      Clínica Dolormed · Sistema SIAU de radicación y trazabilidad en tiempo real
+    </span>
+    <a routerLink="/consulta" class="announcement-banner__link">
+      Consultar radicado &rarr;
+    </a>
+  </div>
+</div>
+
 <app-navbar />
+
 <main class="app-shell">
   <router-outlet />
 </main>
+
 <footer class="app-footer">
   <div class="container footer-content">
     <div class="footer-brand">
-      <span class="footer-title">MiPQR — Plataforma de Gestión y Trazabilidad de PQR</span>
-      <span class="footer-copy">Clínica Dolormed • Proyecto Académico UCEVA 2026</span>
+      <div class="footer-brand__row">
+        <span class="eyebrow-pill eyebrow-pill--dark">MiPQR</span>
+        <span class="footer-title">Plataforma de Gestión y Trazabilidad de PQR</span>
+      </div>
+      <span class="footer-copy">
+        Clínica Dolormed &bull; Proyecto Académico UCEVA <span class="tnum">2026</span>
+      </span>
     </div>
-    <div class="footer-links">
-      <span>Garantía de transparencia y calidad en la atención al usuario</span>
+
+    <div class="footer-right">
+      <nav class="footer-nav" aria-label="Enlaces rápidos">
+        <a routerLink="/registro-pqr">Radicar</a>
+        <a routerLink="/consulta">Trazabilidad</a>
+        <a routerLink="/login">Acceso SIAU</a>
+      </nav>
+      <div class="footer-status">
+        <span class="footer-status__spark" aria-hidden="true"></span>
+        <span>Transparencia y atención al usuario activa</span>
+      </div>
     </div>
   </div>
 </footer>
