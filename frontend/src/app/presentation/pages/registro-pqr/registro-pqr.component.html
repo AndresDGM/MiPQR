@@ -1,32 +1,33 @@
 <div class="container pqr-register">
   @if (state().createdPqr) {
-    <!-- Vista de Confirmación con Código de Seguimiento -->
-    <div class="card success-card">
-      <h2>Solicitud radicada exitosamente</h2>
-      <p class="text-muted">
-        Su requerimiento ha sido registrado formalmente en el sistema de la Clínica Dolormed.
+    <!-- Vista de Confirmación Mixta (Light Shell + Dark Obsidian Ticket) -->
+    <div class="card-marketing success-card">
+      <span class="eyebrow-pill">Radicación Exitosa</span>
+      <h2 class="mt-2">Solicitud registrada formalmente</h2>
+      <p class="text-muted mt-2">
+        Su requerimiento fue ingresado al sistema SIAU de la Clínica Dolormed.
       </p>
 
-      <div class="code-box">
-        <span class="code-box__label">Código Único de Seguimiento:</span>
+      <div class="card-obsidian code-box">
+        <span class="code-box__label">Código Único de Seguimiento</span>
         <span class="code-box__code">{{ state().createdPqr?.codigoSeguimiento }}</span>
         <span class="code-box__hint">
-          Guarde este código para consultar el avance y la respuesta oficial de su caso.
+          Conserve este identificador para consultar avances y respuesta oficial en línea.
         </span>
       </div>
 
       <div class="summary-details">
         <div class="summary-item">
-          <span class="summary-item__label">Tipo:</span>
+          <span class="summary-item__label">Tipo</span>
           <app-badge-tipo [tipo]="state().createdPqr!.tipoPqr" />
         </div>
         <div class="summary-item">
-          <span class="summary-item__label">Asunto:</span>
-          <span>{{ state().createdPqr?.asunto }}</span>
+          <span class="summary-item__label">Asunto</span>
+          <span class="summary-item__val">{{ state().createdPqr?.asunto }}</span>
         </div>
         <div class="summary-item">
-          <span class="summary-item__label">Solicitante:</span>
-          <span>{{ state().createdPqr?.nombreSolicitante }}</span>
+          <span class="summary-item__label">Solicitante</span>
+          <span class="summary-item__val">{{ state().createdPqr?.nombreSolicitante }}</span>
         </div>
       </div>
 
@@ -36,7 +37,7 @@
           class="btn btn-primary"
           (click)="goToConsulta(state().createdPqr!.codigoSeguimiento)"
         >
-          Consultar Estado Ahora
+          Consultar Estado Ahora &rarr;
         </button>
         <button type="button" class="btn btn-outline" (click)="resetForm()">
           Radicar Otra Solicitud
@@ -44,17 +45,21 @@
       </div>
     </div>
   } @else {
-    <!-- Formulario de Radicación -->
-    <div class="card form-card">
-      <div class="form-card__header">
-        <h2>Radicación de Solicitud PQR</h2>
-        <p class="text-muted">
-          Diligencie el siguiente formulario para presentar su petición, queja, reclamo o sugerencia.
-        </p>
+    <!-- Encabezado de Página -->
+    <div class="page-intro">
+      <div class="page-intro__tags">
+        <span class="eyebrow-pill">Trámite en Línea</span>
       </div>
+      <h2>Radicación de Solicitud PQR</h2>
+      <p class="text-muted">
+        Diligencie el formulario para presentar su petición, queja, reclamo o sugerencia ante el equipo SIAU.
+      </p>
+    </div>
 
+    <!-- Formulario de Radicación -->
+    <div class="card-marketing form-card">
       @if (state().error) {
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mb-4" role="alert">
           {{ state().error }}
         </div>
       }
@@ -65,9 +70,12 @@
         />
       } @else {
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <!-- Datos del Solicitante -->
+          <!-- 1. Datos del Solicitante -->
           <div class="form-section">
-            <h3 class="form-section__title">1. Información del Solicitante</h3>
+            <div class="form-section__head">
+              <span class="step-pill tnum">01</span>
+              <h3 class="form-section__title">Información del Solicitante</h3>
+            </div>
             <div class="form-row">
               <div class="form-group">
                 <label for="nombreSolicitante">Nombre Completo *</label>
@@ -111,9 +119,12 @@
             </div>
           </div>
 
-          <!-- Clasificación de la Solicitud -->
+          <!-- 2. Clasificación de la Solicitud -->
           <div class="form-section">
-            <h3 class="form-section__title">2. Clasificación de la PQR</h3>
+            <div class="form-section__head">
+              <span class="step-pill tnum">02</span>
+              <h3 class="form-section__title">Clasificación de la PQR</h3>
+            </div>
             <div class="form-row form-row--2">
               <div class="form-group">
                 <label for="tipoPqr">Tipo de Solicitud *</label>
@@ -135,9 +146,12 @@
             </div>
           </div>
 
-          <!-- Detalle de la Solicitud -->
-          <div class="form-section">
-            <h3 class="form-section__title">3. Detalle de los Hechos</h3>
+          <!-- 3. Detalle de la Solicitud -->
+          <div class="form-section form-section--last">
+            <div class="form-section__head">
+              <span class="step-pill tnum">03</span>
+              <h3 class="form-section__title">Detalle de los Hechos</h3>
+            </div>
             <div class="form-group">
               <label for="asunto">Asunto Breve *</label>
               <input
@@ -165,8 +179,8 @@
 
           <div class="form-actions">
             <a routerLink="/" class="btn btn-outline">Cancelar</a>
-            <button type="submit" class="btn btn-accent" [disabled]="form.invalid">
-              Radicar Solicitud
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+              Radicar Solicitud &rarr;
             </button>
           </div>
         </form>

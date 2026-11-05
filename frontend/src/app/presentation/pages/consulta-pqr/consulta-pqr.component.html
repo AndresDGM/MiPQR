@@ -1,27 +1,32 @@
 <div class="container consulta-page">
-  <!-- Cabecera y buscador -->
-  <div class="card search-card">
-    <div class="search-card__header">
-      <h2>Consulta de Estado y Trazabilidad</h2>
-      <p class="text-muted">
-        Ingrese el código alfanumérico único radicado para conocer el avance de su PQR
-      </p>
+  <div class="consulta-intro">
+    <div class="consulta-intro__tags">
+      <span class="eyebrow-pill">Seguimiento Público</span>
     </div>
+    <h2>Consulta de Estado y Trazabilidad</h2>
+    <p class="text-muted">
+      Ingrese el código alfanumérico único asignado al radicar para verificar el avance de su PQR.
+    </p>
+  </div>
 
+  <!-- Buscador -->
+  <div class="card-marketing search-card">
     <form (submit)="$event.preventDefault(); onSearch()" class="search-form">
+      <label for="codigoRadicado" class="search-label">Código de seguimiento</label>
       <div class="search-input-group">
         <input
+          id="codigoRadicado"
           type="text"
           [formControl]="codigoControl"
-          placeholder="Ej: PQR-2026-0101"
+          placeholder="PQR-2026-0101"
           class="search-input"
         />
         <button
           type="submit"
-          class="btn btn-primary"
+          class="btn btn-primary btn-lg"
           [disabled]="codigoControl.invalid || state().loading"
         >
-          Consultar Estado
+          Consultar Estado &rarr;
         </button>
       </div>
     </form>
@@ -45,19 +50,21 @@
   <!-- Resultados de la PQR encontrada -->
   @if (!state().loading && state().pqr; as pqr) {
     <div class="results mt-6">
-      <!-- Tarjeta Principal de la PQR -->
+      <!-- Tarjeta Principal con Cabecera Dark Obsidian -->
       <div class="card pqr-result-card">
-        <div class="pqr-result-card__header">
+        <div class="card-obsidian pqr-ticket-banner">
           <div>
-            <div class="pqr-result-card__code">{{ pqr.codigoSeguimiento }}</div>
-            <div class="pqr-result-card__tags">
-              <app-badge-tipo [tipo]="pqr.tipoPqr" />
-              @if (pqr.categoria) {
-                <span class="badge-categoria">{{ pqr.categoria }}</span>
-              }
-            </div>
+            <span class="pqr-ticket-banner__caption">Radicado verificado</span>
+            <div class="pqr-ticket-banner__code">{{ pqr.codigoSeguimiento }}</div>
           </div>
           <app-badge-estado [estado]="pqr.estado" />
+        </div>
+
+        <div class="pqr-result-card__tags">
+          <app-badge-tipo [tipo]="pqr.tipoPqr" />
+          @if (pqr.categoria) {
+            <span class="badge">{{ pqr.categoria }}</span>
+          }
         </div>
 
         <h3 class="pqr-result-card__asunto">{{ pqr.asunto }}</h3>
@@ -65,21 +72,21 @@
 
         <div class="pqr-meta-grid">
           <div class="pqr-meta-item">
-            <span class="pqr-meta-item__label">Fecha de Radicación:</span>
-            <span class="pqr-meta-item__val">{{ pqr.fechaRegistro | date:'medium' }}</span>
+            <span class="pqr-meta-item__label">Fecha de Radicación</span>
+            <span class="pqr-meta-item__val tnum">{{ pqr.fechaRegistro | date:'medium' }}</span>
           </div>
           <div class="pqr-meta-item">
-            <span class="pqr-meta-item__label">Solicitante:</span>
+            <span class="pqr-meta-item__label">Solicitante</span>
             <span class="pqr-meta-item__val">{{ pqr.nombreSolicitante || 'Usuario Registrado' }}</span>
           </div>
           <div class="pqr-meta-item">
-            <span class="pqr-meta-item__label">Responsable Asignado:</span>
+            <span class="pqr-meta-item__label">Responsable Asignado</span>
             <span class="pqr-meta-item__val">{{ pqr.nombreResponsable || 'En espera de asignación' }}</span>
           </div>
           @if (pqr.fechaCierre) {
             <div class="pqr-meta-item">
-              <span class="pqr-meta-item__label">Fecha de Cierre:</span>
-              <span class="pqr-meta-item__val">{{ pqr.fechaCierre | date:'medium' }}</span>
+              <span class="pqr-meta-item__label">Fecha de Cierre</span>
+              <span class="pqr-meta-item__val tnum">{{ pqr.fechaCierre | date:'medium' }}</span>
             </div>
           }
         </div>
@@ -87,7 +94,7 @@
         @if (authService.userRol() === 'Analista SIAU' || authService.userRol() === 'Responsable' || authService.userRol() === 'Directivo') {
           <div class="pqr-result-card__actions mt-4">
             <a [routerLink]="['/detalle', pqr.idPqr]" class="btn btn-sm btn-outline">
-              Gestionar en Panel SIAU
+              Gestionar en Panel SIAU &rarr;
             </a>
           </div>
         }
@@ -95,8 +102,13 @@
 
       <!-- Línea de Tiempo / Historial de Trazabilidad -->
       <div class="card history-card mt-6">
-        <h3 class="history-card__title">Historial de Trazabilidad y Eventos</h3>
-        <p class="text-muted mb-4">Registro inmutable de las acciones realizadas durante la atención de la solicitud</p>
+        <div class="history-card__head">
+          <div>
+            <h3>Historial de Trazabilidad y Eventos</h3>
+            <p class="text-muted">Registro inmutable de las actuaciones realizadas sobre la solicitud</p>
+          </div>
+          <span class="badge">Trazabilidad</span>
+        </div>
 
         @if (state().history.length === 0) {
           <p class="text-muted">No hay eventos registrados aún para este radicado.</p>
@@ -108,12 +120,12 @@
                 <div class="timeline__content">
                   <div class="timeline__top">
                     <span class="timeline__action">{{ item.accion }}</span>
-                    <span class="timeline__date text-muted">{{ item.fecha | date:'medium' }}</span>
+                    <span class="timeline__date">{{ item.fecha | date:'medium' }}</span>
                   </div>
-                  <div class="timeline__user text-muted">
+                  <div class="timeline__user">
                     Por: <strong>{{ item.nombreUsuario }}</strong>
                     @if (item.estado) {
-                      <span class="timeline__status">• Estado: {{ item.estado }}</span>
+                      <span class="timeline__status">&bull; {{ item.estado }}</span>
                     }
                   </div>
                   @if (item.observacion) {

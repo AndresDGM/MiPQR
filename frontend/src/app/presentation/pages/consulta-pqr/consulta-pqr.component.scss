@@ -1,24 +1,44 @@
 @use 'styles/variables' as *;
 
 .consulta-page {
-  padding: 2.5rem 1rem 4rem;
-  max-width: 860px;
+  padding-top: 48px;
+  padding-bottom: 64px;
+  max-width: 880px;
+}
+
+.consulta-intro {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  p {
+    font-size: 0.9375rem;
+  }
 }
 
 .search-card {
-  &__header {
-    text-align: center;
-    margin-bottom: 1.5rem;
+  padding: 24px;
+}
 
-    h2 {
-      margin-bottom: 0.35rem;
-    }
-  }
+.search-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: $color-void-black;
+  margin-bottom: 8px;
 }
 
 .search-input-group {
   display: flex;
-  gap: 0.75rem;
+  gap: 10px;
 
   @media (max-width: 600px) {
     flex-direction: column;
@@ -27,198 +47,118 @@
 
 .search-input {
   flex: 1;
-  font-size: 1.0625rem;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  border: 2px solid #d1d5db;
+  font-family: $font-mono;
+  font-size: 0.9375rem;
+  padding: 8px 14px;
+  border-radius: $radius-input;
+  border: 1px solid $color-hairline;
+  background-color: $color-fog-white;
   outline: none;
   text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: $color-dark;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: $color-void-black;
+  transition: border-color $transition-fast, box-shadow $transition-fast, background-color $transition-fast;
+
+  &::placeholder {
+    color: $color-stone;
+  }
 
   &:focus {
-    border-color: $color-accent;
-    box-shadow: 0 0 0 3px rgba($color-accent, 0.15);
+    background-color: $color-pure-white;
+    border-color: $color-electric-violet;
+    box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.2);
   }
 }
 
-.example-codes {
+.pqr-ticket-banner {
+  padding: 18px 20px;
+  border-radius: $radius-code;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.8125rem;
+  justify-content: space-between;
+  gap: 12px;
   flex-wrap: wrap;
-}
+  margin-bottom: 18px;
 
-.btn-link {
-  background: none;
-  border: none;
-  color: $color-primary;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  font-size: 0.8125rem;
+  &__caption {
+    font-family: $font-inter;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $color-slate-mid;
+  }
 
-  &:hover {
-    color: $color-accent;
+  &__code {
+    font-family: $font-mono;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: $color-cyan-spark;
+    margin-top: 2px;
   }
 }
 
 .pqr-result-card {
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-
-  &__code {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: $color-primary;
-    letter-spacing: 0.5px;
-  }
-
   &__tags {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.35rem;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
   }
 
   &__asunto {
-    font-size: 1.125rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 6px;
   }
 
   &__desc {
     font-size: 0.9375rem;
-    color: $color-dark;
-    opacity: 0.85;
+    color: $color-graphite;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
   }
-}
-
-.badge-categoria {
-  background-color: $color-surface;
-  color: $color-dark;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
 }
 
 .pqr-meta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
-  background-color: $color-surface;
-  border-radius: $border-radius-md;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  padding: 16px;
+  background-color: $color-fog-white;
+  border: 1px solid $color-mist;
+  border-radius: $radius-code;
 }
 
 .pqr-meta-item {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 2px;
 
   &__label {
-    font-size: 0.75rem;
-    color: $color-dark;
-    opacity: 0.7;
-    text-transform: uppercase;
-    font-weight: 600;
+    font-family: $font-inter;
+    font-size: 0.6875rem;
+    color: $color-ash;
+    font-weight: 500;
   }
 
   &__val {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
+    color: $color-void-black;
   }
 }
 
-/* Timeline */
-.timeline {
-  position: relative;
-  padding-left: 1.5rem;
+.history-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 6px;
-    bottom: 6px;
-    left: 6px;
-    width: 2px;
-    background-color: rgba($color-primary, 0.2);
-  }
-
-  &__item {
-    position: relative;
-    padding-bottom: 1.5rem;
-
-    &:last-child {
-      padding-bottom: 0;
-    }
-  }
-
-  &__marker {
-    position: absolute;
-    left: -1.5rem;
-    top: 4px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background-color: $color-primary;
-    border: 3px solid $color-white;
-    box-shadow: 0 0 0 2px $color-primary;
-  }
-
-  &__content {
-    background-color: $color-surface;
-    border-radius: $border-radius-md;
-    padding: 0.875rem 1rem;
-  }
-
-  &__top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  &__action {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: $color-dark;
-  }
-
-  &__date {
-    font-size: 0.75rem;
-  }
-
-  &__user {
+  p {
     font-size: 0.8125rem;
-    margin: 0.25rem 0 0.5rem;
-  }
-
-  &__status {
-    color: $color-accent;
-    font-weight: 600;
-  }
-
-  &__observation {
-    font-size: 0.875rem;
-    color: $color-dark;
-    opacity: 0.85;
-    background-color: $color-white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    border-left: 3px solid $color-accent;
-    margin-top: 0.375rem;
+    margin-top: 4px;
   }
 }

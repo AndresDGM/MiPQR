@@ -1,109 +1,134 @@
 @use 'styles/variables' as *;
 
 .bandeja-page {
-  padding: 2.5rem 1rem 4rem;
+  padding-top: 40px;
+  padding-bottom: 64px;
 }
 
 .bandeja-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
 
-  &__user {
+  &__left {
     display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    p {
+      font-size: 0.9375rem;
+    }
+  }
+
+  &__tags {
+    display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
-    background-color: $color-white;
-    padding: 0.5rem 1rem;
-    border-radius: $border-radius-md;
-    border: 1px solid rgba($color-dark, 0.08);
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__user {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: $color-pure-white;
+    padding: 8px 12px;
+    border-radius: $radius-card-sm;
+    box-shadow: $shadow-card-light;
   }
 }
 
 .user-greeting {
-  font-size: 0.875rem;
-}
+  font-size: 0.8125rem;
+  color: $color-graphite;
 
-.user-role {
-  background-color: rgba($color-accent, 0.15);
-  color: $color-accent;
+  strong {
+    color: $color-void-black;
+    font-weight: 600;
+  }
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+
+  @media (max-width: 980px) {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  }
 }
 
 .stat-card {
-  background-color: $color-white;
-  border: 1px solid rgba($color-dark, 0.08);
-  border-radius: $border-radius-md;
-  padding: 0.875rem 1rem;
+  appearance: none;
+  background-color: $color-pure-white;
+  border: 1px solid transparent;
+  border-radius: $radius-card-sm;
+  box-shadow: $shadow-card-light;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  gap: 6px;
   cursor: pointer;
-  transition: $transition-base;
+  text-align: left;
+  transition: box-shadow $transition-fast, border-color $transition-fast, transform $transition-fast;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-sm;
+    transform: translateY(-1px);
+    border-color: $color-hairline;
   }
 
   &.active {
-    border-color: $color-primary;
-    box-shadow: 0 0 0 2px rgba($color-primary, 0.3);
-  }
-
-  &__val {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: $color-dark;
+    border-color: $color-electric-violet;
+    box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.16);
   }
 
   &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: $font-inter;
     font-size: 0.6875rem;
-    font-weight: 600;
-    color: $color-dark;
-    opacity: 0.7;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-top: 0.25rem;
+    font-weight: 500;
+    color: $color-graphite;
   }
 
-  &--recibida &__val {
-    color: $estado-recibida;
+  &__val {
+    font-family: $font-geist;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: $color-void-black;
   }
-  &--revision &__val {
-    color: $estado-revision;
+
+  .stat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: $radius-pill;
+    background-color: $color-ash;
+    display: inline-block;
   }
-  &--asignada &__val {
-    color: $estado-asignada;
-  }
-  &--gestion &__val {
-    color: $estado-gestion;
-  }
-  &--respondida &__val {
-    color: $estado-respondida;
-  }
-  &--cerrada &__val {
-    color: $estado-cerrada;
-  }
+
+  &--recibida .stat-dot { background-color: $estado-recibida; }
+  &--revision .stat-dot { background-color: $estado-revision; }
+  &--asignada .stat-dot { background-color: $estado-asignada; }
+  &--gestion .stat-dot { background-color: $estado-gestion; }
+  &--respondida .stat-dot { background-color: $estado-respondida; }
+  &--cerrada .stat-dot { background-color: $estado-cerrada; }
 }
 
 .filters-card {
-  padding: 1.25rem;
+  padding: 18px 20px;
 }
 
 .filters-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 1rem;
+  gap: 12px;
 
   @media (max-width: 860px) {
     grid-template-columns: 1fr 1fr;
@@ -115,41 +140,13 @@
 }
 
 .filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-
-  label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: $color-dark;
-    opacity: 0.7;
-  }
-
-  input,
-  select {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    outline: none;
-
-    &:focus {
-      border-color: $color-accent;
-    }
-  }
+  margin-bottom: 0;
 }
 
 .table-meta {
-  font-size: 0.8125rem;
-}
+  font-size: 0.75rem;
 
-.alert-danger {
-  background-color: rgba($color-danger, 0.12);
-  border: 1px solid rgba($color-danger, 0.3);
-  color: $color-danger;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  strong {
+    color: $color-void-black;
+  }
 }
