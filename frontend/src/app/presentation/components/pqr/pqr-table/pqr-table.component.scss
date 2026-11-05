@@ -3,41 +3,39 @@
 .table-responsive {
   width: 100%;
   overflow-x: auto;
-  background-color: $color-white;
-  border-radius: $border-radius-md;
-  box-shadow: $shadow-md;
-  border: 1px solid rgba($color-dark, 0.08);
+  background-color: $color-pure-white;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card-light;
 }
 
 .pqr-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 
   thead {
-    background-color: rgba($color-primary, 0.05);
-    border-bottom: 2px solid $color-primary;
+    background-color: $color-fog-white;
+    border-bottom: 1px solid $color-hairline;
 
     th {
-      padding: 0.875rem 1rem;
-      font-weight: 700;
-      color: $color-primary;
+      padding: 11px 16px;
+      font-family: $font-inter;
+      font-weight: 500;
+      color: $color-graphite;
       font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: -0.005em;
       white-space: nowrap;
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid rgba($color-dark, 0.06);
-      transition: background-color 0.15s;
+      border-bottom: 1px solid $color-mist;
+      transition: background-color $transition-fast;
 
       &:hover {
-        background-color: rgba($color-accent, 0.08);
-        box-shadow: inset 3px 0 0 $color-accent;
+        background-color: $color-fog-white;
       }
 
       &:last-child {
@@ -45,35 +43,59 @@
       }
 
       td {
-        padding: 0.875rem 1rem;
+        padding: 13px 16px;
         vertical-align: middle;
+        color: $color-void-black;
       }
     }
   }
 }
 
 .td-code {
-  font-weight: 700;
-  color: $color-primary;
   white-space: nowrap;
 }
 
+.code-link {
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: $color-void-black;
+  padding: 3px 7px;
+  border-radius: $radius-button;
+  background-color: $color-fog-white;
+  border: 1px solid $color-mist;
+  transition: border-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    color: $color-electric-violet;
+    border-color: rgba(108, 71, 255, 0.35);
+  }
+}
+
 .td-subject {
-  max-width: 220px;
+  max-width: 240px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
+  color: $color-void-black;
 }
 
 .td-category,
 .td-requester,
 .td-responsible {
   white-space: nowrap;
-  font-size: 0.8125rem;
+  color: $color-graphite;
+}
+
+.td-unassigned {
+  color: $color-stone;
+  font-style: italic;
 }
 
 .td-date {
   white-space: nowrap;
   font-size: 0.75rem;
+  color: $color-ash;
 }

@@ -3,29 +3,32 @@
 .badge-tipo {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.5rem;
-  border-radius: $border-radius-sm;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.2px;
+  padding: 4px 10px;
+  border-radius: $radius-pill;
+  font-family: $font-geist;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
 
   &--peticion {
-    background-color: rgba($tipo-peticion, 0.12);
-    color: $tipo-peticion;
+    background-color: $color-mist;
+    color: $color-electric-violet;
   }
 
   &--queja {
-    background-color: rgba($tipo-queja, 0.12);
+    background-color: rgba($tipo-queja, 0.09);
     color: $tipo-queja;
   }
 
   &--reclamo {
-    background-color: rgba($tipo-reclamo, 0.12);
+    background-color: rgba($tipo-reclamo, 0.09);
     color: $tipo-reclamo;
   }
 
   &--sugerencia {
-    background-color: rgba($tipo-sugerencia, 0.12);
+    background-color: rgba($tipo-sugerencia, 0.09);
     color: $tipo-sugerencia;
   }
 }

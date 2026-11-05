@@ -11,6 +11,12 @@ import { Component, input } from '@angular/core';
   standalone: true,
   template: `
     <div class="empty-state">
+      <div class="empty-state__icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
       <h3 class="empty-state__title">{{ titulo() }}</h3>
       @if (descripcion()) {
         <p class="empty-state__description">{{ descripcion() }}</p>

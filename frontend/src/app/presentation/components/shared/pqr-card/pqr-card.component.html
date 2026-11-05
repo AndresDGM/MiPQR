@@ -4,7 +4,7 @@
       <span class="pqr-card__codigo">{{ pqr().codigoSeguimiento }}</span>
       <app-badge-tipo [tipo]="pqr().tipoPqr" />
       @if (pqr().categoria) {
-        <span class="pqr-card__categoria text-muted">{{ pqr().categoria }}</span>
+        <span class="pqr-card__categoria">{{ pqr().categoria }}</span>
       }
     </div>
     <app-badge-estado [estado]="pqr().estado" />
@@ -15,13 +15,13 @@
 
   <div class="pqr-card__footer">
     <div class="pqr-card__info">
-      <span class="text-muted">Radicado: {{ pqr().fechaRegistro | date:'mediumDate' }}</span>
+      <span class="tnum">Radicado: {{ pqr().fechaRegistro | date:'mediumDate' }}</span>
       @if (pqr().nombreSolicitante) {
-        <span class="text-muted">• {{ pqr().nombreSolicitante }}</span>
+        <span>&bull; {{ pqr().nombreSolicitante }}</span>
       }
     </div>
     <a [routerLink]="['/detalle', pqr().idPqr]" class="btn btn-sm btn-outline">
-      Ver Detalle
+      Ver Detalle &rarr;
     </a>
   </div>
 </article>
