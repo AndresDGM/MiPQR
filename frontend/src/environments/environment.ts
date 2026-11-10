@@ -12,5 +12,6 @@ export const environment = {
     users: 'node' as const,
     pqrs: 'local' as const,
     categories: 'local' as const,
+    attachments: 'local' as const,
   },
 };
