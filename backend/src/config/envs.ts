@@ -17,4 +17,9 @@ export const envs = {
   RSA_E: env.get('RSA_E').default('10001').asString(),
   RSA_D: env.get('RSA_D').required().asString(),
   JWT_EXPIRES_IN: env.get('JWT_EXPIRES_IN').default('8h').asString(),
+  // Almacenamiento de archivos adjuntos (fuera de rutas publicas)
+  STORAGE_PATH: env.get('STORAGE_PATH').default('./uploads/adjuntos').asString(),
+  MAX_FILE_SIZE_MB: env.get('MAX_FILE_SIZE_MB').default('10').asIntPositive(),
+  MAX_FILES_PER_REQUEST: env.get('MAX_FILES_PER_REQUEST').default('5').asIntPositive(),
+  MAX_TOTAL_SIZE_MB: env.get('MAX_TOTAL_SIZE_MB').default('25').asIntPositive(),
 };
