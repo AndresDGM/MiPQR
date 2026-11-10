@@ -13,10 +13,14 @@ import {
   GetUsersByRolUseCase,
   ResponderPqrUseCase,
   UpdatePqrEstadoUseCase,
+  UploadPqrAttachmentsUseCase,
+  GetPqrAttachmentsUseCase,
+  DownloadPqrAttachmentUseCase,
+  DeletePqrAttachmentUseCase,
 } from '../usecases';
 
 /**
- * Listado de casos de uso del dominio PQR.
+ * Listado de casos de uso del dominio PQR y Documentos de Soporte.
  */
 export const PQR_USE_CASES: Provider[] = [
   GetAllPqrsUseCase,
@@ -27,6 +31,10 @@ export const PQR_USE_CASES: Provider[] = [
   AssignPqrResponsableUseCase,
   ResponderPqrUseCase,
   GetPqrHistorialUseCase,
+  UploadPqrAttachmentsUseCase,
+  GetPqrAttachmentsUseCase,
+  DownloadPqrAttachmentUseCase,
+  DeletePqrAttachmentUseCase,
 ];
 
 /**
