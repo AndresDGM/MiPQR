@@ -230,3 +230,27 @@
     margin-top: 0.375rem;
   }
 }
+
+.attachments-card {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $color-dark;
+    margin: 0;
+  }
+}
+
+.attach-more-box {
+  padding: $spacing-md;
+  background-color: $color-surface;
+  border-radius: $border-radius-md;
+  border: 1px solid #e2e8f0;
+}

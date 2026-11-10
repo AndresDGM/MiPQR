@@ -1,3 +1,4 @@
+import { PqrAttachment } from '../../core/domain/models/pqr-attachment.model';
 import { PqrHistory } from '../../core/domain/models/pqr-history.model';
 import { Pqr } from '../../core/domain/models/pqr.model';
 
@@ -12,5 +13,7 @@ export interface VmConsultaPqr {
   searched: boolean;
   pqr: Pqr | null;
   history: PqrHistory[];
+  attachments?: PqrAttachment[];
+  loadingAttachments?: boolean;
   error: string | null;
 }

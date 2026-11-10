@@ -13,4 +13,5 @@ export interface VmRegistroPqr {
   categories: Category[];
   createdPqr: Pqr | null;
   error: string | null;
+  attachedFilesCount?: number;
 }

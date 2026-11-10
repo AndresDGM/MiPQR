@@ -4,8 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/application/auth';
 import { CreatePqrUseCase } from '../../../core/application/usecases/create-pqr.usecase';
 import { GetAllCategoriesUseCase } from '../../../core/application/usecases/get-all-categories.usecase';
+import { UploadPqrAttachmentsUseCase } from '../../../core/application/usecases/upload-pqr-attachments.usecase';
 import { CreatePqrPayload, PqrType } from '../../../core/domain/models/pqr.model';
-import { BadgeTipoComponent, LoadingSpinnerComponent } from '../../components/shared';
+import {
+  BadgeTipoComponent,
+  FileUploadComponent,
+  LoadingSpinnerComponent,
+} from '../../components/shared';
 import { VmRegistroPqr } from '../../interfaces/vm-registro-pqr.interface';
 
 /**
@@ -17,17 +22,25 @@ import { VmRegistroPqr } from '../../interfaces/vm-registro-pqr.interface';
 @Component({
   selector: 'app-registro-pqr',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, LoadingSpinnerComponent, BadgeTipoComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    LoadingSpinnerComponent,
+    BadgeTipoComponent,
+    FileUploadComponent,
+  ],
   templateUrl: './registro-pqr.component.html',
   styleUrl: './registro-pqr.component.scss',
 })
 export class RegistroPqrComponent implements OnInit {
   private createPqrUseCase = inject(CreatePqrUseCase);
   private getAllCategoriesUseCase = inject(GetAllCategoriesUseCase);
+  private uploadPqrAttachmentsUseCase = inject(UploadPqrAttachmentsUseCase);
   authService = inject(AuthService);
   private router = inject(Router);
 
   tiposPqr: PqrType[] = ['Peticion', 'Queja', 'Reclamo', 'Sugerencia'];
+  selectedFiles = signal<File[]>([]);
 
   state = signal<VmRegistroPqr>({
     loadingCategories: true,
@@ -35,6 +48,7 @@ export class RegistroPqrComponent implements OnInit {
     categories: [],
     createdPqr: null,
     error: null,
+    attachedFilesCount: 0,
   });
 
   form = new FormGroup({
@@ -92,6 +106,10 @@ export class RegistroPqrComponent implements OnInit {
     });
   }
 
+  onFilesSelected(files: File[]): void {
+    this.selectedFiles.set(files);
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -113,11 +131,39 @@ export class RegistroPqrComponent implements OnInit {
 
     this.createPqrUseCase.execute(payload).subscribe({
       next: (pqr) => {
-        this.state.update((s) => ({
-          ...s,
-          submitting: false,
-          createdPqr: pqr,
-        }));
+        const filesToUpload = this.selectedFiles();
+        if (filesToUpload.length > 0) {
+          // Si el usuario adjuntó archivos, subirlos vinculados a la PQR creada
+          this.uploadPqrAttachmentsUseCase.execute(pqr.idPqr, filesToUpload).subscribe({
+            next: (attachments) => {
+              this.state.update((s) => ({
+                ...s,
+                submitting: false,
+                createdPqr: pqr,
+                attachedFilesCount: attachments.length,
+              }));
+              this.selectedFiles.set([]);
+            },
+            error: (err) => {
+              // La PQR se radicó con éxito pero hubo advertencia en los adjuntos
+              this.state.update((s) => ({
+                ...s,
+                submitting: false,
+                createdPqr: pqr,
+                attachedFilesCount: 0,
+                error: `La PQR se radicó exitosamente, pero ocurrió un inconveniente al cargar los soportes: ${err.message || 'Error en carga de archivos'}. Puede aportarlos posteriormente con el analista.`,
+              }));
+              this.selectedFiles.set([]);
+            },
+          });
+        } else {
+          this.state.update((s) => ({
+            ...s,
+            submitting: false,
+            createdPqr: pqr,
+            attachedFilesCount: 0,
+          }));
+        }
       },
       error: (err) => {
         this.state.update((s) => ({
@@ -130,7 +176,8 @@ export class RegistroPqrComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.state.update((s) => ({ ...s, createdPqr: null, error: null }));
+    this.selectedFiles.set([]);
+    this.state.update((s) => ({ ...s, createdPqr: null, error: null, attachedFilesCount: 0 }));
     this.form.reset({
       tipoPqr: 'Peticion',
       idCategoria: this.state().categories[0]?.idCategoria ?? null,

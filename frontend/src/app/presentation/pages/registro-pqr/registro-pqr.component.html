@@ -28,6 +28,12 @@
           <span class="summary-item__label">Solicitante:</span>
           <span>{{ state().createdPqr?.nombreSolicitante }}</span>
         </div>
+        @if (state().attachedFilesCount && state().attachedFilesCount! > 0) {
+          <div class="summary-item">
+            <span class="summary-item__label">Documentos de soporte:</span>
+            <span>{{ state().attachedFilesCount }} archivo(s) adjunto(s) vinculados a la solicitud</span>
+          </div>
+        }
       </div>
 
       <div class="success-card__actions">
@@ -161,6 +167,14 @@
                 "
               ></textarea>
             </div>
+          </div>
+
+          <!-- Documentos de Soporte -->
+          <div class="form-section">
+            <app-file-upload
+              (filesChange)="onFilesSelected($event)"
+              [disabled]="state().submitting"
+            />
           </div>
 
           <div class="form-actions">
