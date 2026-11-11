@@ -105,6 +105,19 @@
   }
 }
 
+.attachments-card {
+  &__header {
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $color-dark;
+    margin-bottom: 0.25rem;
+  }
+}
+
 .badge-categoria {
   background-color: $color-surface;
   color: $color-dark;

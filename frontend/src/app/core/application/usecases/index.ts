@@ -11,3 +11,7 @@ export * from './get-user-by-id.usecase';
 export * from './get-users-by-rol.usecase';
 export * from './responder-pqr.usecase';
 export * from './update-pqr-estado.usecase';
+export * from './upload-pqr-attachments.usecase';
+export * from './get-pqr-attachments.usecase';
+export * from './download-pqr-attachment.usecase';
+export * from './delete-pqr-attachment.usecase';

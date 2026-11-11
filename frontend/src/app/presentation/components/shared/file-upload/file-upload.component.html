@@ -1,0 +1,159 @@
+<div class="file-upload-section">
+  <div class="file-upload-header">
+    <h3 class="file-upload-title">Documentos de soporte</h3>
+    <p class="file-upload-desc">
+      Adjunta documentos que permitan respaldar tu solicitud. Puedes incluir documentos legales, médicos, fotografías u otras evidencias relacionadas con tu caso.
+    </p>
+  </div>
+
+  <!-- Zona de Drag and Drop -->
+  <div
+    class="dropzone"
+    [class.is-dragging]="isDragging()"
+    [class.is-disabled]="disabled()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="triggerFileInput()"
+    tabindex="0"
+    role="button"
+    (keydown.enter)="triggerFileInput()"
+    (keydown.space)="triggerFileInput()"
+    aria-label="Zona para arrastrar y soltar archivos o pulsar para seleccionar"
+  >
+    <input
+      #fileInput
+      type="file"
+      class="dropzone__input"
+      [accept]="acceptAttr"
+      [multiple]="multiple()"
+      [disabled]="disabled()"
+      (change)="onFileSelected($event)"
+    />
+
+    <div class="dropzone__content">
+      <div class="dropzone__icon-wrapper">
+        <svg
+          class="dropzone__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+      </div>
+
+      <div class="dropzone__text">
+        <span class="dropzone__primary-text">
+          Arrastra y suelta tus archivos aquí, o
+          <span class="dropzone__browse-link">explora tus carpetas</span>
+        </span>
+        <span class="dropzone__secondary-text">
+          Formatos autorizados: PDF, Word (.doc, .docx), imágenes (.jpg, .jpeg, .png).
+        </span>
+        <span class="dropzone__limit-text">
+          Máximo {{ maxFiles() }} archivos (hasta 10 MB individuales, {{ formatMaxBytes() }} en total).
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de Error / Alerta de Validación -->
+  @if (errorMessage()) {
+    <div class="upload-alert upload-alert--danger" role="alert">
+      <svg
+        class="upload-alert__icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span class="upload-alert__text">{{ errorMessage() }}</span>
+      <button
+        type="button"
+        class="upload-alert__close"
+        (click)="errorMessage.set(null)"
+        aria-label="Cerrar alerta"
+      >
+        &times;
+      </button>
+    </div>
+  }
+
+  <!-- Lista de Archivos Seleccionados -->
+  @if (selectedFiles().length > 0) {
+    <div class="selected-files">
+      <div class="selected-files__header">
+        <span class="selected-files__count">
+          Archivos seleccionados ({{ selectedFiles().length }} de {{ maxFiles() }}) -
+          Peso total: {{ formatTotalBytes() }} / {{ formatMaxBytes() }}
+        </span>
+        @if (!disabled()) {
+          <button
+            type="button"
+            class="btn-text-danger"
+            (click)="clearFiles()"
+          >
+            Quitar todos
+          </button>
+        }
+      </div>
+
+      <div class="selected-files__list">
+        @for (item of selectedFiles(); track item.id) {
+          <div class="file-item">
+            <div class="file-item__info">
+              <!-- Badge de Tipo de Archivo -->
+              <span
+                class="file-badge"
+                [class.file-badge--pdf]="item.category === 'pdf'"
+                [class.file-badge--word]="item.category === 'word'"
+                [class.file-badge--image]="item.category === 'image'"
+              >
+                {{ item.extension.replace('.', '').toUpperCase() }}
+              </span>
+
+              <div class="file-item__details">
+                <span class="file-item__name" [title]="item.name">{{ item.name }}</span>
+                <span class="file-item__size">{{ item.sizeFormatted }}</span>
+              </div>
+            </div>
+
+            @if (!disabled()) {
+              <button
+                type="button"
+                class="file-item__remove"
+                (click)="removeFile(item.id)"
+                [attr.aria-label]="'Quitar ' + item.name"
+                title="Quitar archivo"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

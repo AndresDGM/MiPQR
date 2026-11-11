@@ -1,0 +1,115 @@
+@if (attachment()) {
+  <div
+    class="modal-backdrop"
+    (click)="onBackdropClick($event)"
+    (keydown)="onKeyDown($event)"
+    tabindex="0"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Visualización de ' + attachment()?.nombreOriginal"
+  >
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header__meta">
+          <span
+            class="file-badge"
+            [class.file-badge--pdf]="category() === 'pdf'"
+            [class.file-badge--image]="category() === 'image'"
+            [class.file-badge--word]="category() === 'word'"
+          >
+            {{ attachment()?.extension?.replace('.', '')?.toUpperCase() }}
+          </span>
+          <div class="modal-header__titles">
+            <h3 class="modal-header__filename" [title]="attachment()?.nombreOriginal">
+              {{ attachment()?.nombreOriginal }}
+            </h3>
+            <span class="modal-header__size">
+              {{ formatSize(attachment()?.tamanoBytes) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-header__actions">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline"
+            (click)="downloadFile.emit(attachment()!)"
+            title="Descargar archivo en su dispositivo"
+          >
+            <svg
+              class="icon-sm"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Descargar</span>
+          </button>
+
+          <button
+            type="button"
+            class="modal-close-btn"
+            (click)="closeModal.emit()"
+            aria-label="Cerrar visor"
+            title="Cerrar (Esc)"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        @if (blobUrl()) {
+          @if (category() === 'pdf') {
+            <object
+              [data]="safeBlobUrl()"
+              type="application/pdf"
+              class="pdf-viewer"
+            >
+              <div class="viewer-fallback">
+                <p>El navegador no puede previsualizar este PDF de manera directa.</p>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  (click)="downloadFile.emit(attachment()!)"
+                >
+                  Descargar Documento PDF
+                </button>
+              </div>
+            </object>
+          } @else if (category() === 'image') {
+            <div class="image-viewer">
+              <img
+                [src]="safeBlobUrl()"
+                [alt]="attachment()?.nombreOriginal"
+                class="preview-img"
+              />
+            </div>
+          } @else {
+            <div class="generic-viewer">
+              <p>Los archivos de Microsoft Word y formatos ofimáticos deben descargarse para abrirse con su procesador de texto.</p>
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="downloadFile.emit(attachment()!)"
+              >
+                Descargar {{ attachment()?.nombreOriginal }}
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="viewer-loading">
+            <div class="spinner"></div>
+            <span>Cargando contenido del documento...</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

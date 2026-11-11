@@ -1,7 +1,9 @@
 import {
   appMiddlewares,
   authController,
+  documentosController,
   passwordCipher,
+  pqrController,
   rolesController,
   usuariosController,
 } from './config/dependencies.js';
@@ -18,6 +20,8 @@ async function main(): Promise<void> {
       authController,
       rolesController,
       usuariosController,
+      documentosController,
+      pqrController,
     },
     appMiddlewares
   );

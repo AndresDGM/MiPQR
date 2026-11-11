@@ -23,3 +23,24 @@ export function authenticate(authenticateUseCase: AuthenticateUseCase): RequestH
     }
   };
 }
+
+/**
+ * Autentica de forma opcional: si se envía token lo valida y adjunta req.user,
+ * si no se envía continúa como petición anónima sin arrojar error.
+ */
+export function optionalAuthenticate(authenticateUseCase: AuthenticateUseCase): RequestHandler {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const header = req.headers.authorization;
+      if (header && header.startsWith(PREFIJO_BEARER)) {
+        const token = header.slice(PREFIJO_BEARER.length);
+        const usuario = await authenticateUseCase.execute(token);
+        req.user = { idUsuario: usuario.idUsuario, idRol: usuario.idRol, rol: usuario.rol };
+      }
+      next();
+    } catch {
+      // Si el token es inválido o expiró en una ruta con auth opcional, continúa como anónimo
+      next();
+    }
+  };
+}
