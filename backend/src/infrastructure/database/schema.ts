@@ -63,14 +63,16 @@ CREATE INDEX IF NOT EXISTS idx_documento_adjunto_id_pqr ON documento_adjunto (id
 CREATE INDEX IF NOT EXISTS idx_documento_adjunto_id_usuario ON documento_adjunto (id_usuario);
 `;
 
-export const seedSql = `
+export const seedRolesSql = `
 INSERT INTO rol (id_rol, nombre, descripcion) VALUES
   (1, 'Solicitante', 'Paciente o usuario externo que radica y consulta sus PQR.'),
   (2, 'Analista SIAU', 'Funcionario de atencion al usuario que clasifica y asigna.'),
   (3, 'Responsable', 'Profesional o jefe de area que gestiona y responde el caso.'),
   (4, 'Directivo', 'Coordinacion y direccion, con acceso de consulta.')
 ON CONFLICT (id_rol) DO NOTHING;
+`;
 
+export const seedPqrSql = `
 INSERT INTO pqr (id_pqr, codigo_seguimiento, id_solicitante, nombre_solicitante, correo_solicitante, identificacion_solicitante, id_categoria, categoria, id_estado, estado, id_responsable, tipo_pqr, asunto, descripcion, fecha_registro) VALUES
   (1, 'PQR-2026-0001', 5, 'Carlos Restrepo', 'carlos.restrepo@gmail.com', '1010101005', 1, 'Atención Médica', 1, 'Recibida', NULL, 'Peticion', 'Solicitud de copia de historia clínica completa', 'Requiero copia completa de mi historia clínica para trámite con especialista.', NOW() - INTERVAL '3 days'),
   (2, 'PQR-2026-0002', 5, 'Carlos Restrepo', 'carlos.restrepo@gmail.com', '1010101005', 2, 'Facturación', 2, 'En revision', 2, 'Reclamo', 'Inconformidad con cobro de cuota moderadora', 'Se realizó cobro de cuota cuando el servicio estaba exento.', NOW() - INTERVAL '2 days'),
