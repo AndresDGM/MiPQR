@@ -1,0 +1,256 @@
+@use 'styles/variables' as *;
+
+.detalle-page {
+  padding: 2rem 1rem 4rem;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    color: $color-accent;
+  }
+}
+
+.detalle-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pqr-info-card {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+.pqr-code {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $color-primary;
+  letter-spacing: 0.5px;
+}
+
+.pqr-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pqr-category {
+  font-size: 0.8125rem;
+  background-color: $color-surface;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.pqr-subject {
+  font-size: 1.25rem;
+  color: $color-dark;
+}
+
+.pqr-desc {
+  font-size: 0.9375rem;
+  color: $color-dark;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid rgba($color-dark, 0.08);
+  margin: 1.5rem 0;
+}
+
+.meta-section {
+  &__title {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: $color-dark;
+    opacity: 0.7;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  background-color: $color-surface;
+  padding: 1rem;
+  border-radius: $border-radius-md;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  color: $color-dark;
+  opacity: 0.65;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.meta-val {
+  font-size: 0.875rem;
+}
+
+.action-card {
+  padding: 1.25rem;
+
+  &__title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: $color-dark;
+    margin-bottom: 1rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid rgba($color-dark, 0.08);
+  }
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.alert-success {
+  background-color: rgba(#059669, 0.12);
+  border: 1px solid rgba(#059669, 0.3);
+  color: #059669;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.alert-danger {
+  background-color: rgba($color-danger, 0.12);
+  border: 1px solid rgba($color-danger, 0.3);
+  color: $color-danger;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 6px;
+    width: 2px;
+    background-color: rgba($color-primary, 0.2);
+  }
+
+  &__item {
+    position: relative;
+    padding-bottom: 1.5rem;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  &__marker {
+    position: absolute;
+    left: -1.5rem;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: $color-primary;
+    border: 3px solid $color-white;
+    box-shadow: 0 0 0 2px $color-primary;
+  }
+
+  &__content {
+    background-color: $color-surface;
+    border-radius: $border-radius-md;
+    padding: 0.875rem 1rem;
+  }
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__action {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $color-dark;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+  }
+
+  &__user {
+    font-size: 0.8125rem;
+    margin: 0.25rem 0 0.5rem;
+  }
+
+  &__status {
+    color: $color-accent;
+    font-weight: 600;
+  }
+
+  &__obs {
+    font-size: 0.875rem;
+    color: $color-dark;
+    opacity: 0.85;
+    background-color: $color-white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    border-left: 3px solid $color-accent;
+    margin-top: 0.375rem;
+  }
+}
+
+.attachments-card {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $color-dark;
+    margin: 0;
+  }
+}
+
+.attach-more-box {
+  padding: $spacing-md;
+  background-color: $color-surface;
+  border-radius: $border-radius-md;
+  border: 1px solid #e2e8f0;
+}

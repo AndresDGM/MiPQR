@@ -1,0 +1,62 @@
+<div class="login-wrapper">
+  <div class="card login-card">
+    <div class="login-card__header">
+      <h2>Iniciar Sesión</h2>
+      <p class="text-muted">Acceso para funcionarios y usuarios de MiPQR</p>
+    </div>
+
+    @if (state().error) {
+      <div class="alert alert-danger" role="alert">
+        {{ state().error }}
+      </div>
+    }
+
+    @if (state().loading) {
+      <app-loading-spinner mensaje="Validando credenciales..." />
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label for="correo">Correo Electrónico Institucional o Personal</label>
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            placeholder="ejemplo@dolormed.com"
+            [class.is-invalid]="form.get('correo')?.touched && form.get('correo')?.invalid"
+          />
+          @if (form.get('correo')?.touched && form.get('correo')?.errors?.['required']) {
+            <span class="form-error">El correo electrónico es requerido.</span>
+          }
+          @if (form.get('correo')?.touched && form.get('correo')?.errors?.['email']) {
+            <span class="form-error">Ingrese un correo válido.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.is-invalid]="form.get('password')?.touched && form.get('password')?.invalid"
+          />
+          @if (form.get('password')?.touched && form.get('password')?.errors?.['required']) {
+            <span class="form-error">La contraseña es requerida.</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="form.invalid">
+          Ingresar al Sistema
+        </button>
+      </form>
+    }
+
+    <div class="login-card__footer">
+      <p class="text-muted">
+        ¿Es paciente y no tiene cuenta?
+        <a routerLink="/registro-solicitante" class="text-primary text-bold">Registrarse aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

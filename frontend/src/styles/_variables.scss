@@ -1,0 +1,54 @@
+// Paleta oficial MiPQR (README)
+$color-primary: #673e93; // Morado: Marca, títulos y estado "En revisión"
+$color-accent: #279baf;  // Turquesa: Acciones principales y estado "Recibida"
+$color-danger: #d54877;  // Coral: Énfasis, alertas y llamados de atención
+$color-dark: #283447;    // Gris oscuro: Tipografía principal y estructural
+$color-white: #ffffff;   // Blanco: Fondos de contenido
+$color-surface: #f2f4f7; // Gris claro: Tarjetas, paneles y áreas secundarias
+
+// Colores de estado PQR
+$estado-recibida: #279baf;
+$estado-revision: #673e93;
+$estado-asignada: #d97706;
+$estado-gestion: #2563eb;
+$estado-respondida: #059669;
+$estado-cerrada: #4b5563;
+
+// Tipos de PQR
+$tipo-peticion: #2563eb;
+$tipo-queja: #ea580c;
+$tipo-reclamo: #dc2626;
+$tipo-sugerencia: #059669;
+
+// Tipografía y medidas
+$font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+
+// Espaciado
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+
+// Bordes y sombras
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+$border-radius-full: 9999px;
+
+$shadow-sm: 0 1px 2px rgba(40, 52, 71, 0.06), 0 1px 3px rgba(40, 52, 71, 0.05);
+$shadow-md: 0 6px 16px -4px rgba(103, 62, 147, 0.16), 0 2px 6px -2px rgba(40, 52, 71, 0.08);
+$shadow-lg: 0 18px 34px -10px rgba(103, 62, 147, 0.28), 0 6px 12px -6px rgba(40, 52, 71, 0.12);
+
+$transition-base: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+$gradient-brand: linear-gradient(135deg, #673e93 0%, #7d4fb0 55%, #279baf 100%);
+$gradient-primary: linear-gradient(135deg, #673e93, #7d4fb0);
+$gradient-accent: linear-gradient(135deg, #279baf, #36b4c9);

@@ -1,0 +1,80 @@
+@use 'styles/variables' as *;
+
+.pqr-card {
+  background-color: $color-white;
+  border: 1px solid rgba($color-dark, 0.1);
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
+    border-color: rgba($color-accent, 0.3);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__codigo {
+    font-weight: 700;
+    color: $color-primary;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+
+  &__categoria {
+    font-size: 0.8125rem;
+  }
+
+  &__asunto {
+    font-size: 1rem;
+    color: $color-dark;
+    font-weight: 600;
+  }
+
+  &__descripcion {
+    font-size: 0.875rem;
+    color: $color-dark;
+    opacity: 0.85;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba($color-dark, 0.06);
+    flex-wrap: wrap;
+  }
+
+  &__info {
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+}

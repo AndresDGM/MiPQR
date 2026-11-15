@@ -1,0 +1,27 @@
+<article class="pqr-card">
+  <div class="pqr-card__header">
+    <div class="pqr-card__meta">
+      <span class="pqr-card__codigo">{{ pqr().codigoSeguimiento }}</span>
+      <app-badge-tipo [tipo]="pqr().tipoPqr" />
+      @if (pqr().categoria) {
+        <span class="pqr-card__categoria text-muted">{{ pqr().categoria }}</span>
+      }
+    </div>
+    <app-badge-estado [estado]="pqr().estado" />
+  </div>
+
+  <h4 class="pqr-card__asunto">{{ pqr().asunto }}</h4>
+  <p class="pqr-card__descripcion">{{ pqr().descripcion }}</p>
+
+  <div class="pqr-card__footer">
+    <div class="pqr-card__info">
+      <span class="text-muted">Radicado: {{ pqr().fechaRegistro | date:'mediumDate' }}</span>
+      @if (pqr().nombreSolicitante) {
+        <span class="text-muted">• {{ pqr().nombreSolicitante }}</span>
+      }
+    </div>
+    <a [routerLink]="['/detalle', pqr().idPqr]" class="btn btn-sm btn-outline">
+      Ver Detalle
+    </a>
+  </div>
+</article>

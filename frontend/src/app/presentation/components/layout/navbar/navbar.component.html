@@ -1,0 +1,61 @@
+<header class="navbar">
+  <div class="navbar__container">
+    <a routerLink="/" class="navbar__brand">
+      <div class="navbar__logo-icon">PQR</div>
+      <div class="navbar__brand-text">
+        <span class="navbar__title">MiPQR</span>
+        <span class="navbar__subtitle">Clínica Dolormed</span>
+      </div>
+    </a>
+
+    <nav class="navbar__nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar__link">
+        Inicio
+      </a>
+
+      @if (!authService.isAuthenticated()) {
+        <a routerLink="/consulta" routerLinkActive="active" class="navbar__link">
+          Consultar PQR
+        </a>
+        <a routerLink="/registro-pqr" routerLinkActive="active" class="navbar__link">
+          Radicar PQR
+        </a>
+      } @else {
+        @if (authService.userRol() === 'Solicitante') {
+          <a routerLink="/registro-pqr" routerLinkActive="active" class="navbar__link">
+            Nueva PQR
+          </a>
+          <a routerLink="/consulta" routerLinkActive="active" class="navbar__link">
+            Consultar PQR
+          </a>
+        } @else {
+          <a routerLink="/bandeja" routerLinkActive="active" class="navbar__link">
+            Bandeja de Gestión
+          </a>
+          <a routerLink="/consulta" routerLinkActive="active" class="navbar__link">
+            Búsqueda
+          </a>
+        }
+      }
+    </nav>
+
+    <div class="navbar__actions">
+      @if (!authService.isAuthenticated()) {
+        <a routerLink="/registro-solicitante" class="btn btn-sm btn-outline">
+          Registrarme
+        </a>
+        <a routerLink="/login" class="btn btn-sm btn-primary">
+          Iniciar Sesión
+        </a>
+      } @else {
+        <div class="navbar__user-info">
+          <span class="navbar__user-name">{{ authService.currentUser()?.nombre }}</span>
+          <span class="navbar__user-role badge">{{ authService.userRol() }}</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="logout()">
+          Cerrar Sesión
+        </button>
+      }
+    </div>
+  </div>
+</header>

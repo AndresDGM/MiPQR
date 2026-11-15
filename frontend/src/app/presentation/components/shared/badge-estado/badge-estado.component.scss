@@ -1,0 +1,49 @@
+@use 'styles/variables' as *;
+
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: $border-radius-full;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+
+  &--recibida {
+    background-color: rgba($estado-recibida, 0.12);
+    color: $estado-recibida;
+  }
+
+  &--revision {
+    background-color: rgba($estado-revision, 0.12);
+    color: $estado-revision;
+  }
+
+  &--asignada {
+    background-color: rgba($estado-asignada, 0.15);
+    color: $estado-asignada;
+  }
+
+  &--gestion {
+    background-color: rgba($estado-gestion, 0.12);
+    color: $estado-gestion;
+  }
+
+  &--respondida {
+    background-color: rgba($estado-respondida, 0.15);
+    color: $estado-respondida;
+  }
+
+  &--cerrada {
+    background-color: rgba($estado-cerrada, 0.15);
+    color: $estado-cerrada;
+  }
+}

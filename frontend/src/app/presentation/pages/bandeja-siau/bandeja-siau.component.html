@@ -1,0 +1,150 @@
+<div class="container bandeja-page">
+  <!-- Cabecera -->
+  <div class="bandeja-header">
+    <div>
+      <h2>Bandeja de Gestión de Solicitudes</h2>
+      <p class="text-muted">
+        Centralización de PQR para clasificación, asignación a responsables y control de tiempos
+      </p>
+    </div>
+    <div class="bandeja-header__user">
+      <span class="user-greeting">
+        Hola, <strong>{{ authService.currentUser()?.nombre }}</strong>
+      </span>
+      <span class="badge user-role">{{ authService.userRol() }}</span>
+    </div>
+  </div>
+
+  <!-- Tarjetas de Estadísticas / Contadores -->
+  <div class="stats-grid">
+    <div
+      class="stat-card"
+      [class.active]="estadoFilter() === 'Todos'"
+      (click)="setEstadoFilter('Todos')"
+    >
+      <span class="stat-card__val">{{ stats().total }}</span>
+      <span class="stat-card__label">Todas las Solicitudes</span>
+    </div>
+    <div
+      class="stat-card stat-card--recibida"
+      [class.active]="estadoFilter() === 'Recibida'"
+      (click)="setEstadoFilter('Recibida')"
+    >
+      <span class="stat-card__val">{{ stats().recibidas }}</span>
+      <span class="stat-card__label">Recibidas</span>
+    </div>
+    <div
+      class="stat-card stat-card--revision"
+      [class.active]="estadoFilter() === 'En revision'"
+      (click)="setEstadoFilter('En revision')"
+    >
+      <span class="stat-card__val">{{ stats().enRevision }}</span>
+      <span class="stat-card__label">En Revisión</span>
+    </div>
+    <div
+      class="stat-card stat-card--asignada"
+      [class.active]="estadoFilter() === 'Asignada'"
+      (click)="setEstadoFilter('Asignada')"
+    >
+      <span class="stat-card__val">{{ stats().asignadas }}</span>
+      <span class="stat-card__label">Asignadas</span>
+    </div>
+    <div
+      class="stat-card stat-card--gestion"
+      [class.active]="estadoFilter() === 'En gestion'"
+      (click)="setEstadoFilter('En gestion')"
+    >
+      <span class="stat-card__val">{{ stats().enGestion }}</span>
+      <span class="stat-card__label">En Gestión</span>
+    </div>
+    <div
+      class="stat-card stat-card--respondida"
+      [class.active]="estadoFilter() === 'Respondida'"
+      (click)="setEstadoFilter('Respondida')"
+    >
+      <span class="stat-card__val">{{ stats().respondidas }}</span>
+      <span class="stat-card__label">Respondidas</span>
+    </div>
+    <div
+      class="stat-card stat-card--cerrada"
+      [class.active]="estadoFilter() === 'Cerrada'"
+      (click)="setEstadoFilter('Cerrada')"
+    >
+      <span class="stat-card__val">{{ stats().cerradas }}</span>
+      <span class="stat-card__label">Cerradas</span>
+    </div>
+  </div>
+
+  <!-- Barra de Filtros -->
+  <div class="card filters-card mt-6">
+    <div class="filters-grid">
+      <div class="filter-item filter-item--search">
+        <label for="search">Buscar</label>
+        <input
+          id="search"
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Por código, asunto, solicitante..."
+        />
+      </div>
+
+      <div class="filter-item">
+        <label for="filterEstado">Estado</label>
+        <select id="filterEstado" [formControl]="estadoFilterControl">
+          <option value="Todos">Todos los Estados</option>
+          <option value="Recibida">Recibida</option>
+          <option value="En revision">En revisión</option>
+          <option value="Asignada">Asignada</option>
+          <option value="En gestion">En gestión</option>
+          <option value="Respondida">Respondida</option>
+          <option value="Cerrada">Cerrada</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="filterTipo">Tipo</label>
+        <select id="filterTipo" [formControl]="tipoFilterControl">
+          <option value="Todos">Todos los Tipos</option>
+          <option value="Peticion">Petición</option>
+          <option value="Queja">Queja</option>
+          <option value="Reclamo">Reclamo</option>
+          <option value="Sugerencia">Sugerencia</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="filterCat">Categoría</label>
+        <select id="filterCat" [formControl]="categoriaFilterControl">
+          <option value="Todas">Todas las Categorías</option>
+          @for (cat of state().categories; track cat.idCategoria) {
+            <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal: Lista / Tabla -->
+  <div class="table-section mt-6">
+    @if (state().loading) {
+      <app-loading-spinner mensaje="Cargando solicitudes de la bandeja..." />
+    } @else if (state().error) {
+      <div class="alert alert-danger" role="alert">
+        {{ state().error }}
+      </div>
+    } @else if (filteredPqrs().length === 0) {
+      <app-empty-state
+        titulo="No se encontraron solicitudes"
+        descripcion="No hay PQRs que coincidan con los filtros aplicados actualmente."
+      />
+    } @else {
+      <div class="table-meta mb-2">
+        <span class="text-muted">
+          Mostrando <strong>{{ filteredPqrs().length }}</strong> de
+          <strong>{{ state().pqrs.length }}</strong> casos registrados
+        </span>
+      </div>
+      <app-pqr-table [pqrs]="filteredPqrs()" />
+    }
+  </div>
+</div>

@@ -1,0 +1,262 @@
+<div class="container detalle-page">
+  <!-- Navegación superior -->
+  <div class="breadcrumb mb-4">
+    <a routerLink="/bandeja" class="btn-back">&larr; Volver a la Bandeja</a>
+  </div>
+
+  @if (state().loading) {
+    <app-loading-spinner mensaje="Cargando información del caso..." />
+  } @else if (state().error && !state().pqr) {
+    <div class="alert alert-danger" role="alert">
+      {{ state().error }}
+    </div>
+  } @else if (state().pqr; as pqr) {
+    <!-- Notificaciones de éxito / error de acciones -->
+    @if (state().successMessage) {
+      <div class="alert alert-success mb-4" role="alert">
+        {{ state().successMessage }}
+      </div>
+    }
+    @if (state().error) {
+      <div class="alert alert-danger mb-4" role="alert">
+        {{ state().error }}
+      </div>
+    }
+
+    <div class="detalle-layout">
+      <!-- Columna Izquierda: Información de la PQR e Historial -->
+      <div class="detalle-main">
+        <!-- Tarjeta de Información Principal -->
+        <div class="card pqr-info-card">
+          <div class="pqr-info-card__header">
+            <div>
+              <span class="pqr-code">{{ pqr.codigoSeguimiento }}</span>
+              <div class="pqr-tags mt-2">
+                <app-badge-tipo [tipo]="pqr.tipoPqr" />
+                <span class="pqr-category">{{ pqr.categoria }}</span>
+              </div>
+            </div>
+            <app-badge-estado [estado]="pqr.estado" />
+          </div>
+
+          <h2 class="pqr-subject mt-4">{{ pqr.asunto }}</h2>
+          <p class="pqr-desc mt-2">{{ pqr.descripcion }}</p>
+
+          <hr class="divider" />
+
+          <!-- Datos del solicitante y radicación -->
+          <div class="meta-section">
+            <h4 class="meta-section__title">Información del Solicitante</h4>
+            <div class="meta-grid">
+              <div>
+                <span class="meta-label">Nombre:</span>
+                <span class="meta-val">{{ pqr.nombreSolicitante || 'N/A' }}</span>
+              </div>
+              <div>
+                <span class="meta-label">Correo:</span>
+                <span class="meta-val">{{ pqr.correoSolicitante || 'N/A' }}</span>
+              </div>
+              <div>
+                <span class="meta-label">Fecha de Radicación:</span>
+                <span class="meta-val">{{ pqr.fechaRegistro | date:'medium' }}</span>
+              </div>
+              <div>
+                <span class="meta-label">Responsable Actual:</span>
+                <span class="meta-val text-primary text-bold">
+                  {{ pqr.nombreResponsable || 'Sin responsable asignado' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Documentos de Soporte y Evidencias -->
+        <div class="card attachments-card mt-6">
+          <div class="attachments-card__header mb-4">
+            <div>
+              <h3 class="attachments-card__title">Documentos de soporte y evidencias</h3>
+              <p class="text-muted mb-0">
+                Archivos adjuntos asociados a la solicitud para fines probatorios y de gestión
+              </p>
+            </div>
+            @if (puedeAdjuntarSoporte()) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                (click)="showAttachSection.set(!showAttachSection())"
+              >
+                {{ showAttachSection() ? 'Cancelar anexo' : '+ Anexar documentos' }}
+              </button>
+            }
+          </div>
+
+          @if (showAttachSection()) {
+            <div class="attach-more-box mb-4">
+              <app-file-upload
+                (filesChange)="onFilesToAttachSelected($event)"
+                [disabled]="state().actionLoading"
+              />
+              @if (filesToAttach().length > 0) {
+                <div class="mt-3 text-right">
+                  <button
+                    type="button"
+                    class="btn btn-accent btn-sm"
+                    [disabled]="state().actionLoading"
+                    (click)="onSubmitAttachMore()"
+                  >
+                    Guardar documentos adjuntos
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <app-attachments-list
+            [attachments]="state().attachments || []"
+            [loading]="state().loadingAttachments || false"
+            [canDelete]="puedeEliminarAdjunto()"
+            emptyMessage="Esta solicitud no cuenta con documentos de soporte adjuntos."
+            (preview)="onPreview($event)"
+            (download)="onDownload($event)"
+            (delete)="onDeleteAttachment($event)"
+          />
+        </div>
+
+        <!-- Línea de Tiempo de Trazabilidad -->
+        <div class="card history-card mt-6">
+          <h3 class="history-card__title">Historial y Trazabilidad del Caso</h3>
+          <p class="text-muted mb-4">Registro inmutable de todos los eventos y actuaciones</p>
+
+          <div class="timeline">
+            @for (item of state().history; track item.idHistorial) {
+              <div class="timeline__item">
+                <div class="timeline__marker"></div>
+                <div class="timeline__content">
+                  <div class="timeline__top">
+                    <span class="timeline__action">{{ item.accion }}</span>
+                    <span class="timeline__date text-muted">{{ item.fecha | date:'medium' }}</span>
+                  </div>
+                  <div class="timeline__user text-muted">
+                    Ejecutado por: <strong>{{ item.nombreUsuario }}</strong>
+                    @if (item.estado) {
+                      <span class="timeline__status">• Estado: {{ item.estado }}</span>
+                    }
+                  </div>
+                  @if (item.observacion) {
+                    <p class="timeline__obs">{{ item.observacion }}</p>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Panel de Acciones Administrativas -->
+      <aside class="detalle-sidebar">
+        @if (soloLectura()) {
+          <div class="card action-card">
+            <h4 class="action-card__title">Modo de consulta</h4>
+            <p class="text-muted">Su rol permite revisar el detalle y el historial de la solicitud, sin modificarla.</p>
+          </div>
+        }
+
+        <!-- 1. Acción: Cambiar Estado -->
+        @if (puedeActualizarEstado()) {
+        <div class="card action-card">
+          <h4 class="action-card__title">Actualizar Estado</h4>
+          <form [formGroup]="estadoForm" (ngSubmit)="onCambiarEstado()">
+            <div class="form-group">
+              <label for="nuevoEstado">Nuevo Estado</label>
+              <select id="nuevoEstado" formControlName="nuevoEstado">
+                @for (est of estadosDisponibles; track est) {
+                  <option [value]="est">{{ est }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="observacion">Observación / Justificación *</label>
+              <textarea
+                id="observacion"
+                rows="3"
+                formControlName="observacion"
+                placeholder="Motivo del cambio de estado..."
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-block btn-sm"
+              [disabled]="estadoForm.invalid || state().actionLoading"
+            >
+              Guardar Estado
+            </button>
+          </form>
+        </div>
+
+        }
+
+        <!-- 2. Acción: Asignar Responsable -->
+        @if (puedeAsignar()) {
+        <div class="card action-card mt-4">
+          <h4 class="action-card__title">Asignar Responsable</h4>
+          <form [formGroup]="responsableForm" (ngSubmit)="onAsignarResponsable()">
+            <div class="form-group">
+              <label for="idResponsable">Seleccionar Profesional</label>
+              <select id="idResponsable" formControlName="idResponsable">
+                @for (resp of state().responsables; track resp.idUsuario) {
+                  <option [value]="resp.idUsuario">{{ resp.nombre }}</option>
+                }
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-accent btn-block btn-sm"
+              [disabled]="responsableForm.invalid || state().actionLoading"
+            >
+              Asignar Caso
+            </button>
+          </form>
+        </div>
+
+        }
+
+        <!-- 3. Acción: Emitir Respuesta Oficial -->
+        @if (puedeResponder()) {
+        <div class="card action-card mt-4">
+          <h4 class="action-card__title">Emitir Respuesta Oficial</h4>
+          <form [formGroup]="respuestaForm" (ngSubmit)="onResponder()">
+            <div class="form-group">
+              <label for="contenidoRespuesta">Contenido de la Respuesta Formal *</label>
+              <textarea
+                id="contenidoRespuesta"
+                rows="4"
+                formControlName="contenido"
+                placeholder="Redacte la respuesta institucional detallada que se notificará al solicitante..."
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-block btn-sm"
+              [disabled]="respuestaForm.invalid || state().actionLoading"
+            >
+              Enviar Respuesta y Notificar
+            </button>
+          </form>
+        </div>
+        }
+      </aside>
+    </div>
+
+    <!-- Modal de Previsualización in-situ -->
+    <app-attachment-preview-modal
+      [attachment]="previewAttachment()"
+      [blobUrl]="previewBlobUrl()"
+      (closeModal)="onClosePreview()"
+      (downloadFile)="onDownload($event)"
+    />
+  }
+</div>

@@ -1,0 +1,48 @@
+@use 'styles/variables' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-shell {
+  flex: 1;
+}
+
+.app-footer {
+  background: linear-gradient(135deg, $color-dark 0%, color-mix(in srgb, $color-primary 55%, $color-dark) 100%);
+  border-top: 3px solid $color-accent;
+  color: $color-white;
+  padding: 1.75rem 1rem;
+  border-top: 1px solid rgba($color-white, 0.1);
+  margin-top: auto;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8125rem;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.footer-title {
+  font-weight: 700;
+  color: $color-white;
+}
+
+.footer-copy {
+  opacity: 0.7;
+}
+
+.footer-links {
+  opacity: 0.7;
+}

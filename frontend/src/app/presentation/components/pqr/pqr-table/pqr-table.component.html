@@ -1,0 +1,52 @@
+<div class="table-responsive">
+  <table class="pqr-table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Tipo</th>
+        <th>Categoría</th>
+        <th>Asunto</th>
+        <th>Solicitante</th>
+        <th>Estado</th>
+        <th>Responsable</th>
+        <th>Fecha</th>
+        <th class="text-center">Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (pqr of pqrs(); track pqr.idPqr) {
+        <tr>
+          <td class="td-code">
+            <span class="code-link">{{ pqr.codigoSeguimiento }}</span>
+          </td>
+          <td>
+            <app-badge-tipo [tipo]="pqr.tipoPqr" />
+          </td>
+          <td class="td-category">
+            {{ pqr.categoria || 'General' }}
+          </td>
+          <td class="td-subject" [title]="pqr.asunto">
+            {{ pqr.asunto }}
+          </td>
+          <td class="td-requester">
+            {{ pqr.nombreSolicitante || 'N/A' }}
+          </td>
+          <td>
+            <app-badge-estado [estado]="pqr.estado" />
+          </td>
+          <td class="td-responsible">
+            {{ pqr.nombreResponsable || 'Sin asignar' }}
+          </td>
+          <td class="td-date text-muted">
+            {{ pqr.fechaRegistro | date:'shortDate' }}
+          </td>
+          <td class="text-center">
+            <a [routerLink]="['/detalle', pqr.idPqr]" class="btn btn-sm btn-outline">
+              Gestionar
+            </a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

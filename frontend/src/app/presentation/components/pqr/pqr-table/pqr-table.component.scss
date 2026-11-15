@@ -1,0 +1,79 @@
+@use 'styles/variables' as *;
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  background-color: $color-white;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-md;
+  border: 1px solid rgba($color-dark, 0.08);
+}
+
+.pqr-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+
+  thead {
+    background-color: rgba($color-primary, 0.05);
+    border-bottom: 2px solid $color-primary;
+
+    th {
+      padding: 0.875rem 1rem;
+      font-weight: 700;
+      color: $color-primary;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba($color-dark, 0.06);
+      transition: background-color 0.15s;
+
+      &:hover {
+        background-color: rgba($color-accent, 0.08);
+        box-shadow: inset 3px 0 0 $color-accent;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 0.875rem 1rem;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.td-code {
+  font-weight: 700;
+  color: $color-primary;
+  white-space: nowrap;
+}
+
+.td-subject {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.td-category,
+.td-requester,
+.td-responsible {
+  white-space: nowrap;
+  font-size: 0.8125rem;
+}
+
+.td-date {
+  white-space: nowrap;
+  font-size: 0.75rem;
+}

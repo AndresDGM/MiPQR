@@ -1,0 +1,219 @@
+name: Deploy Backend to Server
+
+# Disparadores: se ejecuta en cada push a develop o manualmente desde GitHub Actions
+on:
+  push:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+# Permisos mínimos por defecto del workflow
+permissions:
+  contents: read
+
+# Evita ejecuciones simultáneas de despliegues del backend
+concurrency:
+  group: "backend"
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Ejecutar pruebas unitarias y verificar compilación TypeScript
+  # ---------------------------------------------------------------------------
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run unit tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Build TypeScript
+        working-directory: ./backend
+        run: npm run build
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Construir la imagen Docker del servidor y publicarla en GHCR
+  # ---------------------------------------------------------------------------
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+
+    # Permiso adicional requerido para subir imágenes a GitHub Container Registry
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # 1. Descargar el código del repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Verificar carga de variables dinámicas del repositorio (Settings -> Variables)
+      - name: Cargar Variables de entorno
+        env:
+          IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+          IMAGE_TAG: ${{ vars.IMAGE_TAG }}
+        run: echo "Variables cargadas correctamente"
+
+      # 3. Configurar QEMU para compilar imágenes multi-arquitectura (amd64 y arm64)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # 4. Configurar Docker Buildx para construcción avanzada de imágenes
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 5. Autenticarse en GitHub Container Registry usando el token automático
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. Generar etiquetas (tags) y labels OCI para la imagen Docker
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.actor }}/${{ vars.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ vars.IMAGE_TAG }}
+            type=ref,event=tag
+            type=sha
+
+      # 7. Construir la imagen multi-arquitectura (amd64 y arm64) desde ./backend y subirla a GHCR
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Conectarse por SSH al servidor remoto y actualizar los contenedores
+  # ---------------------------------------------------------------------------
+  deploy:
+    runs-on: ubuntu-latest
+    needs: publish
+
+    # Variables compartidas entre todos los pasos de este job:
+    # - secrets.* -> datos sensibles de conexión y cifrado (Settings -> Secrets)
+    # - vars.*    -> configuración dinámica del despliegue (Settings -> Variables)
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+      IMAGE_TAG: ${{ vars.IMAGE_TAG }}
+      CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+      DOMAIN: ${{ vars.DOMAIN }}
+      API_PREFIX: ${{ github.event.repository.name }}
+      TRAEFIK_NETWORK: ${{ vars.TRAEFIK_NETWORK }}
+      PORT: ${{ vars.PORT }}
+      IMAGE_AUTOR: ghcr.io/${{ github.actor }}
+      DB_USER: ${{ vars.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ vars.DB_NAME }}
+      DB_PORT: ${{ vars.DB_PORT }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_EXPIRES_IN: ${{ vars.JWT_EXPIRES_IN }}
+      DES_KEY: ${{ secrets.DES_KEY }}
+      RSA_N: ${{ secrets.RSA_N }}
+      RSA_E: ${{ vars.RSA_E }}
+      RSA_D: ${{ secrets.RSA_D }}
+      STORAGE_PATH: ${{ vars.STORAGE_PATH }}
+      MAX_FILE_SIZE_MB: ${{ vars.MAX_FILE_SIZE_MB }}
+      MAX_FILES_PER_REQUEST: ${{ vars.MAX_FILES_PER_REQUEST }}
+      MAX_TOTAL_SIZE_MB: ${{ vars.MAX_TOTAL_SIZE_MB }}
+
+    steps:
+      # 1. Descargar el código (para obtener docker-compose.yml)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Generar el .env dinámico que usará docker-compose.yml en el servidor
+      #    ${...,,} convierte a minúsculas (requisito de GHCR y para coincidir con environment.ts)
+      - name: Cargar Variables de entorno
+        working-directory: ./backend
+        run: |
+          {
+            echo "IMAGE_AUTOR=${IMAGE_AUTOR,,}"
+            echo "IMAGE_NAME=$IMAGE_NAME"
+            echo "IMAGE_TAG=$IMAGE_TAG"
+            echo "CONTAINER_NAME=$CONTAINER_NAME"
+            echo "DOMAIN=$DOMAIN"
+            echo "API_PREFIX=${API_PREFIX,,}"
+            echo "TRAEFIK_NETWORK=$TRAEFIK_NETWORK"
+            echo "PORT=${PORT:-3000}"
+            echo "DB_USER=${DB_USER:-postgres}"
+            echo "DB_PASSWORD=${DB_PASSWORD:-postgres}"
+            echo "DB_NAME=${DB_NAME:-mipqr}"
+            echo "DB_PORT=${DB_PORT:-5432}"
+            echo "JWT_SECRET=$JWT_SECRET"
+            echo "JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-8h}"
+            echo "DES_KEY=$DES_KEY"
+            echo "RSA_N=$RSA_N"
+            echo "RSA_E=${RSA_E:-10001}"
+            echo "RSA_D=$RSA_D"
+            echo "STORAGE_PATH=${STORAGE_PATH:-./uploads/adjuntos}"
+            echo "MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-10}"
+            echo "MAX_FILES_PER_REQUEST=${MAX_FILES_PER_REQUEST:-5}"
+            echo "MAX_TOTAL_SIZE_MB=${MAX_TOTAL_SIZE_MB:-25}"
+          } > .env
+          echo "Variables cargadas correctamente"
+
+      # 3. Configurar la llave privada SSH (Secret: SSH_KEY) en el runner
+      - name: Configurar llave SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      # 4. Descargar la nueva imagen desde GHCR en el servidor remoto
+      - name: Pull Docker image on remote server
+        run: |
+          echo "Descargando imagen Docker en el servidor remoto (${IMAGE_AUTOR,,}/${IMAGE_NAME}:${IMAGE_TAG})"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USER@$SSH_HOST << EOF
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull ${IMAGE_AUTOR,,}/${IMAGE_NAME}:${IMAGE_TAG}
+          EOF
+
+      # 5. Crear la carpeta de despliegue en el servidor y copiar compose + .env
+      - name: Copy compose and env file to remote server
+        working-directory: ./backend
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USER@$SSH_HOST << EOF
+          mkdir -p ~/deployments/${IMAGE_NAME}
+          EOF
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -P $SSH_PORT docker-compose.yml $SSH_USER@$SSH_HOST:~/deployments/${IMAGE_NAME}/docker-compose.yml
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -P $SSH_PORT .env $SSH_USER@$SSH_HOST:~/deployments/${IMAGE_NAME}/.env
+
+      # 6. Reiniciar los servicios con Docker Compose en el servidor remoto
+      - name: Deploy Docker container on remote server
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USER@$SSH_HOST << EOF
+          cd ~/deployments/${IMAGE_NAME}
+          docker compose down
+          docker compose up -d --no-build
+          EOF
+          echo "Despliegue completado correctamente"

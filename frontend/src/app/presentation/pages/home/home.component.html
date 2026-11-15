@@ -1,0 +1,65 @@
+<section class="home">
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="container hero__content">
+      <div class="hero__badge">Sistema de Atención al Usuario (SIAU)</div>
+      <h1 class="hero__title">
+        Bienvenido a <span>MiPQR</span>
+      </h1>
+      <p class="hero__subtitle">
+        Plataforma oficial de la <strong>Clínica Dolormed</strong> para la radicación,
+        gestión y seguimiento transparente de sus Peticiones, Quejas, Reclamos y Sugerencias.
+      </p>
+
+      <div class="hero__actions">
+        <a routerLink="/registro-pqr" class="btn btn-primary">
+          Radicar Solicitud
+        </a>
+        <a routerLink="/consulta" class="btn btn-outline-accent">
+          Consultar por Código
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards de Acceso Rápido -->
+  <div class="container services">
+    <div class="services__grid">
+      <div class="card service-card">
+        <h3 class="service-card__title">Radicación Digital</h3>
+        <p class="service-card__desc">
+          Presente su solicitud en línea en pocos minutos y reciba un código único de seguimiento para su control.
+        </p>
+        <a routerLink="/registro-pqr" class="btn btn-sm btn-accent mt-4">
+          Comenzar trámite
+        </a>
+      </div>
+
+      <div class="card service-card">
+        <h3 class="service-card__title">Consulta de Trazabilidad</h3>
+        <p class="service-card__desc">
+          Verifique el estado actual, el profesional asignado y el historial cronológico de atención de su caso.
+        </p>
+        <a routerLink="/consulta" class="btn btn-sm btn-outline mt-4">
+          Consultar estado
+        </a>
+      </div>
+
+      <div class="card service-card">
+        <h3 class="service-card__title">Gestión SIAU y Procesos</h3>
+        <p class="service-card__desc">
+          Bandeja administrativa para clasificación, asignación de responsables y emisión de respuestas oportunas.
+        </p>
+        @if (!authService.isAuthenticated()) {
+          <a routerLink="/login" class="btn btn-sm btn-outline mt-4">
+            Acceso institucional
+          </a>
+        } @else {
+          <a routerLink="/bandeja" class="btn btn-sm btn-primary mt-4">
+            Ir a la bandeja
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</section>

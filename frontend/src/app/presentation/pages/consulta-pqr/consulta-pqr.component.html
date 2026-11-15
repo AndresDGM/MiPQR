@@ -1,0 +1,157 @@
+<div class="container consulta-page">
+  <!-- Cabecera y buscador -->
+  <div class="card search-card">
+    <div class="search-card__header">
+      <h2>Consulta de Estado y Trazabilidad</h2>
+      <p class="text-muted">
+        Ingrese el código alfanumérico único radicado para conocer el avance de su PQR
+      </p>
+    </div>
+
+    <form (submit)="$event.preventDefault(); onSearch()" class="search-form">
+      <div class="search-input-group">
+        <input
+          type="text"
+          [formControl]="codigoControl"
+          placeholder="Ej: PQR-2026-0101"
+          class="search-input"
+        />
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="codigoControl.invalid || state().loading"
+        >
+          Consultar Estado
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Estado de Carga -->
+  @if (state().loading) {
+    <app-loading-spinner mensaje="Consultando registros de la PQR en el sistema..." />
+  }
+
+  <!-- Error / No encontrado -->
+  @if (!state().loading && state().searched && state().error) {
+    <div class="mt-6">
+      <app-empty-state
+        titulo="Solicitud No Encontrada"
+        [descripcion]="state().error!"
+      />
+    </div>
+  }
+
+  <!-- Resultados de la PQR encontrada -->
+  @if (!state().loading && state().pqr; as pqr) {
+    <div class="results mt-6">
+      <!-- Tarjeta Principal de la PQR -->
+      <div class="card pqr-result-card">
+        <div class="pqr-result-card__header">
+          <div>
+            <div class="pqr-result-card__code">{{ pqr.codigoSeguimiento }}</div>
+            <div class="pqr-result-card__tags">
+              <app-badge-tipo [tipo]="pqr.tipoPqr" />
+              @if (pqr.categoria) {
+                <span class="badge-categoria">{{ pqr.categoria }}</span>
+              }
+            </div>
+          </div>
+          <app-badge-estado [estado]="pqr.estado" />
+        </div>
+
+        <h3 class="pqr-result-card__asunto">{{ pqr.asunto }}</h3>
+        <p class="pqr-result-card__desc">{{ pqr.descripcion }}</p>
+
+        <div class="pqr-meta-grid">
+          <div class="pqr-meta-item">
+            <span class="pqr-meta-item__label">Fecha de Radicación:</span>
+            <span class="pqr-meta-item__val">{{ pqr.fechaRegistro | date:'medium' }}</span>
+          </div>
+          <div class="pqr-meta-item">
+            <span class="pqr-meta-item__label">Solicitante:</span>
+            <span class="pqr-meta-item__val">{{ pqr.nombreSolicitante || 'Usuario Registrado' }}</span>
+          </div>
+          <div class="pqr-meta-item">
+            <span class="pqr-meta-item__label">Responsable Asignado:</span>
+            <span class="pqr-meta-item__val">{{ pqr.nombreResponsable || 'En espera de asignación' }}</span>
+          </div>
+          @if (pqr.fechaCierre) {
+            <div class="pqr-meta-item">
+              <span class="pqr-meta-item__label">Fecha de Cierre:</span>
+              <span class="pqr-meta-item__val">{{ pqr.fechaCierre | date:'medium' }}</span>
+            </div>
+          }
+        </div>
+
+        @if (authService.userRol() === 'Analista SIAU' || authService.userRol() === 'Responsable' || authService.userRol() === 'Directivo') {
+          <div class="pqr-result-card__actions mt-4">
+            <a [routerLink]="['/detalle', pqr.idPqr]" class="btn btn-sm btn-outline">
+              Gestionar en Panel SIAU
+            </a>
+          </div>
+        }
+      </div>
+
+      <!-- Sección: Documentos adjuntos -->
+      <div class="card attachments-card mt-6">
+        <div class="attachments-card__header">
+          <h3 class="attachments-card__title">Documentos adjuntos</h3>
+          <p class="text-muted mb-4">
+            Evidencias y soportes aportados para el trámite de esta solicitud
+          </p>
+        </div>
+
+        <app-attachments-list
+          [attachments]="state().attachments || []"
+          [loading]="state().loadingAttachments || false"
+          [canDelete]="false"
+          emptyMessage="No se adjuntaron documentos de soporte al momento de radicar esta PQR."
+          (preview)="onPreview($event)"
+          (download)="onDownload($event)"
+        />
+      </div>
+
+      <!-- Línea de Tiempo / Historial de Trazabilidad -->
+      <div class="card history-card mt-6">
+        <h3 class="history-card__title">Historial de Trazabilidad y Eventos</h3>
+        <p class="text-muted mb-4">Registro inmutable de las acciones realizadas durante la atención de la solicitud</p>
+
+        @if (state().history.length === 0) {
+          <p class="text-muted">No hay eventos registrados aún para este radicado.</p>
+        } @else {
+          <div class="timeline">
+            @for (item of state().history; track item.idHistorial) {
+              <div class="timeline__item">
+                <div class="timeline__marker"></div>
+                <div class="timeline__content">
+                  <div class="timeline__top">
+                    <span class="timeline__action">{{ item.accion }}</span>
+                    <span class="timeline__date text-muted">{{ item.fecha | date:'medium' }}</span>
+                  </div>
+                  <div class="timeline__user text-muted">
+                    Por: <strong>{{ item.nombreUsuario }}</strong>
+                    @if (item.estado) {
+                      <span class="timeline__status">• Estado: {{ item.estado }}</span>
+                    }
+                  </div>
+                  @if (item.observacion) {
+                    <p class="timeline__observation">{{ item.observacion }}</p>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Modal de Previsualización -->
+    <app-attachment-preview-modal
+      [attachment]="previewAttachment()"
+      [blobUrl]="previewBlobUrl()"
+      (closeModal)="onClosePreview()"
+      (downloadFile)="onDownload($event)"
+    />
+  }
+</div>

@@ -1,0 +1,53 @@
+@use 'styles/variables' as *;
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 180px);
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 460px;
+  box-shadow: $shadow-lg;
+  border-radius: $border-radius-lg;
+  border-top: 4px solid $color-primary;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  &__icon {
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba($color-dark, 0.08);
+    font-size: 0.875rem;
+  }
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.alert-danger {
+  background-color: rgba($color-danger, 0.12);
+  border: 1px solid rgba($color-danger, 0.3);
+  color: $color-danger;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}

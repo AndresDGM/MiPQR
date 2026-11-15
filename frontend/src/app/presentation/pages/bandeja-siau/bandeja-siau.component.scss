@@ -1,0 +1,155 @@
+@use 'styles/variables' as *;
+
+.bandeja-page {
+  padding: 2.5rem 1rem 4rem;
+}
+
+.bandeja-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: $color-white;
+    padding: 0.5rem 1rem;
+    border-radius: $border-radius-md;
+    border: 1px solid rgba($color-dark, 0.08);
+  }
+}
+
+.user-greeting {
+  font-size: 0.875rem;
+}
+
+.user-role {
+  background-color: rgba($color-accent, 0.15);
+  color: $color-accent;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.stat-card {
+  background-color: $color-white;
+  border: 1px solid rgba($color-dark, 0.08);
+  border-radius: $border-radius-md;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-sm;
+  }
+
+  &.active {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.3);
+  }
+
+  &__val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: $color-dark;
+  }
+
+  &__label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: $color-dark;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 0.25rem;
+  }
+
+  &--recibida &__val {
+    color: $estado-recibida;
+  }
+  &--revision &__val {
+    color: $estado-revision;
+  }
+  &--asignada &__val {
+    color: $estado-asignada;
+  }
+  &--gestion &__val {
+    color: $estado-gestion;
+  }
+  &--respondida &__val {
+    color: $estado-respondida;
+  }
+  &--cerrada &__val {
+    color: $estado-cerrada;
+  }
+}
+
+.filters-card {
+  padding: 1.25rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $color-dark;
+    opacity: 0.7;
+  }
+
+  input,
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    outline: none;
+
+    &:focus {
+      border-color: $color-accent;
+    }
+  }
+}
+
+.table-meta {
+  font-size: 0.8125rem;
+}
+
+.alert-danger {
+  background-color: rgba($color-danger, 0.12);
+  border: 1px solid rgba($color-danger, 0.3);
+  color: $color-danger;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}

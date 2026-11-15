@@ -1,0 +1,54 @@
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { PqrHistory } from '../../../domain/models/pqr-history.model';
+import { PqrResponse } from '../../../domain/models/pqr-response.model';
+import { CreatePqrPayload, Pqr, PqrStatusName } from '../../../domain/models/pqr.model';
+import { PqrRepository } from '../../../domain/repositories/pqr.repository';
+import { PqrRemoteDatasource } from '../../datasources/remote/pqr-remote.datasource';
+
+/**
+ * Implementación concreta del repositorio de PQRs para backend Node.js.
+ *
+ * @remarks
+ * Adapter de infraestructura que cumple el contrato {@link PqrRepository}
+ * conectándose a los endpoints de la API Node.js mediante {@link PqrRemoteDatasource}.
+ *
+ * @architecture Clean Architecture
+ * @layer Infrastructure
+ */
+@Injectable()
+export class PqrNodeRepositoryImpl extends PqrRepository {
+  private dataSource = inject(PqrRemoteDatasource);
+
+  getAll(limit?: number): Observable<Pqr[]> {
+    return this.dataSource.getAll(limit);
+  }
+
+  getById(idPqr: number): Observable<Pqr> {
+    return this.dataSource.getById(idPqr);
+  }
+
+  getByCodigoSeguimiento(codigoSeguimiento: string): Observable<Pqr> {
+    return this.dataSource.getByCodigo(codigoSeguimiento);
+  }
+
+  create(payload: CreatePqrPayload): Observable<Pqr> {
+    return this.dataSource.create(payload);
+  }
+
+  updateEstado(idPqr: number, nuevoEstado: PqrStatusName, observacion?: string): Observable<Pqr> {
+    return this.dataSource.updateEstado(idPqr, nuevoEstado, observacion);
+  }
+
+  assignResponsable(idPqr: number, idResponsable: number): Observable<Pqr> {
+    return this.dataSource.assignResponsable(idPqr, idResponsable);
+  }
+
+  getHistorial(idPqr: number): Observable<PqrHistory[]> {
+    return this.dataSource.getHistorial(idPqr);
+  }
+
+  responder(idPqr: number, contenido: string): Observable<PqrResponse> {
+    return this.dataSource.responder(idPqr, contenido);
+  }
+}

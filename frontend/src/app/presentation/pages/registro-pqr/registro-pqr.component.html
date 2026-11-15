@@ -1,0 +1,190 @@
+<div class="container pqr-register">
+  @if (state().createdPqr) {
+    <!-- Vista de Confirmación con Código de Seguimiento -->
+    <div class="card success-card">
+      <h2>Solicitud radicada exitosamente</h2>
+      <p class="text-muted">
+        Su requerimiento ha sido registrado formalmente en el sistema de la Clínica Dolormed.
+      </p>
+
+      <div class="code-box">
+        <span class="code-box__label">Código Único de Seguimiento:</span>
+        <span class="code-box__code">{{ state().createdPqr?.codigoSeguimiento }}</span>
+        <span class="code-box__hint">
+          Guarde este código para consultar el avance y la respuesta oficial de su caso.
+        </span>
+      </div>
+
+      <div class="summary-details">
+        <div class="summary-item">
+          <span class="summary-item__label">Tipo:</span>
+          <app-badge-tipo [tipo]="state().createdPqr!.tipoPqr" />
+        </div>
+        <div class="summary-item">
+          <span class="summary-item__label">Asunto:</span>
+          <span>{{ state().createdPqr?.asunto }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-item__label">Solicitante:</span>
+          <span>{{ state().createdPqr?.nombreSolicitante }}</span>
+        </div>
+        @if (state().attachedFilesCount && state().attachedFilesCount! > 0) {
+          <div class="summary-item">
+            <span class="summary-item__label">Documentos de soporte:</span>
+            <span>{{ state().attachedFilesCount }} archivo(s) adjunto(s) vinculados a la solicitud</span>
+          </div>
+        }
+      </div>
+
+      <div class="success-card__actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="goToConsulta(state().createdPqr!.codigoSeguimiento)"
+        >
+          Consultar Estado Ahora
+        </button>
+        <button type="button" class="btn btn-outline" (click)="resetForm()">
+          Radicar Otra Solicitud
+        </button>
+      </div>
+    </div>
+  } @else {
+    <!-- Formulario de Radicación -->
+    <div class="card form-card">
+      <div class="form-card__header">
+        <h2>Radicación de Solicitud PQR</h2>
+        <p class="text-muted">
+          Diligencie el siguiente formulario para presentar su petición, queja, reclamo o sugerencia.
+        </p>
+      </div>
+
+      @if (state().error) {
+        <div class="alert alert-danger" role="alert">
+          {{ state().error }}
+        </div>
+      }
+
+      @if (state().loadingCategories || state().submitting) {
+        <app-loading-spinner
+          [mensaje]="state().submitting ? 'Radicando solicitud y generando código...' : 'Cargando formulario...'"
+        />
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Datos del Solicitante -->
+          <div class="form-section">
+            <h3 class="form-section__title">1. Información del Solicitante</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nombreSolicitante">Nombre Completo *</label>
+                <input
+                  id="nombreSolicitante"
+                  type="text"
+                  formControlName="nombreSolicitante"
+                  placeholder="Ej: Carolina Restrepo"
+                  [class.is-invalid]="
+                    form.get('nombreSolicitante')?.touched && form.get('nombreSolicitante')?.invalid
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="identificacionSolicitante">Documento de Identificación *</label>
+                <input
+                  id="identificacionSolicitante"
+                  type="text"
+                  formControlName="identificacionSolicitante"
+                  placeholder="Ej: 1116234901"
+                  [class.is-invalid]="
+                    form.get('identificacionSolicitante')?.touched &&
+                    form.get('identificacionSolicitante')?.invalid
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="correoSolicitante">Correo Electrónico de Notificación *</label>
+                <input
+                  id="correoSolicitante"
+                  type="email"
+                  formControlName="correoSolicitante"
+                  placeholder="ejemplo@correo.com"
+                  [class.is-invalid]="
+                    form.get('correoSolicitante')?.touched && form.get('correoSolicitante')?.invalid
+                  "
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Clasificación de la Solicitud -->
+          <div class="form-section">
+            <h3 class="form-section__title">2. Clasificación de la PQR</h3>
+            <div class="form-row form-row--2">
+              <div class="form-group">
+                <label for="tipoPqr">Tipo de Solicitud *</label>
+                <select id="tipoPqr" formControlName="tipoPqr">
+                  @for (tipo of tiposPqr; track tipo) {
+                    <option [value]="tipo">{{ tipo }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="idCategoria">Categoría / Área del Servicio *</label>
+                <select id="idCategoria" formControlName="idCategoria">
+                  @for (cat of state().categories; track cat.idCategoria) {
+                    <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalle de la Solicitud -->
+          <div class="form-section">
+            <h3 class="form-section__title">3. Detalle de los Hechos</h3>
+            <div class="form-group">
+              <label for="asunto">Asunto Breve *</label>
+              <input
+                id="asunto"
+                type="text"
+                formControlName="asunto"
+                placeholder="Resumen concreto de la solicitud (mínimo 5 caracteres)"
+                [class.is-invalid]="form.get('asunto')?.touched && form.get('asunto')?.invalid"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="descripcion">Descripción Detallada *</label>
+              <textarea
+                id="descripcion"
+                rows="5"
+                formControlName="descripcion"
+                placeholder="Indique con claridad los hechos, fechas, personal involucrado y cualquier antecedente relevante (mínimo 15 caracteres)..."
+                [class.is-invalid]="
+                  form.get('descripcion')?.touched && form.get('descripcion')?.invalid
+                "
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Documentos de Soporte -->
+          <div class="form-section">
+            <app-file-upload
+              (filesChange)="onFilesSelected($event)"
+              [disabled]="state().submitting"
+            />
+          </div>
+
+          <div class="form-actions">
+            <a routerLink="/" class="btn btn-outline">Cancelar</a>
+            <button type="submit" class="btn btn-accent" [disabled]="form.invalid">
+              Radicar Solicitud
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+</div>

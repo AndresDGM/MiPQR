@@ -1,0 +1,72 @@
+@use 'styles/variables' as *;
+
+.register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 180px);
+  padding: 2.5rem 1rem;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 520px;
+  box-shadow: $shadow-md;
+  border-radius: $border-radius-lg;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  &__icon {
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba($color-dark, 0.08);
+    font-size: 0.875rem;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.alert-danger {
+  background-color: rgba($color-danger, 0.12);
+  border: 1px solid rgba($color-danger, 0.3);
+  color: $color-danger;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.alert-success {
+  background-color: rgba(#059669, 0.12);
+  border: 1px solid rgba(#059669, 0.3);
+  color: #059669;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
