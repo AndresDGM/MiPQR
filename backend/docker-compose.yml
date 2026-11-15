@@ -1,3 +1,7 @@
+# Configuración de despliegue y desarrollo para el backend de MiPQR (Express + TypeScript + PostgreSQL)
+# Todas las variables ${VAR:-default} se leen desde el archivo .env
+# o usan su valor por defecto cuando está disponible.
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -11,6 +15,62 @@ services:
       - '${DB_PORT:-5432}:5432'
     volumes:
       - mipqr-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-mipqr}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  backend:
+    build: .
+    image: ${IMAGE_AUTOR:+${IMAGE_AUTOR}/}${IMAGE_NAME:-mipqr-backend}:${IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-mipqr-backend}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '${PORT:-3000}:${PORT:-3000}'
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-mipqr}
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      DES_KEY: ${DES_KEY:-}
+      RSA_N: ${RSA_N:-}
+      RSA_E: ${RSA_E:-10001}
+      RSA_D: ${RSA_D:-}
+      STORAGE_PATH: ${STORAGE_PATH:-./uploads/adjuntos}
+      MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-10}
+      MAX_FILES_PER_REQUEST: ${MAX_FILES_PER_REQUEST:-5}
+      MAX_TOTAL_SIZE_MB: ${MAX_TOTAL_SIZE_MB:-25}
+    volumes:
+      - mipqr-uploads:/app/uploads
+    networks:
+      - default
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-traefik-network}"
+      - "traefik.http.routers.${CONTAINER_NAME:-mipqr-backend}.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/${API_PREFIX:-apibackend}`)"
+      - "traefik.http.routers.${CONTAINER_NAME:-mipqr-backend}.entrypoints=websecure"
+      - "traefik.http.routers.${CONTAINER_NAME:-mipqr-backend}.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${CONTAINER_NAME:-mipqr-backend}.middlewares=${CONTAINER_NAME:-mipqr-backend}-strip"
+      - "traefik.http.middlewares.${CONTAINER_NAME:-mipqr-backend}-strip.stripprefix.prefixes=/${API_PREFIX:-apibackend}"
+      - "traefik.http.services.${CONTAINER_NAME:-mipqr-backend}.loadbalancer.server.port=${PORT:-3000}"
 
 volumes:
   mipqr-pgdata:
+  mipqr-uploads:
+
+networks:
+  traefik-net:
+    name: ${TRAEFIK_NETWORK:-traefik-network}
+    external: true
