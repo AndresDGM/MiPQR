@@ -1,0 +1,30 @@
+{
+  "nombre_modelo": "modelo_seeds.h5",
+  "version": "1.0.0",
+  "arquitectura": "Sequential([Input(7), Dense(8, relu), Dense(8, relu), Dense(3, softmax)])",
+  "optimizador": "Adam(lr=0.01)",
+  "loss": "sparse_categorical_crossentropy",
+  "metricas": {
+    "test_accuracy": 0.8809523582458496,
+    "test_loss": 0.32274723052978516
+  },
+  "caracteristicas": [
+    "area",
+    "perimetro",
+    "compacidad",
+    "longitud_grano",
+    "ancho_grano",
+    "coeficiente_asimetria",
+    "longitud_ranura"
+  ],
+  "clases_originales": [
+    "Kama",
+    "Rosa",
+    "Canadian"
+  ],
+  "mapeo_pqr": {
+    "0": "Atención Médica",
+    "1": "Facturación",
+    "2": "Farmacia"
+  }
+}
