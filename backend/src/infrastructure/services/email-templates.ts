@@ -2,8 +2,8 @@ export interface SolicitanteRegistroEmailData {
   nombreSolicitante: string;
   codigoSeguimiento: string;
   tipoPqr: string;
-  asunto: string;
-  descripcion: string;
+  asunto?: string;
+  descripcion?: string;
   fechaRegistro: Date | string;
   estadoInicial: string;
   appUrl: string;
@@ -13,8 +13,8 @@ export interface ResponsableAsignadoEmailData {
   nombreResponsable: string;
   codigoSeguimiento: string;
   tipoPqr: string;
-  asunto: string;
-  descripcion: string;
+  asunto?: string;
+  descripcion?: string;
   nombreSolicitante?: string | null;
   fechaRegistro: Date | string;
   fechaAsignacion: Date | string;
@@ -120,18 +120,12 @@ export class EmailTemplates {
                 </tr>
               </table>
 
-              <!-- Detalle de la Solicitud -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 28px;">
+              <!-- Detalle de la Solicitud (Información Mínima por Privacidad) -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 24px;">
                 <tr>
                   <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 13px; color: #718096; width: 35%;">Tipo de Solicitud:</td>
                   <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 14px; font-weight: 600; color: #283447;">${escapeHtml(
                     data.tipoPqr
-                  )}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 13px; color: #718096;">Asunto:</td>
-                  <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 14px; font-weight: 600; color: #283447;">${escapeHtml(
-                    data.asunto
                   )}</td>
                 </tr>
                 <tr>
@@ -144,11 +138,17 @@ export class EmailTemplates {
                     data.estadoInicial
                   )}</td>
                 </tr>
+              </table>
+
+              <!-- Aviso de Privacidad y Proteccion de Datos Medicos Sensibles -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F8F9FA; border-left: 4px solid #673E93; border-radius: 4px; padding: 14px; margin-bottom: 24px;">
                 <tr>
-                  <td style="padding: 12px 0; vertical-align: top; font-size: 13px; color: #718096;">Descripcion:</td>
-                  <td style="padding: 12px 0; font-size: 14px; line-height: 1.5; color: #4A5568;">${escapeHtml(
-                    data.descripcion
-                  )}</td>
+                  <td>
+                    <span style="font-size: 12px; font-weight: 700; color: #673E93; text-transform: uppercase; display: block; margin-bottom: 4px;">Aviso de Privacidad y Confidencialidad Medica</span>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #283447;">
+                      Por motivos de seguridad, reserva legal y proteccion de datos sensibles de salud (Habeas Data), el asunto y la descripcion detallada de su caso no se envian por correo electronico. Puede consultar los detalles completos de su solicitud de forma segura a traves de nuestro portal.
+                    </p>
+                  </td>
                 </tr>
               </table>
 
@@ -212,12 +212,11 @@ Le informamos que su solicitud ha sido radicada formalmente en nuestro sistema.
 
 Codigo Unico de Seguimiento: ${data.codigoSeguimiento}
 Tipo de Solicitud: ${data.tipoPqr}
-Asunto: ${data.asunto}
 Fecha de Registro: ${formattedFecha}
 Estado Inicial: ${data.estadoInicial}
-Descripcion: ${data.descripcion}
 
-Puede consultar el avance y respuesta oficial de su caso en:
+Aviso de Privacidad y Confidencialidad:
+Por motivos de seguridad y proteccion de datos sensibles de salud, el asunto y la descripcion detallada de su caso no se envian por correo electronico. Puede consultar la informacion completa de su solicitud ingresando a nuestro portal institucional:
 ${consultaUrl}
 
 Atencion al Usuario (SIAU) Clinica Dolormed:
@@ -297,18 +296,12 @@ PBX: (602) 555-0199 | Correo: siau@dolormed.com.co
                 </tr>
               </table>
 
-              <!-- Detalle de la Solicitud -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 28px;">
+              <!-- Detalle de la Solicitud (Información Mínima por Privacidad) -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 24px;">
                 <tr>
                   <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 13px; color: #718096; width: 35%;">Tipo de Solicitud:</td>
                   <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 14px; font-weight: 600; color: #283447;">${escapeHtml(
                     data.tipoPqr
-                  )}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 13px; color: #718096;">Asunto:</td>
-                  <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 14px; font-weight: 600; color: #283447;">${escapeHtml(
-                    data.asunto
                   )}</td>
                 </tr>
                 <tr>
@@ -329,12 +322,6 @@ PBX: (602) 555-0199 | Correo: siau@dolormed.com.co
                   <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 13px; color: #718096;">Estado Actual:</td>
                   <td style="padding: 10px 0; border-bottom: 1px solid #EDF2F7; font-size: 14px; color: #673E93; font-weight: 600;">${escapeHtml(
                     data.estadoActual
-                  )}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; vertical-align: top; font-size: 13px; color: #718096;">Resumen / Detalle:</td>
-                  <td style="padding: 12px 0; font-size: 14px; line-height: 1.5; color: #4A5568;">${escapeHtml(
-                    data.descripcion
                   )}</td>
                 </tr>
               </table>
@@ -394,12 +381,13 @@ Se le ha delegado formalmente la gestion de la siguiente PQR:
 
 Codigo: ${data.codigoSeguimiento}
 Tipo: ${data.tipoPqr}
-Asunto: ${data.asunto}
 Solicitante: ${data.nombreSolicitante || 'Usuario Registrado'}
 Fecha de Registro: ${formattedFechaReg}
 Fecha de Asignacion: ${formattedFechaAsig}
 Estado Actual: ${data.estadoActual}
-Detalle: ${data.descripcion}
+
+Aviso de Privacidad y Confidencialidad:
+Por motivos de seguridad y proteccion de datos sensibles (historia clinica y Ley 1581 de 2012), el detalle clinico y los documentos de soporte solo se encuentran disponibles en el portal autenticado.
 
 Acceda al panel SIAU mediante el siguiente enlace autenticado:
 ${detalleUrl}

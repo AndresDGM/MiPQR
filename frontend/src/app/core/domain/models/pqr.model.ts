@@ -115,7 +115,8 @@ export interface Pqr {
   /** Estado del envío de notificación por correo electrónico */
   notificacionEmail?: {
     enviado: boolean;
-    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO';
+    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+    simulated?: boolean;
     mensaje?: string;
   };
 }

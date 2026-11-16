@@ -19,7 +19,8 @@ export interface VmDetallePqr {
   responsables: User[];
   emailDeliveryStatus?: {
     enviado: boolean;
-    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO';
+    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+    simulated?: boolean;
     mensaje?: string;
   } | null;
   successMessage: string | null;

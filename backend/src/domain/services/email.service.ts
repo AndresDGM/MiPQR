@@ -9,9 +9,11 @@ export interface SendEmailOptions {
 
 export interface SendEmailResult {
   success: boolean;
-  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO';
+  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+  simulated?: boolean;
   messageId?: string;
   error?: string;
+  auditError?: string;
 }
 
 /**
