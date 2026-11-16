@@ -22,10 +22,16 @@ describe('EmailTemplates', () => {
     assert.ok(template.html.includes('Juan Pérez'));
     assert.ok(template.html.includes('PQR-2026-0042'));
     assert.ok(template.html.includes('Peticion'));
-    assert.ok(template.html.includes('Copia de historia clínica'));
     assert.ok(template.html.includes('Recibida'));
     assert.ok(template.html.includes('siau@dolormed.com.co'));
     assert.ok(template.html.includes('http://localhost:4200/consulta-pqr?codigo=PQR-2026-0042'));
+    assert.ok(template.html.includes('Aviso de Privacidad y Confidencialidad Medica'));
+
+    // Garantizar privacidad: NO debe incluir asunto ni descripcion medica sensible
+    assert.ok(!template.html.includes('Copia de historia clínica'), 'No debe exponer asunto médico en HTML');
+    assert.ok(!template.html.includes('Requiero copia de mis exámenes'), 'No debe exponer descripción en HTML');
+    assert.ok(!template.text.includes('Copia de historia clínica'), 'No debe exponer asunto en texto plano');
+    assert.ok(!template.text.includes('Requiero copia de mis exámenes'), 'No debe exponer descripción en texto');
 
     // Validar colores institucionales
     assert.ok(template.html.includes('#673E93'));
@@ -63,6 +69,12 @@ describe('EmailTemplates', () => {
     assert.ok(template.html.includes('Asignada'));
     assert.ok(template.html.includes('http://localhost:4200/siau/detalle/89'));
     assert.ok(template.html.includes('Aviso de Privacidad y Confidencialidad'));
+
+    // Garantizar privacidad: NO debe incluir asunto ni descripcion medica sensible
+    assert.ok(!template.html.includes('Demora en asignación de cita médica'), 'No debe exponer asunto sensible');
+    assert.ok(!template.html.includes('El usuario manifiesta retraso'), 'No debe exponer descripción sensible');
+    assert.ok(!template.text.includes('Demora en asignación de cita médica'));
+    assert.ok(!template.text.includes('El usuario manifiesta retraso'));
 
     // Validar colores institucionales y ausencia de emojis
     assert.ok(template.html.includes('#673E93'));

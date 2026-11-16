@@ -6,6 +6,7 @@ import { AssignPqrResponsableBackendUseCase } from '../src/application/usecases/
 import { CreatePqrData, PqrRecord, PqrRepository } from '../src/domain/repositories/pqr.repository.js';
 import { UsuarioRepository } from '../src/domain/repositories/usuario.repository.js';
 import { EmailService, SendEmailOptions, SendEmailResult } from '../src/domain/services/email.service.js';
+import { CustomError } from '../src/domain/errors/custom.error.js';
 
 class MockPqrRepository extends PqrRepository {
   private pqrs: PqrRecord[] = [
@@ -21,6 +22,20 @@ class MockPqrRepository extends PqrRepository {
       descripcion: 'Detalle de prueba',
       nombreSolicitante: 'Solicitante Uno',
       correoSolicitante: 'solicitante@test.com',
+      fechaRegistro: new Date(),
+    },
+    {
+      idPqr: 30,
+      codigoSeguimiento: 'PQR-2026-0030',
+      idCategoria: 1,
+      categoria: 'General',
+      idEstado: 6,
+      estado: 'Cerrada',
+      tipoPqr: 'Reclamo',
+      asunto: 'Caso cerrado terminado',
+      descripcion: 'Trámite finalizado con respuesta oficial',
+      nombreSolicitante: 'Paciente Cerrado',
+      correoSolicitante: 'cerrado@test.com',
       fechaRegistro: new Date(),
     },
   ];
@@ -76,8 +91,30 @@ class MockUsuarioRepository extends UsuarioRepository {
         idUsuario: 20,
         nombre: 'Dr. Fernando Responsable',
         correo: 'fernando.resp@dolormed.com',
-        idRol: 3,
+        idRol: 3, // Responsable
         identificacion: '202020',
+        activo: true,
+      };
+    }
+    if (idUsuario === 21) {
+      // Inactivo
+      return {
+        idUsuario: 21,
+        nombre: 'Dr. Usuario Inactivo',
+        correo: 'inactivo@dolormed.com',
+        idRol: 3,
+        identificacion: '212121',
+        activo: false,
+      };
+    }
+    if (idUsuario === 22) {
+      // Rol incorrecto (Solicitante idRol: 1)
+      return {
+        idUsuario: 22,
+        nombre: 'Juan Solicitante',
+        correo: 'juan.solic@dolormed.com',
+        idRol: 1,
+        identificacion: '222222',
         activo: true,
       };
     }
@@ -92,7 +129,7 @@ class MockUsuarioRepository extends UsuarioRepository {
 }
 
 describe('NodemailerEmailService & Casos de Uso con Notificación', () => {
-  it('debe enviar correo simulado exitoso cuando no hay SMTP configurado', async () => {
+  it('debe diferenciar explícitamente el envío simulado cuando no hay SMTP configurado', async () => {
     const emailService = new NodemailerEmailService({
       from: 'MiPQR <notificaciones@mipqr.com>',
     });
@@ -105,8 +142,32 @@ describe('NodemailerEmailService & Casos de Uso con Notificación', () => {
     });
 
     assert.equal(result.success, true);
-    assert.equal(result.estado, 'ENVIADO');
+    assert.equal(result.estado, 'SIMULADO');
+    assert.equal(result.simulated, true);
     assert.ok(result.messageId?.includes('simulated'));
+  });
+
+  it('debe retornar estado FALLIDO ante configuración SMTP incorrecta o fallo de conexión', async () => {
+    // Configuración SMTP apuntando a un host y puerto inexistente con credenciales inválidas
+    const failingSmtpService = new NodemailerEmailService({
+      host: '127.0.0.1',
+      port: 59998,
+      user: 'usuario_invalido@test.com',
+      pass: 'clave_invalida',
+      from: 'MiPQR <notificaciones@mipqr.com>',
+    });
+
+    const result = await failingSmtpService.sendEmail({
+      to: 'destinatario@test.com',
+      subject: 'Fallo intencional SMTP',
+      html: '<p>Prueba de error</p>',
+      tipoEvento: 'REGISTRO_PQR',
+    });
+
+    assert.equal(result.success, false);
+    assert.equal(result.estado, 'FALLIDO');
+    assert.equal(result.simulated, false);
+    assert.ok(result.error && result.error.length > 0);
   });
 
   it('CreatePqrBackendUseCase debe crear la PQR y notificar al solicitante por correo', async () => {
@@ -196,5 +257,62 @@ describe('NodemailerEmailService & Casos de Uso con Notificación', () => {
     assert.ok(sentOptions);
     assert.equal((sentOptions as SendEmailOptions).to, 'fernando.resp@dolormed.com');
     assert.equal((sentOptions as SendEmailOptions).tipoEvento, 'ASIGNACION_RESPONSABLE');
+  });
+
+  it('AssignPqrResponsableBackendUseCase debe rechazar la asignación si el responsable está inactivo', async () => {
+    const pqrRepo = new MockPqrRepository();
+    const userRepo = new MockUsuarioRepository();
+
+    const useCase = new AssignPqrResponsableBackendUseCase(
+      pqrRepo,
+      userRepo,
+      undefined,
+      'http://localhost:4200'
+    );
+
+    await assert.rejects(
+      async () => {
+        await useCase.execute(10, 21); // ID 21 es inactivo
+      },
+      (err: any) => err instanceof CustomError && err.statusCode === 400 && err.message.includes('inactivo')
+    );
+  });
+
+  it('AssignPqrResponsableBackendUseCase debe rechazar la asignación si el usuario no tiene rol de Responsable', async () => {
+    const pqrRepo = new MockPqrRepository();
+    const userRepo = new MockUsuarioRepository();
+
+    const useCase = new AssignPqrResponsableBackendUseCase(
+      pqrRepo,
+      userRepo,
+      undefined,
+      'http://localhost:4200'
+    );
+
+    await assert.rejects(
+      async () => {
+        await useCase.execute(10, 22); // ID 22 tiene rol Solicitante (idRol: 1)
+      },
+      (err: any) => err instanceof CustomError && err.statusCode === 400 && err.message.includes('rol de Responsable')
+    );
+  });
+
+  it('AssignPqrResponsableBackendUseCase debe rechazar la asignación sobre una PQR en estado terminal (Cerrada)', async () => {
+    const pqrRepo = new MockPqrRepository();
+    const userRepo = new MockUsuarioRepository();
+
+    const useCase = new AssignPqrResponsableBackendUseCase(
+      pqrRepo,
+      userRepo,
+      undefined,
+      'http://localhost:4200'
+    );
+
+    await assert.rejects(
+      async () => {
+        await useCase.execute(30, 20); // ID 30 está Cerrada
+      },
+      (err: any) => err instanceof CustomError && err.statusCode === 400 && err.message.includes('estado terminal')
+    );
   });
 });
