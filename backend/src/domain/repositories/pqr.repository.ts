@@ -1,3 +1,9 @@
+export interface NotificacionEmailRecord {
+  enviado: boolean;
+  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO';
+  mensaje?: string;
+}
+
 export interface PqrRecord {
   idPqr: number;
   codigoSeguimiento: string;
@@ -16,6 +22,7 @@ export interface PqrRecord {
   descripcion: string;
   fechaRegistro: Date;
   fechaCierre?: Date | null;
+  notificacionEmail?: NotificacionEmailRecord;
 }
 
 export interface CreatePqrData {

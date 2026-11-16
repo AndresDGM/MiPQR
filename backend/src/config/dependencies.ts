@@ -119,7 +119,7 @@ const deleteDocumentoUseCase = new DeleteDocumentoUseCase(
 const getAllPqrsBackendUseCase = new GetAllPqrsBackendUseCase(pqrRepository);
 const getPqrByIdBackendUseCase = new GetPqrByIdBackendUseCase(pqrRepository);
 const getPqrByCodigoBackendUseCase = new GetPqrByCodigoBackendUseCase(pqrRepository);
-const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository);
+const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository, emailService, envs.APP_URL);
 
 // 4. Controladores
 export const rolesController = new RolesController(

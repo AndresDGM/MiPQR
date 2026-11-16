@@ -174,6 +174,11 @@ export class PqrLocalDatasource {
       asunto: payload.asunto,
       descripcion: payload.descripcion,
       fechaRegistro: fecha,
+      notificacionEmail: {
+        enviado: true,
+        estado: 'ENVIADO',
+        mensaje: `Confirmación de radicación enviada a ${payload.correoSolicitante}`,
+      },
     };
 
     this.pqrs.unshift(nueva);
