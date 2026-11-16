@@ -22,4 +22,7 @@ export const envs = {
   MAX_FILE_SIZE_MB: env.get('MAX_FILE_SIZE_MB').default('10').asIntPositive(),
   MAX_FILES_PER_REQUEST: env.get('MAX_FILES_PER_REQUEST').default('5').asIntPositive(),
   MAX_TOTAL_SIZE_MB: env.get('MAX_TOTAL_SIZE_MB').default('25').asIntPositive(),
+  // Microservicio de Inteligencia Artificial (FastAPI / TensorFlow)
+  AI_SERVICE_URL: env.get('AI_SERVICE_URL').default('http://localhost:8000').asString(),
+  AI_SERVICE_TIMEOUT_MS: env.get('AI_SERVICE_TIMEOUT_MS').default('5000').asIntPositive(),
 };

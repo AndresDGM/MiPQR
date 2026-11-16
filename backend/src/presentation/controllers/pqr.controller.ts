@@ -5,6 +5,7 @@ import {
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
 } from '../../application/usecases/pqrs/pqr.usecases.js';
+import { ClassifyPqrUseCase } from '../../application/usecases/pqrs/classify-pqr.usecase.js';
 import { CustomError } from '../../domain/errors/custom.error.js';
 
 export class PqrController {
@@ -12,7 +13,8 @@ export class PqrController {
     private readonly getAllUseCase: GetAllPqrsBackendUseCase,
     private readonly getByIdUseCase: GetPqrByIdBackendUseCase,
     private readonly getByCodigoUseCase: GetPqrByCodigoBackendUseCase,
-    private readonly createUseCase: CreatePqrBackendUseCase
+    private readonly createUseCase: CreatePqrBackendUseCase,
+    private readonly classifyUseCase?: ClassifyPqrUseCase
   ) {}
 
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -76,6 +78,31 @@ export class PqrController {
       });
 
       res.status(201).json(pqr);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  classify = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { texto, features } = req.body;
+      if (!this.classifyUseCase) {
+        throw CustomError.badRequest('Servicio de clasificación IA no disponible');
+      }
+
+      const result = await this.classifyUseCase.execute(texto, features);
+      if (!result) {
+        res.status(200).json({
+          disponible: false,
+          mensaje: 'El servicio de IA no se encuentra disponible temporalmente',
+        });
+        return;
+      }
+
+      res.json({
+        disponible: true,
+        ...result,
+      });
     } catch (error) {
       next(error);
     }
