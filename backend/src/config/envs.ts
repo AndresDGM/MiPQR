@@ -25,4 +25,12 @@ export const envs = {
   // Microservicio de Inteligencia Artificial (FastAPI / TensorFlow)
   AI_SERVICE_URL: env.get('AI_SERVICE_URL').default('http://localhost:8000').asString(),
   AI_SERVICE_TIMEOUT_MS: env.get('AI_SERVICE_TIMEOUT_MS').default('5000').asIntPositive(),
+  // Configuracion del servicio de correo electronico (SMTP)
+  SMTP_HOST: env.get('SMTP_HOST').asString(),
+  SMTP_PORT: env.get('SMTP_PORT').default('587').asPortNumber(),
+  SMTP_USER: env.get('SMTP_USER').asString(),
+  SMTP_PASS: env.get('SMTP_PASS').asString(),
+  SMTP_FROM: env.get('SMTP_FROM').default('MiPQR Clinica Dolormed <notificaciones@mipqr.com>').asString(),
+  SMTP_SECURE: env.get('SMTP_SECURE').default('false').asBool(),
+  APP_URL: env.get('APP_URL').default('http://localhost:4200').asString(),
 };

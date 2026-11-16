@@ -27,7 +27,7 @@ export class CustomError extends Error {
     return new CustomError(message, 409);
   }
 
-  static internal(message: string): CustomError {
+  static internal(message: string = 'Error interno del servidor'): CustomError {
     return new CustomError(message, 500);
   }
 }

@@ -32,6 +32,10 @@ export class PqrRepositoryImpl extends PqrRepository {
     return this.datasource.create(data);
   }
 
+  assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord> {
+    return this.datasource.assignResponsable(idPqr, idResponsable);
+  }
+
   updateCategoria(
     idPqr: number,
     idCategoria: number,

@@ -99,10 +99,18 @@ export class PqrDatasource {
   }
 
   async create(data: CreatePqrData): Promise<PqrRecord> {
-    // Generar código de seguimiento PQR-YYYY-XXXX
-    const { rows: countRows } = await pool.query<{ total: string }>('SELECT COUNT(*) AS total FROM pqr');
-    const seq = Number(countRows[0]?.total ?? 0) + 1;
+    // Generar código de seguimiento atómico y seguro contra concurrencia: PQR-YYYY-XXXX
     const year = new Date().getFullYear();
+    let seq: number;
+    try {
+      const { rows: seqRows } = await pool.query<{ seq: string }>(
+        "SELECT nextval('pqr_codigo_seq') AS seq"
+      );
+      seq = Number(seqRows[0]?.seq ?? 1);
+    } catch {
+      const { rows: countRows } = await pool.query<{ total: string }>('SELECT COUNT(*) AS total FROM pqr');
+      seq = Number(countRows[0]?.total ?? 0) + 1;
+    }
     const codigo = `PQR-${year}-${String(seq).padStart(4, '0')}`;
 
     const hasIa = !!data.categoriaSugeridaIa;
@@ -149,7 +157,8 @@ export class PqrDatasource {
        SET id_categoria = $1,
            categoria = $2,
            estado_revision_ia = $3,
-           id_usuario_revision_ia = $4
+           id_usuario_revision_ia = $4,
+           fecha_clasificacion_ia = NOW()
        WHERE id_pqr = $5
        RETURNING *`,
       [idCategoria, categoria, estadoRevisionIa, idUsuarioRevision ?? null, idPqr]
@@ -161,5 +170,32 @@ export class PqrDatasource {
 
     const record = await this.findById(idPqr);
     return record || this.toRecord(rows[0]);
+  }
+
+  async assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord> {
+    const { rowCount } = await pool.query(
+      `UPDATE pqr
+       SET id_responsable = $1,
+           id_estado = CASE WHEN id_estado IN (1, 2) THEN 3 ELSE id_estado END,
+           estado = CASE WHEN estado IN ('Recibida', 'En revision') THEN 'Asignada' ELSE estado END
+       WHERE id_pqr = $2 AND estado != 'Cerrada'`,
+      [idResponsable, idPqr]
+    );
+
+    if (rowCount === 0) {
+      const current = await this.findById(idPqr);
+      if (!current) {
+        throw new Error(`PQR con ID ${idPqr} no encontrada`);
+      }
+      if (current.estado === 'Cerrada') {
+        throw new Error(`No es posible reasignar una PQR que ya se encuentra cerrada`);
+      }
+    }
+
+    const updated = await this.findById(idPqr);
+    if (!updated) {
+      throw new Error(`PQR con ID ${idPqr} no encontrada`);
+    }
+    return updated;
   }
 }

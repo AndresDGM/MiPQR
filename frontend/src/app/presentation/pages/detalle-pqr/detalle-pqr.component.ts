@@ -382,11 +382,28 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
 
     this.assignPqrResponsableUseCase.execute(this.idPqr, idResp).subscribe({
       next: (updated) => {
+        const emailStatus = updated.notificacionEmail;
+        let successMsg: string | null = null;
+        let errorMsg: string | null = null;
+
+        if (emailStatus?.estado === 'ENVIADO') {
+          successMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito. Correo de notificación confirmado y enviado correctamente.`;
+        } else if (emailStatus?.estado === 'PENDIENTE') {
+          // No mostrar mensaje de éxito del correo si el proveedor no lo ha confirmado
+          successMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito. El correo de notificación está pendiente de confirmación por el proveedor.`;
+        } else if (emailStatus?.estado === 'FALLIDO') {
+          errorMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito, pero ocurrió un error durante el envío del correo de notificación (${emailStatus.mensaje || 'Error del servidor SMTP'}).`;
+        } else {
+          successMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito.`;
+        }
+
         this.state.update((s) => ({
           ...s,
           actionLoading: false,
           pqr: updated,
-          successMessage: `Responsable "${updated.nombreResponsable}" asignado con éxito.`,
+          emailDeliveryStatus: emailStatus ?? null,
+          successMessage: successMsg,
+          error: errorMsg,
         }));
         this.loadHistory();
       },
@@ -394,6 +411,7 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
         this.state.update((s) => ({
           ...s,
           actionLoading: false,
+          emailDeliveryStatus: null,
           error: err.message || 'Error al asignar responsable.',
         }));
       },

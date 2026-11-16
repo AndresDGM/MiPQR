@@ -23,6 +23,7 @@ import {
 } from '../application/usecases/pqrs/pqr.usecases.js';
 import { ClassifyPqrUseCase } from '../application/usecases/pqrs/classify-pqr.usecase.js';
 import { HttpPqrClassificationAdapter } from '../infrastructure/repositories/http-pqr-classification.adapter.js';
+import { AssignPqrResponsableBackendUseCase } from '../application/usecases/pqrs/assign-responsable.usecase.js';
 import { DesCipherAdapter } from '../infrastructure/services/des-cipher.adapter.js';
 import { RsaCipherAdapter } from '../infrastructure/services/rsa-cipher.adapter.js';
 import { RolDatasource } from '../infrastructure/datasources/rol.datasource.js';
@@ -31,6 +32,7 @@ import { DocumentoAdjuntoDatasource } from '../infrastructure/datasources/docume
 import { PqrDatasource } from '../infrastructure/datasources/pqr.datasource.js';
 import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 import { FileValidatorService } from '../infrastructure/services/file-validator.service.js';
+import { NodemailerEmailService } from '../infrastructure/services/nodemailer-email.service.js';
 import { RolRepositoryImpl } from '../infrastructure/repositories/rol.repository.impl.js';
 import { UsuarioRepositoryImpl } from '../infrastructure/repositories/usuario.repository.impl.js';
 import { DocumentoAdjuntoRepositoryImpl } from '../infrastructure/repositories/documento-adjunto.repository.impl.js';
@@ -55,6 +57,14 @@ const pqrDatasource = new PqrDatasource();
 // Servicios de infraestructura
 const tokenService = new JwtTokenService();
 const fileValidatorService = new FileValidatorService();
+export const emailService = new NodemailerEmailService({
+  host: envs.SMTP_HOST,
+  port: envs.SMTP_PORT,
+  user: envs.SMTP_USER,
+  pass: envs.SMTP_PASS,
+  from: envs.SMTP_FROM,
+  secure: envs.SMTP_SECURE,
+});
 
 // Servicios
 // DES para las peticiones (transporte) y RSA para las contrasenas guardadas (reposo)
@@ -117,7 +127,18 @@ const deleteDocumentoUseCase = new DeleteDocumentoUseCase(
 const getAllPqrsBackendUseCase = new GetAllPqrsBackendUseCase(pqrRepository);
 const getPqrByIdBackendUseCase = new GetPqrByIdBackendUseCase(pqrRepository);
 const getPqrByCodigoBackendUseCase = new GetPqrByCodigoBackendUseCase(pqrRepository);
-const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository, pqrClassificationRepository);
+const createPqrBackendUseCase = new CreatePqrBackendUseCase(
+  pqrRepository,
+  pqrClassificationRepository,
+  emailService,
+  envs.APP_URL
+);
+const assignPqrResponsableBackendUseCase = new AssignPqrResponsableBackendUseCase(
+  pqrRepository,
+  usuarioRepository,
+  emailService,
+  envs.APP_URL
+);
 const updatePqrCategoriaUseCase = new UpdatePqrCategoriaUseCase(pqrRepository);
 const classifyPqrUseCase = new ClassifyPqrUseCase(pqrClassificationRepository);
 
@@ -151,7 +172,8 @@ export const pqrController = new PqrController(
   getPqrByCodigoBackendUseCase,
   createPqrBackendUseCase,
   classifyPqrUseCase,
-  updatePqrCategoriaUseCase
+  updatePqrCategoriaUseCase,
+  assignPqrResponsableBackendUseCase
 );
 
 // 5. Middlewares

@@ -129,6 +129,14 @@ export interface Pqr {
 
   /** Identificador del funcionario SIAU que revisó o modificó la sugerencia */
   idUsuarioRevisionIa?: number | null;
+
+  /** Estado del envío de notificación por correo electrónico */
+  notificacionEmail?: {
+    enviado: boolean;
+    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+    simulated?: boolean;
+    mensaje?: string;
+  };
 }
 
 /**

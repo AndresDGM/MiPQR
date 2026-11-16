@@ -21,6 +21,9 @@ ALTER TABLE usuario ALTER COLUMN password TYPE TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_usuario_id_rol ON usuario (id_rol);
 
+-- Secuencia atómica para generación segura y concurrente de códigos de seguimiento
+CREATE SEQUENCE IF NOT EXISTS pqr_codigo_seq START WITH 1;
+
 -- Tabla principal de PQR
 CREATE TABLE IF NOT EXISTS pqr (
   id_pqr                     SERIAL PRIMARY KEY,
@@ -76,6 +79,24 @@ CREATE TABLE IF NOT EXISTS documento_adjunto (
 
 CREATE INDEX IF NOT EXISTS idx_documento_adjunto_id_pqr ON documento_adjunto (id_pqr);
 CREATE INDEX IF NOT EXISTS idx_documento_adjunto_id_usuario ON documento_adjunto (id_usuario);
+
+-- Tabla de Registro y Auditoría de Notificaciones por Correo Electrónico
+CREATE TABLE IF NOT EXISTS registro_correo (
+  id_correo       SERIAL PRIMARY KEY,
+  id_pqr          INTEGER REFERENCES pqr (id_pqr) ON DELETE CASCADE,
+  destinatario    VARCHAR(160) NOT NULL,
+  tipo_evento     VARCHAR(50) NOT NULL,
+  asunto          VARCHAR(255) NOT NULL,
+  estado          VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
+  mensaje_id      VARCHAR(255),
+  mensaje_error   TEXT,
+  intentos        INTEGER NOT NULL DEFAULT 1,
+  fecha_creacion  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  fecha_envio     TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS idx_registro_correo_id_pqr ON registro_correo (id_pqr);
+CREATE INDEX IF NOT EXISTS idx_registro_correo_estado ON registro_correo (estado);
 `;
 
 export const seedRolesSql = `
@@ -97,5 +118,10 @@ ON CONFLICT (id_pqr) DO NOTHING;
 SELECT setval(
   pg_get_serial_sequence('pqr', 'id_pqr'),
   GREATEST((SELECT COALESCE(MAX(id_pqr), 1) FROM pqr), 1)
+);
+
+SELECT setval(
+  'pqr_codigo_seq',
+  GREATEST((SELECT COALESCE(MAX(id_pqr), 0) FROM pqr), 1)
 );
 `;

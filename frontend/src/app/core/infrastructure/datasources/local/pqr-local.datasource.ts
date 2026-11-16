@@ -174,6 +174,11 @@ export class PqrLocalDatasource {
       asunto: payload.asunto,
       descripcion: payload.descripcion,
       fechaRegistro: fecha,
+      notificacionEmail: {
+        enviado: true,
+        estado: 'ENVIADO',
+        mensaje: `Confirmación de radicación enviada a ${payload.correoSolicitante}`,
+      },
     };
 
     this.pqrs.unshift(nueva);
@@ -235,6 +240,11 @@ export class PqrLocalDatasource {
       idResponsable,
       nombreResponsable: responsable?.nombre ?? 'Responsable Asignado',
       estado: 'Asignada',
+      notificacionEmail: {
+        enviado: true,
+        estado: 'ENVIADO',
+        mensaje: `Correo de notificación enviado exitosamente a ${responsable?.correo ?? 'responsable@dolormed.com'}`,
+      },
     };
     this.pqrs[index] = updated;
 
