@@ -20,6 +20,7 @@ import {
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
 } from '../application/usecases/pqrs/pqr.usecases.js';
+import { AssignPqrResponsableBackendUseCase } from '../application/usecases/pqrs/assign-responsable.usecase.js';
 import { DesCipherAdapter } from '../infrastructure/services/des-cipher.adapter.js';
 import { RsaCipherAdapter } from '../infrastructure/services/rsa-cipher.adapter.js';
 import { RolDatasource } from '../infrastructure/datasources/rol.datasource.js';
@@ -120,6 +121,12 @@ const getAllPqrsBackendUseCase = new GetAllPqrsBackendUseCase(pqrRepository);
 const getPqrByIdBackendUseCase = new GetPqrByIdBackendUseCase(pqrRepository);
 const getPqrByCodigoBackendUseCase = new GetPqrByCodigoBackendUseCase(pqrRepository);
 const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository, emailService, envs.APP_URL);
+const assignPqrResponsableBackendUseCase = new AssignPqrResponsableBackendUseCase(
+  pqrRepository,
+  usuarioRepository,
+  emailService,
+  envs.APP_URL
+);
 
 // 4. Controladores
 export const rolesController = new RolesController(
@@ -149,7 +156,8 @@ export const pqrController = new PqrController(
   getAllPqrsBackendUseCase,
   getPqrByIdBackendUseCase,
   getPqrByCodigoBackendUseCase,
-  createPqrBackendUseCase
+  createPqrBackendUseCase,
+  assignPqrResponsableBackendUseCase
 );
 
 // 5. Middlewares

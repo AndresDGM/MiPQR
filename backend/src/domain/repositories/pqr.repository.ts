@@ -47,4 +47,5 @@ export abstract class PqrRepository {
   abstract findById(idPqr: number): Promise<PqrRecord | null>;
   abstract findByCodigo(codigo: string): Promise<PqrRecord | null>;
   abstract create(data: CreatePqrData): Promise<PqrRecord>;
+  abstract assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord>;
 }

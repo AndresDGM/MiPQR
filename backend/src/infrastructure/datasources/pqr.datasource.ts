@@ -117,4 +117,19 @@ export class PqrDatasource {
 
     return this.toRecord(rows[0]!);
   }
+
+  async assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord> {
+    await pool.query(
+      `UPDATE pqr
+       SET id_responsable = $1, id_estado = 3, estado = 'Asignada'
+       WHERE id_pqr = $2`,
+      [idResponsable, idPqr]
+    );
+
+    const updated = await this.findById(idPqr);
+    if (!updated) {
+      throw new Error(`PQR con ID ${idPqr} no encontrada`);
+    }
+    return updated;
+  }
 }

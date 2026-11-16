@@ -17,6 +17,11 @@ export interface VmDetallePqr {
   attachments?: PqrAttachment[];
   loadingAttachments?: boolean;
   responsables: User[];
+  emailDeliveryStatus?: {
+    enviado: boolean;
+    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO';
+    mensaje?: string;
+  } | null;
   successMessage: string | null;
   error: string | null;
 }
