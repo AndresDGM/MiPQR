@@ -64,7 +64,11 @@ export class CreatePqrBackendUseCase {
         pqr.notificacionEmail = {
           enviado: sendResult.success,
           estado: sendResult.estado,
-          mensaje: sendResult.error || (sendResult.success ? 'Correo de confirmación enviado exitosamente' : undefined),
+          mensaje:
+            sendResult.error ||
+            (sendResult.simulated
+              ? 'Notificación simulada correctamente (SMTP no configurado)'
+              : 'Correo de confirmación enviado exitosamente'),
         };
       } catch (err: any) {
         console.error('[CreatePqrBackendUseCase] Error inesperado en notificación por correo:', err);

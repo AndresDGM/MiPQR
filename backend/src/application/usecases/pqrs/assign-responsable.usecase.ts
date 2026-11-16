@@ -25,13 +25,35 @@ export class AssignPqrResponsableBackendUseCase {
       throw CustomError.notFound(`PQR con ID ${idPqr} no encontrada`);
     }
 
-    // 2. Validar existencia del usuario responsable
+    // 2. Validar que la PQR no se encuentre en un estado terminal
+    const estadosTerminales = ['Cerrada'];
+    if (estadosTerminales.includes(pqr.estado) || pqr.idEstado === 6) {
+      throw CustomError.badRequest(
+        `No es posible asignar responsables a una PQR que ya se encuentra en estado terminal ("${pqr.estado}")`
+      );
+    }
+
+    // 3. Validar existencia del usuario responsable
     const responsable = await this.usuarioRepository.getById(idResponsable);
     if (!responsable) {
       throw CustomError.notFound(`Usuario responsable con ID ${idResponsable} no encontrado`);
     }
 
-    // 3. Persistir la asignación en la base de datos
+    // 4. Validar que el responsable esté activo
+    if (!responsable.activo) {
+      throw CustomError.badRequest(
+        `El usuario "${responsable.nombre}" se encuentra inactivo y no puede recibir asignaciones`
+      );
+    }
+
+    // 5. Validar que el responsable tenga el rol correspondiente (idRol 3 = Responsable)
+    if (responsable.idRol !== 3) {
+      throw CustomError.badRequest(
+        `El usuario "${responsable.nombre}" no cuenta con el rol de Responsable (idRol actual: ${responsable.idRol})`
+      );
+    }
+
+    // 6. Persistir la asignación en la base de datos
     const updated = await this.pqrRepository.assignResponsable(idPqr, idResponsable);
 
     // 4. Enviar notificación por correo al responsable asignado
@@ -63,7 +85,11 @@ export class AssignPqrResponsableBackendUseCase {
         updated.notificacionEmail = {
           enviado: sendResult.success,
           estado: sendResult.estado,
-          mensaje: sendResult.error || (sendResult.success ? `Notificación enviada a ${responsable.correo}` : undefined),
+          mensaje:
+            sendResult.error ||
+            (sendResult.simulated
+              ? `Notificación simulada para ${responsable.correo} (SMTP no configurado)`
+              : `Notificación enviada a ${responsable.correo}`),
         };
       } catch (err: any) {
         console.error('[AssignPqrResponsableBackendUseCase] Error inesperado en notificación por correo:', err);

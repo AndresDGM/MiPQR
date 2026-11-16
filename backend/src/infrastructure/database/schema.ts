@@ -21,6 +21,9 @@ ALTER TABLE usuario ALTER COLUMN password TYPE TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_usuario_id_rol ON usuario (id_rol);
 
+-- Secuencia atómica para generación segura y concurrente de códigos de seguimiento
+CREATE SEQUENCE IF NOT EXISTS pqr_codigo_seq START WITH 1;
+
 -- Tabla principal de PQR
 CREATE TABLE IF NOT EXISTS pqr (
   id_pqr                     SERIAL PRIMARY KEY,
@@ -100,5 +103,10 @@ ON CONFLICT (id_pqr) DO NOTHING;
 SELECT setval(
   pg_get_serial_sequence('pqr', 'id_pqr'),
   GREATEST((SELECT COALESCE(MAX(id_pqr), 1) FROM pqr), 1)
+);
+
+SELECT setval(
+  'pqr_codigo_seq',
+  GREATEST((SELECT COALESCE(MAX(id_pqr), 0) FROM pqr), 1)
 );
 `;

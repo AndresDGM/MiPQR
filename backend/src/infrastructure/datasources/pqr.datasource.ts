@@ -87,10 +87,18 @@ export class PqrDatasource {
   }
 
   async create(data: CreatePqrData): Promise<PqrRecord> {
-    // Generar código de seguimiento PQR-YYYY-XXXX
-    const { rows: countRows } = await pool.query<{ total: string }>('SELECT COUNT(*) AS total FROM pqr');
-    const seq = Number(countRows[0]?.total ?? 0) + 1;
+    // Generar código de seguimiento atómico y seguro contra concurrencia: PQR-YYYY-XXXX
     const year = new Date().getFullYear();
+    let seq: number;
+    try {
+      const { rows: seqRows } = await pool.query<{ seq: string }>(
+        "SELECT nextval('pqr_codigo_seq') AS seq"
+      );
+      seq = Number(seqRows[0]?.seq ?? 1);
+    } catch {
+      const { rows: countRows } = await pool.query<{ total: string }>('SELECT COUNT(*) AS total FROM pqr');
+      seq = Number(countRows[0]?.total ?? 0) + 1;
+    }
     const codigo = `PQR-${year}-${String(seq).padStart(4, '0')}`;
 
     const { rows } = await pool.query<PqrRow>(
@@ -119,12 +127,24 @@ export class PqrDatasource {
   }
 
   async assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord> {
-    await pool.query(
+    const { rowCount } = await pool.query(
       `UPDATE pqr
-       SET id_responsable = $1, id_estado = 3, estado = 'Asignada'
-       WHERE id_pqr = $2`,
+       SET id_responsable = $1,
+           id_estado = CASE WHEN id_estado IN (1, 2) THEN 3 ELSE id_estado END,
+           estado = CASE WHEN estado IN ('Recibida', 'En revision') THEN 'Asignada' ELSE estado END
+       WHERE id_pqr = $2 AND estado != 'Cerrada'`,
       [idResponsable, idPqr]
     );
+
+    if (rowCount === 0) {
+      const current = await this.findById(idPqr);
+      if (!current) {
+        throw new Error(`PQR con ID ${idPqr} no encontrada`);
+      }
+      if (current.estado === 'Cerrada') {
+        throw new Error(`No es posible reasignar una PQR que ya se encuentra cerrada`);
+      }
+    }
 
     const updated = await this.findById(idPqr);
     if (!updated) {

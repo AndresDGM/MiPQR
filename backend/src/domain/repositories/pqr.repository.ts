@@ -1,6 +1,7 @@
 export interface NotificacionEmailRecord {
   enviado: boolean;
-  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO';
+  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+  simulated?: boolean;
   mensaje?: string;
 }
 
