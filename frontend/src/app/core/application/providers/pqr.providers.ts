@@ -17,6 +17,7 @@ import {
   GetPqrAttachmentsUseCase,
   DownloadPqrAttachmentUseCase,
   DeletePqrAttachmentUseCase,
+  UpdatePqrCategoriaUseCase,
 } from '../usecases';
 
 /**
@@ -35,6 +36,7 @@ export const PQR_USE_CASES: Provider[] = [
   GetPqrAttachmentsUseCase,
   DownloadPqrAttachmentUseCase,
   DeletePqrAttachmentUseCase,
+  UpdatePqrCategoriaUseCase,
 ];
 
 /**

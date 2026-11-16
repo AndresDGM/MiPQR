@@ -34,6 +34,9 @@
               <div class="pqr-tags mt-2">
                 <app-badge-tipo [tipo]="pqr.tipoPqr" />
                 <span class="pqr-category">{{ pqr.categoria }}</span>
+                @if (pqr.estadoRevisionIa === 'CONFIRMADA') {
+                  <span class="ia-verified-badge" title="Categoría verificada por IA">IA Confirmada</span>
+                }
               </div>
             </div>
             <app-badge-estado [estado]="pqr.estado" />
@@ -158,6 +161,98 @@
           <div class="card action-card">
             <h4 class="action-card__title">Modo de consulta</h4>
             <p class="text-muted">Su rol permite revisar el detalle y el historial de la solicitud, sin modificarla.</p>
+          </div>
+        }
+
+        <!-- Clasificación Asistida por IA (Personal SIAU) -->
+        @if (puedeAsignar()) {
+          <div class="card action-card ia-card mb-4">
+            <div class="ia-card__header">
+              <span class="ia-card__badge">Asistente IA</span>
+              <h4 class="action-card__title mb-0">Clasificación Automática</h4>
+            </div>
+
+            @if (pqr.categoriaSugeridaIa) {
+              <div class="ia-suggestion-box mt-3">
+                <div class="ia-suggestion-box__top">
+                  <span class="ia-label">Categoría sugerida</span>
+                  <span class="ia-confidence-badge" title="Confianza del modelo neuronal">
+                    {{ formatConfianza(pqr.confianzaIa) }}
+                  </span>
+                </div>
+                <div class="ia-category-name">{{ pqr.categoriaSugeridaIa }}</div>
+
+                <div class="ia-review-status mt-2">
+                  <span class="ia-status-label">Estado de revisión:</span>
+                  <span
+                    class="ia-status-badge"
+                    [class.ia-status-badge--pendiente]="!pqr.estadoRevisionIa || pqr.estadoRevisionIa === 'PENDIENTE'"
+                    [class.ia-status-badge--confirmada]="pqr.estadoRevisionIa === 'CONFIRMADA'"
+                    [class.ia-status-badge--modificada]="pqr.estadoRevisionIa === 'MODIFICADA'"
+                  >
+                    {{ pqr.estadoRevisionIa || 'PENDIENTE' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="ia-actions mt-3">
+                @if (pqr.estadoRevisionIa !== 'CONFIRMADA') {
+                  <button
+                    type="button"
+                    class="btn btn-accent btn-block btn-sm"
+                    [disabled]="state().actionLoading"
+                    (click)="onConfirmarSugerenciaIa()"
+                  >
+                    Confirmar Sugerencia
+                  </button>
+                }
+
+                <div class="ia-divider my-3">
+                  <span>Modificar categoría</span>
+                </div>
+
+                <form [formGroup]="categoriaForm" (ngSubmit)="onModificarCategoria()">
+                  <div class="form-group mb-2">
+                    <label for="selectCategoriaIa">Seleccionar otra categoría:</label>
+                    <select id="selectCategoriaIa" formControlName="idCategoria">
+                      @for (cat of state().categories; track cat.idCategoria) {
+                        <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
+                      }
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn btn-outline-primary btn-block btn-sm"
+                    [disabled]="categoriaForm.invalid || state().actionLoading"
+                  >
+                    Modificar Categoría
+                  </button>
+                </form>
+              </div>
+            } @else {
+              <div class="ia-unavailable-box mt-3">
+                <p class="ia-unavailable-text">
+                  El servicio de Inteligencia Artificial no proporcionó una clasificación automática para esta solicitud.
+                </p>
+                <form [formGroup]="categoriaForm" (ngSubmit)="onModificarCategoria()">
+                  <div class="form-group mb-2">
+                    <label for="selectCategoriaManual">Asignar categoría manual:</label>
+                    <select id="selectCategoriaManual" formControlName="idCategoria">
+                      @for (cat of state().categories; track cat.idCategoria) {
+                        <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
+                      }
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-block btn-sm"
+                    [disabled]="categoriaForm.invalid || state().actionLoading"
+                  >
+                    Guardar Categoría
+                  </button>
+                </form>
+              </div>
+            }
           </div>
         }
 

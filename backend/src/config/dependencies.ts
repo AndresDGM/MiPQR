@@ -19,7 +19,10 @@ import {
   GetAllPqrsBackendUseCase,
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
+  UpdatePqrCategoriaUseCase,
 } from '../application/usecases/pqrs/pqr.usecases.js';
+import { ClassifyPqrUseCase } from '../application/usecases/pqrs/classify-pqr.usecase.js';
+import { HttpPqrClassificationAdapter } from '../infrastructure/repositories/http-pqr-classification.adapter.js';
 import { AssignPqrResponsableBackendUseCase } from '../application/usecases/pqrs/assign-responsable.usecase.js';
 import { DesCipherAdapter } from '../infrastructure/services/des-cipher.adapter.js';
 import { RsaCipherAdapter } from '../infrastructure/services/rsa-cipher.adapter.js';
@@ -76,6 +79,10 @@ const rolRepository = new RolRepositoryImpl(rolDatasource);
 const usuarioRepository = new UsuarioRepositoryImpl(usuarioDatasource);
 const documentoAdjuntoRepository = new DocumentoAdjuntoRepositoryImpl(documentoAdjuntoDatasource);
 const pqrRepository = new PqrRepositoryImpl(pqrDatasource);
+export const pqrClassificationRepository = new HttpPqrClassificationAdapter(
+  envs.AI_SERVICE_URL,
+  envs.AI_SERVICE_TIMEOUT_MS
+);
 
 // 3. Casos de uso
 const getAllRolesUseCase = new GetAllRolesUseCase(rolRepository);
@@ -120,13 +127,20 @@ const deleteDocumentoUseCase = new DeleteDocumentoUseCase(
 const getAllPqrsBackendUseCase = new GetAllPqrsBackendUseCase(pqrRepository);
 const getPqrByIdBackendUseCase = new GetPqrByIdBackendUseCase(pqrRepository);
 const getPqrByCodigoBackendUseCase = new GetPqrByCodigoBackendUseCase(pqrRepository);
-const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository, emailService, envs.APP_URL);
+const createPqrBackendUseCase = new CreatePqrBackendUseCase(
+  pqrRepository,
+  pqrClassificationRepository,
+  emailService,
+  envs.APP_URL
+);
 const assignPqrResponsableBackendUseCase = new AssignPqrResponsableBackendUseCase(
   pqrRepository,
   usuarioRepository,
   emailService,
   envs.APP_URL
 );
+const updatePqrCategoriaUseCase = new UpdatePqrCategoriaUseCase(pqrRepository);
+const classifyPqrUseCase = new ClassifyPqrUseCase(pqrClassificationRepository);
 
 // 4. Controladores
 export const rolesController = new RolesController(
@@ -157,6 +171,8 @@ export const pqrController = new PqrController(
   getPqrByIdBackendUseCase,
   getPqrByCodigoBackendUseCase,
   createPqrBackendUseCase,
+  classifyPqrUseCase,
+  updatePqrCategoriaUseCase,
   assignPqrResponsableBackendUseCase
 );
 

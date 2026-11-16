@@ -23,6 +23,13 @@ export interface PqrRecord {
   descripcion: string;
   fechaRegistro: Date;
   fechaCierre?: Date | null;
+  // Campos IA
+  categoriaSugeridaIa?: string | null;
+  confianzaIa?: number | null;
+  estadoRevisionIa?: 'PENDIENTE' | 'CONFIRMADA' | 'MODIFICADA';
+  fechaClasificacionIa?: Date | null;
+  versionModeloIa?: string | null;
+  idUsuarioRevisionIa?: number | null;
   notificacionEmail?: NotificacionEmailRecord;
 }
 
@@ -35,6 +42,9 @@ export interface CreatePqrData {
   correoSolicitante: string;
   identificacionSolicitante: string;
   idSolicitante?: number | null;
+  categoriaSugeridaIa?: string | null;
+  confianzaIa?: number | null;
+  versionModeloIa?: string | null;
 }
 
 /**
@@ -49,4 +59,11 @@ export abstract class PqrRepository {
   abstract findByCodigo(codigo: string): Promise<PqrRecord | null>;
   abstract create(data: CreatePqrData): Promise<PqrRecord>;
   abstract assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord>;
+  abstract updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA',
+    idUsuarioRevision?: number | null
+  ): Promise<PqrRecord>;
 }

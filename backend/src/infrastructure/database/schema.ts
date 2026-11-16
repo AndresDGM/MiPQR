@@ -41,8 +41,23 @@ CREATE TABLE IF NOT EXISTS pqr (
   asunto                     VARCHAR(200) NOT NULL,
   descripcion                TEXT NOT NULL,
   fecha_registro             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  fecha_cierre               TIMESTAMP WITH TIME ZONE
+  fecha_cierre               TIMESTAMP WITH TIME ZONE,
+  -- Campos de sugerencia y auditoría de Inteligencia Artificial
+  categoria_sugerida_ia      VARCHAR(100),
+  confianza_ia               REAL,
+  estado_revision_ia         VARCHAR(20) DEFAULT 'PENDIENTE',
+  fecha_clasificacion_ia     TIMESTAMP WITH TIME ZONE,
+  version_modelo_ia          VARCHAR(50),
+  id_usuario_revision_ia     INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL
 );
+
+-- Asegurar compatibilidad si la tabla pqr ya existía
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS categoria_sugerida_ia VARCHAR(100);
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS confianza_ia REAL;
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS estado_revision_ia VARCHAR(20) DEFAULT 'PENDIENTE';
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS fecha_clasificacion_ia TIMESTAMP WITH TIME ZONE;
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS version_modelo_ia VARCHAR(50);
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS id_usuario_revision_ia INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL;
 
 CREATE INDEX IF NOT EXISTS idx_pqr_codigo ON pqr (codigo_seguimiento);
 CREATE INDEX IF NOT EXISTS idx_pqr_id_solicitante ON pqr (id_solicitante);

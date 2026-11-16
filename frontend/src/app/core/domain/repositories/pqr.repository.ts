@@ -95,5 +95,21 @@ export abstract class PqrRepository {
    * @returns Observable con la respuesta generada {@link PqrResponse}
    */
   abstract responder(idPqr: number, contenido: string): Observable<PqrResponse>;
+
+  /**
+   * Confirma o modifica la categoría sugerida por el modelo neuronal de IA.
+   *
+   * @param idPqr Identificador de la PQR
+   * @param idCategoria Identificador de la categoría seleccionada
+   * @param categoria Nombre descriptivo de la categoría
+   * @param estadoRevisionIa Estado de la revisión ('CONFIRMADA' o 'MODIFICADA')
+   * @returns Observable que emite la {@link Pqr} con la categoría actualizada
+   */
+  abstract updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA'
+  ): Observable<Pqr>;
 }
 

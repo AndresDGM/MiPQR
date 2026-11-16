@@ -22,6 +22,8 @@ export class PqrRoutes {
     router.get('/codigo/:codigo', optionalAuthenticate, controller.getByCodigo);
     router.get('/:id', optionalAuthenticate, controller.getById);
     router.post('/', optionalAuthenticate, controller.create);
+    router.post('/classify', optionalAuthenticate, controller.classify);
+    router.patch('/:id/categoria', optionalAuthenticate, controller.updateCategoria);
     router.patch('/:id/responsable', middlewares.authenticate, controller.assignResponsable);
 
     // Rutas de adjuntos anidadas: /api/pqrs/:id/attachments y /api/pqrs/:id/adjuntos
