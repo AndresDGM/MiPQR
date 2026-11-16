@@ -5,6 +5,7 @@ import {
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
 } from '../../application/usecases/pqrs/pqr.usecases.js';
+import { AssignPqrResponsableBackendUseCase } from '../../application/usecases/pqrs/assign-responsable.usecase.js';
 import { CustomError } from '../../domain/errors/custom.error.js';
 
 export class PqrController {
@@ -12,7 +13,8 @@ export class PqrController {
     private readonly getAllUseCase: GetAllPqrsBackendUseCase,
     private readonly getByIdUseCase: GetPqrByIdBackendUseCase,
     private readonly getByCodigoUseCase: GetPqrByCodigoBackendUseCase,
-    private readonly createUseCase: CreatePqrBackendUseCase
+    private readonly createUseCase: CreatePqrBackendUseCase,
+    private readonly assignResponsableUseCase?: AssignPqrResponsableBackendUseCase
   ) {}
 
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -76,6 +78,28 @@ export class PqrController {
       });
 
       res.status(201).json(pqr);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  assignResponsable = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const idPqr = Number(req.params.id);
+      if (isNaN(idPqr) || idPqr <= 0) throw CustomError.badRequest('ID de PQR inválido');
+
+      const { idResponsable } = req.body;
+      const idResp = Number(idResponsable);
+      if (isNaN(idResp) || idResp <= 0) {
+        throw CustomError.badRequest('ID de responsable inválido o faltante');
+      }
+
+      if (!this.assignResponsableUseCase) {
+        throw CustomError.internal('Caso de uso de asignación no configurado');
+      }
+
+      const updated = await this.assignResponsableUseCase.execute(idPqr, idResp);
+      res.json(updated);
     } catch (error) {
       next(error);
     }

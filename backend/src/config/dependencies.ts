@@ -20,6 +20,7 @@ import {
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
 } from '../application/usecases/pqrs/pqr.usecases.js';
+import { AssignPqrResponsableBackendUseCase } from '../application/usecases/pqrs/assign-responsable.usecase.js';
 import { DesCipherAdapter } from '../infrastructure/services/des-cipher.adapter.js';
 import { RsaCipherAdapter } from '../infrastructure/services/rsa-cipher.adapter.js';
 import { RolDatasource } from '../infrastructure/datasources/rol.datasource.js';
@@ -28,6 +29,7 @@ import { DocumentoAdjuntoDatasource } from '../infrastructure/datasources/docume
 import { PqrDatasource } from '../infrastructure/datasources/pqr.datasource.js';
 import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 import { FileValidatorService } from '../infrastructure/services/file-validator.service.js';
+import { NodemailerEmailService } from '../infrastructure/services/nodemailer-email.service.js';
 import { RolRepositoryImpl } from '../infrastructure/repositories/rol.repository.impl.js';
 import { UsuarioRepositoryImpl } from '../infrastructure/repositories/usuario.repository.impl.js';
 import { DocumentoAdjuntoRepositoryImpl } from '../infrastructure/repositories/documento-adjunto.repository.impl.js';
@@ -52,6 +54,14 @@ const pqrDatasource = new PqrDatasource();
 // Servicios de infraestructura
 const tokenService = new JwtTokenService();
 const fileValidatorService = new FileValidatorService();
+export const emailService = new NodemailerEmailService({
+  host: envs.SMTP_HOST,
+  port: envs.SMTP_PORT,
+  user: envs.SMTP_USER,
+  pass: envs.SMTP_PASS,
+  from: envs.SMTP_FROM,
+  secure: envs.SMTP_SECURE,
+});
 
 // Servicios
 // DES para las peticiones (transporte) y RSA para las contrasenas guardadas (reposo)
@@ -110,7 +120,13 @@ const deleteDocumentoUseCase = new DeleteDocumentoUseCase(
 const getAllPqrsBackendUseCase = new GetAllPqrsBackendUseCase(pqrRepository);
 const getPqrByIdBackendUseCase = new GetPqrByIdBackendUseCase(pqrRepository);
 const getPqrByCodigoBackendUseCase = new GetPqrByCodigoBackendUseCase(pqrRepository);
-const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository);
+const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository, emailService, envs.APP_URL);
+const assignPqrResponsableBackendUseCase = new AssignPqrResponsableBackendUseCase(
+  pqrRepository,
+  usuarioRepository,
+  emailService,
+  envs.APP_URL
+);
 
 // 4. Controladores
 export const rolesController = new RolesController(
@@ -140,7 +156,8 @@ export const pqrController = new PqrController(
   getAllPqrsBackendUseCase,
   getPqrByIdBackendUseCase,
   getPqrByCodigoBackendUseCase,
-  createPqrBackendUseCase
+  createPqrBackendUseCase,
+  assignPqrResponsableBackendUseCase
 );
 
 // 5. Middlewares

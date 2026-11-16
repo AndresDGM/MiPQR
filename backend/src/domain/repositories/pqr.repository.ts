@@ -1,3 +1,10 @@
+export interface NotificacionEmailRecord {
+  enviado: boolean;
+  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+  simulated?: boolean;
+  mensaje?: string;
+}
+
 export interface PqrRecord {
   idPqr: number;
   codigoSeguimiento: string;
@@ -16,6 +23,7 @@ export interface PqrRecord {
   descripcion: string;
   fechaRegistro: Date;
   fechaCierre?: Date | null;
+  notificacionEmail?: NotificacionEmailRecord;
 }
 
 export interface CreatePqrData {
@@ -40,4 +48,5 @@ export abstract class PqrRepository {
   abstract findById(idPqr: number): Promise<PqrRecord | null>;
   abstract findByCodigo(codigo: string): Promise<PqrRecord | null>;
   abstract create(data: CreatePqrData): Promise<PqrRecord>;
+  abstract assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord>;
 }

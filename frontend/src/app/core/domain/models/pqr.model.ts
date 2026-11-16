@@ -111,6 +111,14 @@ export interface Pqr {
 
   /** Fecha y hora en la que se cerró la solicitud (si aplica) */
   fechaCierre?: string;
+
+  /** Estado del envío de notificación por correo electrónico */
+  notificacionEmail?: {
+    enviado: boolean;
+    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+    simulated?: boolean;
+    mensaje?: string;
+  };
 }
 
 /**

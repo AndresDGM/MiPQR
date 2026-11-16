@@ -218,6 +218,28 @@
             >
               Asignar Caso
             </button>
+
+            @if (state().emailDeliveryStatus) {
+              <div
+                class="mt-3 p-3 rounded"
+                [style.background-color]="state().emailDeliveryStatus?.estado === 'ENVIADO' ? '#E6FFFA' : (state().emailDeliveryStatus?.estado === 'PENDIENTE' ? '#F2F4F7' : '#FFF5F7')"
+                [style.border-left]="'4px solid ' + (state().emailDeliveryStatus?.estado === 'ENVIADO' ? '#279BAF' : (state().emailDeliveryStatus?.estado === 'PENDIENTE' ? '#673E93' : '#D54877'))"
+              >
+                <div style="font-size: 13px; font-weight: 600;"
+                  [style.color]="state().emailDeliveryStatus?.estado === 'ENVIADO' ? '#279BAF' : (state().emailDeliveryStatus?.estado === 'PENDIENTE' ? '#673E93' : '#D54877')">
+                  @if (state().emailDeliveryStatus?.estado === 'ENVIADO') {
+                    Correo enviado correctamente
+                  } @else if (state().emailDeliveryStatus?.estado === 'PENDIENTE') {
+                    Correo pendiente de envio
+                  } @else {
+                    Error durante el envio del correo
+                  }
+                </div>
+                <div style="font-size: 12px; color: #283447; margin-top: 4px;">
+                  {{ state().emailDeliveryStatus?.mensaje }}
+                </div>
+              </div>
+            }
           </form>
         </div>
 
