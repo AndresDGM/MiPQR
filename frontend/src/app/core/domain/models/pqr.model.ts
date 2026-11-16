@@ -111,6 +111,24 @@ export interface Pqr {
 
   /** Fecha y hora en la que se cerró la solicitud (si aplica) */
   fechaCierre?: string;
+
+  /** Categoría sugerida por el modelo de inferencia IA */
+  categoriaSugeridaIa?: string | null;
+
+  /** Nivel de confianza probabilística de la predicción IA (0.0 a 1.0) */
+  confianzaIa?: number | null;
+
+  /** Estado de auditoría y validación del personal SIAU sobre la predicción */
+  estadoRevisionIa?: 'PENDIENTE' | 'CONFIRMADA' | 'MODIFICADA';
+
+  /** Fecha y hora en la que se ejecutó la inferencia del modelo */
+  fechaClasificacionIa?: string | null;
+
+  /** Versión del modelo o artefacto utilizado */
+  versionModeloIa?: string | null;
+
+  /** Identificador del funcionario SIAU que revisó o modificó la sugerencia */
+  idUsuarioRevisionIa?: number | null;
 }
 
 /**

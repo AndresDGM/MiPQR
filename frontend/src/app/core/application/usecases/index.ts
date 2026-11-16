@@ -15,3 +15,4 @@ export * from './upload-pqr-attachments.usecase';
 export * from './get-pqr-attachments.usecase';
 export * from './download-pqr-attachment.usecase';
 export * from './delete-pqr-attachment.usecase';
+export * from './update-pqr-categoria.usecase';
