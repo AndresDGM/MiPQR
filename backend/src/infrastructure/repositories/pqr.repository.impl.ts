@@ -31,4 +31,20 @@ export class PqrRepositoryImpl extends PqrRepository {
   create(data: CreatePqrData): Promise<PqrRecord> {
     return this.datasource.create(data);
   }
+
+  updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA',
+    idUsuarioRevision?: number | null
+  ): Promise<PqrRecord> {
+    return this.datasource.updateCategoria(
+      idPqr,
+      idCategoria,
+      categoria,
+      estadoRevisionIa,
+      idUsuarioRevision
+    );
+  }
 }

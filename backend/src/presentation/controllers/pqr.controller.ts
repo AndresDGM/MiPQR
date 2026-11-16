@@ -4,6 +4,7 @@ import {
   GetAllPqrsBackendUseCase,
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
+  UpdatePqrCategoriaUseCase,
 } from '../../application/usecases/pqrs/pqr.usecases.js';
 import { ClassifyPqrUseCase } from '../../application/usecases/pqrs/classify-pqr.usecase.js';
 import { CustomError } from '../../domain/errors/custom.error.js';
@@ -14,7 +15,8 @@ export class PqrController {
     private readonly getByIdUseCase: GetPqrByIdBackendUseCase,
     private readonly getByCodigoUseCase: GetPqrByCodigoBackendUseCase,
     private readonly createUseCase: CreatePqrBackendUseCase,
-    private readonly classifyUseCase?: ClassifyPqrUseCase
+    private readonly classifyUseCase?: ClassifyPqrUseCase,
+    private readonly updateCategoriaUseCase?: UpdatePqrCategoriaUseCase
   ) {}
 
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -103,6 +105,32 @@ export class PqrController {
         disponible: true,
         ...result,
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateCategoria = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = Number(req.params.id);
+      if (isNaN(id) || id <= 0) throw CustomError.badRequest('ID de PQR inválido');
+
+      if (!this.updateCategoriaUseCase) {
+        throw CustomError.internal('Caso de uso para actualizar categoría no configurado');
+      }
+
+      const { idCategoria, categoria, estadoRevisionIa } = req.body;
+      const idUsuario = req.user?.idUsuario ?? null;
+
+      const updated = await this.updateCategoriaUseCase.execute({
+        idPqr: id,
+        idCategoria: Number(idCategoria),
+        categoria: String(categoria).trim(),
+        estadoRevisionIa,
+        idUsuarioRevision: idUsuario,
+      });
+
+      res.json(updated);
     } catch (error) {
       next(error);
     }

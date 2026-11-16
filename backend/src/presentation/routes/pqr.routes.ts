@@ -23,6 +23,7 @@ export class PqrRoutes {
     router.get('/:id', optionalAuthenticate, controller.getById);
     router.post('/', optionalAuthenticate, controller.create);
     router.post('/classify', optionalAuthenticate, controller.classify);
+    router.patch('/:id/categoria', optionalAuthenticate, controller.updateCategoria);
 
     // Rutas de adjuntos anidadas: /api/pqrs/:id/attachments y /api/pqrs/:id/adjuntos
     const nested = DocumentosRoutes.pqrNestedRoutes(documentosController, middlewares);

@@ -19,6 +19,7 @@ import {
   GetAllPqrsBackendUseCase,
   GetPqrByCodigoBackendUseCase,
   GetPqrByIdBackendUseCase,
+  UpdatePqrCategoriaUseCase,
 } from '../application/usecases/pqrs/pqr.usecases.js';
 import { ClassifyPqrUseCase } from '../application/usecases/pqrs/classify-pqr.usecase.js';
 import { HttpPqrClassificationAdapter } from '../infrastructure/repositories/http-pqr-classification.adapter.js';
@@ -116,7 +117,8 @@ const deleteDocumentoUseCase = new DeleteDocumentoUseCase(
 const getAllPqrsBackendUseCase = new GetAllPqrsBackendUseCase(pqrRepository);
 const getPqrByIdBackendUseCase = new GetPqrByIdBackendUseCase(pqrRepository);
 const getPqrByCodigoBackendUseCase = new GetPqrByCodigoBackendUseCase(pqrRepository);
-const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository);
+const createPqrBackendUseCase = new CreatePqrBackendUseCase(pqrRepository, pqrClassificationRepository);
+const updatePqrCategoriaUseCase = new UpdatePqrCategoriaUseCase(pqrRepository);
 const classifyPqrUseCase = new ClassifyPqrUseCase(pqrClassificationRepository);
 
 // 4. Controladores
@@ -148,7 +150,8 @@ export const pqrController = new PqrController(
   getPqrByIdBackendUseCase,
   getPqrByCodigoBackendUseCase,
   createPqrBackendUseCase,
-  classifyPqrUseCase
+  classifyPqrUseCase,
+  updatePqrCategoriaUseCase
 );
 
 // 5. Middlewares

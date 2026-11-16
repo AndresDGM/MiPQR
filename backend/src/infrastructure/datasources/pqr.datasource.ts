@@ -19,6 +19,12 @@ interface PqrRow {
   descripcion: string;
   fecha_registro: string | Date;
   fecha_cierre: string | Date | null;
+  categoria_sugerida_ia?: string | null;
+  confianza_ia?: number | null;
+  estado_revision_ia?: string | null;
+  fecha_clasificacion_ia?: string | Date | null;
+  version_modelo_ia?: string | null;
+  id_usuario_revision_ia?: number | null;
 }
 
 /**
@@ -47,6 +53,12 @@ export class PqrDatasource {
       descripcion: row.descripcion,
       fechaRegistro: new Date(row.fecha_registro),
       fechaCierre: row.fecha_cierre ? new Date(row.fecha_cierre) : null,
+      categoriaSugeridaIa: row.categoria_sugerida_ia ?? null,
+      confianzaIa: row.confianza_ia !== undefined && row.confianza_ia !== null ? Number(row.confianza_ia) : null,
+      estadoRevisionIa: (row.estado_revision_ia as any) || 'PENDIENTE',
+      fechaClasificacionIa: row.fecha_clasificacion_ia ? new Date(row.fecha_clasificacion_ia) : null,
+      versionModeloIa: row.version_modelo_ia ?? null,
+      idUsuarioRevisionIa: row.id_usuario_revision_ia ?? null,
     };
   }
 
@@ -93,13 +105,15 @@ export class PqrDatasource {
     const year = new Date().getFullYear();
     const codigo = `PQR-${year}-${String(seq).padStart(4, '0')}`;
 
+    const hasIa = !!data.categoriaSugeridaIa;
     const { rows } = await pool.query<PqrRow>(
       `INSERT INTO pqr (
          codigo_seguimiento, id_solicitante, nombre_solicitante, correo_solicitante,
          identificacion_solicitante, id_categoria, categoria, id_estado, estado,
-         tipo_pqr, asunto, descripcion, fecha_registro
+         tipo_pqr, asunto, descripcion, fecha_registro,
+         categoria_sugerida_ia, confianza_ia, estado_revision_ia, fecha_clasificacion_ia, version_modelo_ia
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 1, 'Recibida', $8, $9, $10, NOW())
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 1, 'Recibida', $8, $9, $10, NOW(), $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         codigo,
@@ -112,9 +126,40 @@ export class PqrDatasource {
         data.tipoPqr,
         data.asunto,
         data.descripcion,
+        data.categoriaSugeridaIa ?? null,
+        data.confianzaIa ?? null,
+        hasIa ? 'PENDIENTE' : null,
+        hasIa ? new Date() : null,
+        data.versionModeloIa ?? null,
       ]
     );
 
     return this.toRecord(rows[0]!);
+  }
+
+  async updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA',
+    idUsuarioRevision?: number | null
+  ): Promise<PqrRecord> {
+    const { rows } = await pool.query<PqrRow>(
+      `UPDATE pqr
+       SET id_categoria = $1,
+           categoria = $2,
+           estado_revision_ia = $3,
+           id_usuario_revision_ia = $4
+       WHERE id_pqr = $5
+       RETURNING *`,
+      [idCategoria, categoria, estadoRevisionIa, idUsuarioRevision ?? null, idPqr]
+    );
+
+    if (!rows[0]) {
+      throw new Error(`PQR con ID ${idPqr} no encontrada`);
+    }
+
+    const record = await this.findById(idPqr);
+    return record || this.toRecord(rows[0]);
   }
 }
