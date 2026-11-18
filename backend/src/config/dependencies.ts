@@ -151,7 +151,8 @@ const createPqrBackendUseCase = new CreatePqrBackendUseCase(
   pqrRepository,
   pqrClassificationRepository,
   emailService,
-  envs.APP_URL
+  envs.APP_URL,
+  whatsappService
 );
 const assignPqrResponsableBackendUseCase = new AssignPqrResponsableBackendUseCase(
   pqrRepository,

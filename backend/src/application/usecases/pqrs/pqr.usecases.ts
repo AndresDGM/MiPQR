@@ -2,6 +2,7 @@ import { CreatePqrData, PqrRecord, PqrRepository } from '../../../domain/reposit
 import { PQRClassificationRepository } from '../../../domain/repositories/pqr-classification.repository.js';
 import { CustomError } from '../../../domain/errors/custom.error.js';
 import { EmailService } from '../../../domain/services/email.service.js';
+import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
 import { Actor } from '../../types/actor.type.js';
 
@@ -51,15 +52,18 @@ export class CreatePqrBackendUseCase {
   private readonly repository: PqrRepository;
   private readonly classificationRepo?: PQRClassificationRepository;
   private readonly emailService?: EmailService;
+  private readonly whatsappService?: WhatsAppService;
   private readonly appUrl: string;
 
   constructor(
     repository: PqrRepository,
     arg2?: PQRClassificationRepository | EmailService,
     arg3?: EmailService | string,
-    arg4?: string
+    arg4?: string,
+    arg5?: WhatsAppService
   ) {
     this.repository = repository;
+    this.whatsappService = arg5;
     if (arg2 && 'classify' in arg2) {
       this.classificationRepo = arg2 as PQRClassificationRepository;
       if (arg3 && typeof arg3 === 'object' && 'sendEmail' in arg3) {
@@ -136,6 +140,21 @@ export class CreatePqrBackendUseCase {
           estado: 'FALLIDO',
           mensaje: err?.message || 'Error al procesar correo de confirmación',
         };
+      }
+    }
+
+    // 4. Notificación por WhatsApp al solicitante (no bloqueante)
+    if (this.whatsappService && pqr.telefonoSolicitante) {
+      try {
+        const baseUrl = this.appUrl.replace(/\/$/, '');
+        await this.whatsappService.sendMessage({
+          to: pqr.telefonoSolicitante,
+          idPqr: pqr.idPqr,
+          tipoEvento: 'REGISTRO_PQR',
+          body: `MiPQR | Hola ${pqr.nombreSolicitante || 'Solicitante'}, tu ${pqr.tipoPqr} fue radicada con el código ${pqr.codigoSeguimiento}. Consulta su estado en: ${baseUrl}/consulta?codigo=${encodeURIComponent(pqr.codigoSeguimiento)}`,
+        });
+      } catch (err) {
+        console.error('[CreatePqrBackendUseCase] Error en notificación WhatsApp:', err);
       }
     }
 

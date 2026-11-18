@@ -15,6 +15,7 @@ import { UsuarioRepository } from '../src/domain/repositories/usuario.repository
 import { Usuario } from '../src/domain/entities/usuario.entity.js';
 import { ResponderPqrUseCase } from '../src/application/usecases/pqrs/responder-pqr.usecase.js';
 import { CheckSlaAlertsUseCase } from '../src/application/usecases/pqrs/check-sla-alerts.usecase.js';
+import { CreatePqrBackendUseCase } from '../src/application/usecases/pqrs/pqr.usecases.js';
 
 class SpyEmailService extends EmailService {
   public sent: SendEmailOptions[] = [];
@@ -63,7 +64,25 @@ class SlaMockPqrRepository extends PqrRepository {
   async findByCodigo(codigo: string): Promise<PqrRecord | null> {
     return this.pqrs.find((p) => p.codigoSeguimiento === codigo) ?? null;
   }
-  async create(_data: CreatePqrData): Promise<PqrRecord> { throw new Error('Not needed'); }
+  async create(data: CreatePqrData): Promise<PqrRecord> {
+    const created: PqrRecord = {
+      idPqr: this.pqrs.length + 1,
+      codigoSeguimiento: `PQR-2026-000${this.pqrs.length + 1}`,
+      idCategoria: data.idCategoria,
+      categoria: 'Atención Médica',
+      idEstado: 1,
+      estado: 'Recibida',
+      tipoPqr: data.tipoPqr,
+      asunto: data.asunto,
+      descripcion: data.descripcion,
+      nombreSolicitante: data.nombreSolicitante,
+      correoSolicitante: data.correoSolicitante,
+      telefonoSolicitante: data.telefonoSolicitante ?? null,
+      fechaRegistro: new Date(),
+    };
+    this.pqrs.push(created);
+    return created;
+  }
   async assignResponsable(): Promise<PqrRecord> { throw new Error('Not needed'); }
   async updateCategoria(): Promise<PqrRecord> { throw new Error('Not needed'); }
   async updateEstado(_id: number, _idE: number, _e: PqrStatusName): Promise<PqrRecord> {
@@ -157,5 +176,35 @@ describe('Alertas por Correo y WhatsApp (Respuesta y SLA)', () => {
     const second = await useCase.execute();
     assert.equal(second.alertadas, 0);
     assert.equal(emailSpy.sent.length, 1);
+  });
+
+  it('CreatePqrBackendUseCase debe notificar al solicitante por WhatsApp si tiene telefono', async () => {
+    const pqrRepo = new SlaMockPqrRepository();
+    const emailSpy = new SpyEmailService();
+    const waSpy = new SpyWhatsAppService();
+
+    const useCase = new CreatePqrBackendUseCase(
+      pqrRepo,
+      undefined,
+      emailSpy,
+      'https://mipqr.example',
+      waSpy
+    );
+
+    const created = await useCase.execute({
+      tipoPqr: 'Peticion',
+      idCategoria: 1,
+      asunto: 'Solicitud de cita',
+      descripcion: 'Necesito reprogramar mi cita médica.',
+      nombreSolicitante: 'Laura Pérez',
+      correoSolicitante: 'laura@test.com',
+      identificacionSolicitante: '10101010',
+      telefonoSolicitante: '3159804296',
+    });
+
+    assert.equal(waSpy.sent.length, 1);
+    assert.equal(waSpy.sent[0]?.to, '3159804296');
+    assert.equal(waSpy.sent[0]?.tipoEvento, 'REGISTRO_PQR');
+    assert.ok(waSpy.sent[0]?.body.includes(created.codigoSeguimiento));
   });
 });
