@@ -2,10 +2,11 @@ import { CustomError } from '../../../domain/errors/custom.error.js';
 import { PqrRecord, PqrRepository } from '../../../domain/repositories/pqr.repository.js';
 import { UsuarioRepository } from '../../../domain/repositories/usuario.repository.js';
 import { EmailService } from '../../../domain/services/email.service.js';
+import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
 
 /**
- * Caso de uso para asignar un profesional responsable a una PQR y notificarle vía correo electrónico.
+ * Caso de uso para asignar un profesional responsable a una PQR y notificarle vía correo electrónico y WhatsApp.
  *
  * @architecture Clean Architecture
  * @layer Application
@@ -15,7 +16,8 @@ export class AssignPqrResponsableBackendUseCase {
     private readonly pqrRepository: PqrRepository,
     private readonly usuarioRepository: UsuarioRepository,
     private readonly emailService?: EmailService,
-    private readonly appUrl: string = 'http://localhost:4200'
+    private readonly appUrl: string = 'http://localhost:4200',
+    private readonly whatsappService?: WhatsAppService
   ) {}
 
   async execute(idPqr: number, idResponsable: number): Promise<PqrRecord> {
@@ -98,6 +100,21 @@ export class AssignPqrResponsableBackendUseCase {
           estado: 'FALLIDO',
           mensaje: err?.message || 'Error al procesar correo de asignación',
         };
+      }
+    }
+
+    // 5. Enviar notificación por WhatsApp al responsable asignado (no bloqueante)
+    if (this.whatsappService && responsable.telefono) {
+      try {
+        const baseUrl = this.appUrl.replace(/\/$/, '');
+        await this.whatsappService.sendMessage({
+          to: responsable.telefono,
+          idPqr: updated.idPqr,
+          tipoEvento: 'ASIGNACION_RESPONSABLE',
+          body: `MiPQR | Hola ${responsable.nombre}, se te ha asignado la PQR ${updated.codigoSeguimiento} (${updated.tipoPqr}). Gestiónala en: ${baseUrl}/detalle/${updated.idPqr}`,
+        });
+      } catch (err) {
+        console.error('[AssignPqrResponsableBackendUseCase] Error en notificación WhatsApp:', err);
       }
     }
 

@@ -4,7 +4,7 @@ export interface SendEmailOptions {
   html: string;
   text?: string;
   idPqr?: number;
-  tipoEvento: 'REGISTRO_PQR' | 'ASIGNACION_RESPONSABLE' | 'ALERTA_VENCIMIENTO';
+  tipoEvento: 'REGISTRO_PQR' | 'ASIGNACION_RESPONSABLE' | 'RESPUESTA_PQR' | 'ALERTA_VENCIMIENTO';
 }
 
 export interface SendEmailResult {

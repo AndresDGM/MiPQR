@@ -2,6 +2,7 @@ import {
   appMiddlewares,
   authController,
   categoriasController,
+  checkSlaAlertsUseCase,
   documentosController,
   passwordCipher,
   pqrController,
@@ -34,6 +35,15 @@ async function main(): Promise<void> {
   });
 
   server.start();
+
+  const runSlaCheck = (): void => {
+    checkSlaAlertsUseCase.execute().catch((err) => {
+      console.error('[SLA Monitor] Error verificando alertas de vencimiento:', err);
+    });
+  };
+  runSlaCheck();
+  const intervalMs = envs.SLA_CHECK_INTERVAL_MINUTES * 60 * 1000;
+  setInterval(runSlaCheck, intervalMs).unref();
 }
 
 main().catch((error) => {

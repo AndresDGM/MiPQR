@@ -1,5 +1,8 @@
 import { CustomError } from '../../../domain/errors/custom.error.js';
 import { PqrRepository, PqrResponseRecord } from '../../../domain/repositories/pqr.repository.js';
+import { EmailService } from '../../../domain/services/email.service.js';
+import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
+import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
 
 export interface ResponderPqrDTO {
   idPqr: number;
@@ -8,7 +11,12 @@ export interface ResponderPqrDTO {
 }
 
 export class ResponderPqrUseCase {
-  constructor(private readonly repository: PqrRepository) {}
+  constructor(
+    private readonly repository: PqrRepository,
+    private readonly emailService?: EmailService,
+    private readonly whatsappService?: WhatsAppService,
+    private readonly appUrl: string = 'http://localhost:4200'
+  ) {}
 
   async execute(dto: ResponderPqrDTO): Promise<PqrResponseRecord> {
     const contenido = dto.contenido?.trim();
@@ -25,6 +33,45 @@ export class ResponderPqrUseCase {
       throw CustomError.badRequest('No es posible responder una PQR que ya se encuentra cerrada');
     }
 
-    return this.repository.responder(dto.idPqr, dto.idUsuario, contenido);
+    const respuesta = await this.repository.responder(dto.idPqr, dto.idUsuario, contenido);
+
+    if (this.emailService && pqr.correoSolicitante) {
+      try {
+        const { subject, html, text } = EmailTemplates.buildRespuestaEmitida({
+          nombreSolicitante: pqr.nombreSolicitante || 'Solicitante',
+          codigoSeguimiento: pqr.codigoSeguimiento,
+          tipoPqr: pqr.tipoPqr,
+          fechaRespuesta: respuesta.fechaRespuesta,
+          appUrl: this.appUrl,
+        });
+
+        await this.emailService.sendEmail({
+          to: pqr.correoSolicitante,
+          subject,
+          html,
+          text,
+          idPqr: pqr.idPqr,
+          tipoEvento: 'RESPUESTA_PQR',
+        });
+      } catch (err) {
+        console.error('[ResponderPqrUseCase] Error en notificación por correo:', err);
+      }
+    }
+
+    if (this.whatsappService && pqr.telefonoSolicitante) {
+      try {
+        const baseUrl = this.appUrl.replace(/\/$/, '');
+        await this.whatsappService.sendMessage({
+          to: pqr.telefonoSolicitante,
+          idPqr: pqr.idPqr,
+          tipoEvento: 'RESPUESTA_PQR',
+          body: `MiPQR | Hola ${pqr.nombreSolicitante || 'Solicitante'}, tu solicitud ${pqr.codigoSeguimiento} ya tiene respuesta oficial. Consúltala en: ${baseUrl}/consulta?codigo=${encodeURIComponent(pqr.codigoSeguimiento)}`,
+        });
+      } catch (err) {
+        console.error('[ResponderPqrUseCase] Error en notificación WhatsApp:', err);
+      }
+    }
+
+    return respuesta;
   }
 }

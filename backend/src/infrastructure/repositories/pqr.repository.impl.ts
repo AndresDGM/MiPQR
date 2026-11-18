@@ -72,4 +72,12 @@ export class PqrRepositoryImpl extends PqrRepository {
   responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord> {
     return this.datasource.responder(idPqr, idUsuario, contenido);
   }
+
+  findProximasAVencer(horasRestantes: number): Promise<PqrRecord[]> {
+    return this.datasource.findProximasAVencer(horasRestantes);
+  }
+
+  markAlertaVencimientoEnviada(idPqr: number): Promise<void> {
+    return this.datasource.markAlertaVencimientoEnviada(idPqr);
+  }
 }

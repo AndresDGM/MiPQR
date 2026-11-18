@@ -85,6 +85,12 @@ class SecurityMockPqrRepository extends PqrRepository {
   async responder(): Promise<PqrResponseRecord> {
     throw new Error('Not needed');
   }
+
+  async findProximasAVencer(): Promise<PqrRecord[]> {
+    return [];
+  }
+
+  async markAlertaVencimientoEnviada(): Promise<void> {}
 }
 
 describe('Seguridad y control de acceso en consultas PQR', () => {

@@ -20,11 +20,13 @@ CREATE TABLE IF NOT EXISTS usuario (
   identificacion VARCHAR(20) NOT NULL UNIQUE,
   -- Valor cifrado con RSA (formato "rsa1:<base64>"); nunca texto plano
   password       TEXT NOT NULL,
+  telefono       VARCHAR(30),
   activo         BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- Bases creadas antes del cifrado tenian la contrasena como VARCHAR(255)
 ALTER TABLE usuario ALTER COLUMN password TYPE TEXT;
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS telefono VARCHAR(30);
 
 CREATE INDEX IF NOT EXISTS idx_usuario_id_rol ON usuario (id_rol);
 
@@ -39,6 +41,7 @@ CREATE TABLE IF NOT EXISTS pqr (
   nombre_solicitante         VARCHAR(120),
   correo_solicitante         VARCHAR(160),
   identificacion_solicitante VARCHAR(20),
+  telefono_solicitante       VARCHAR(30),
   id_categoria               INTEGER NOT NULL DEFAULT 1,
   categoria                  VARCHAR(100) NOT NULL DEFAULT 'General',
   id_estado                  INTEGER NOT NULL DEFAULT 1,
@@ -48,7 +51,9 @@ CREATE TABLE IF NOT EXISTS pqr (
   asunto                     VARCHAR(200) NOT NULL,
   descripcion                TEXT NOT NULL,
   fecha_registro             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  fecha_limite               TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (NOW() + INTERVAL '8 days'),
   fecha_cierre               TIMESTAMP WITH TIME ZONE,
+  alerta_vencimiento_enviada BOOLEAN NOT NULL DEFAULT FALSE,
   -- Campos de sugerencia y auditoría de Inteligencia Artificial
   categoria_sugerida_ia      VARCHAR(100),
   confianza_ia               REAL,
@@ -65,6 +70,9 @@ ALTER TABLE pqr ADD COLUMN IF NOT EXISTS estado_revision_ia VARCHAR(20) DEFAULT 
 ALTER TABLE pqr ADD COLUMN IF NOT EXISTS fecha_clasificacion_ia TIMESTAMP WITH TIME ZONE;
 ALTER TABLE pqr ADD COLUMN IF NOT EXISTS version_modelo_ia VARCHAR(50);
 ALTER TABLE pqr ADD COLUMN IF NOT EXISTS id_usuario_revision_ia INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL;
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS telefono_solicitante VARCHAR(30);
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS fecha_limite TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '8 days');
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS alerta_vencimiento_enviada BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE INDEX IF NOT EXISTS idx_pqr_codigo ON pqr (codigo_seguimiento);
 CREATE INDEX IF NOT EXISTS idx_pqr_id_solicitante ON pqr (id_solicitante);

@@ -6,6 +6,7 @@ export class Usuario {
     public readonly correo: string,
     public readonly identificacion: string,
     public readonly password: string,
-    public readonly activo: boolean
+    public readonly activo: boolean,
+    public readonly telefono?: string | null
   ) {}
 }
