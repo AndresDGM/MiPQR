@@ -1,12 +1,14 @@
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DIGITS_ONLY_REGEX = /^\d{5,15}$/;
+const PHONE_REGEX = /^\+?\d{7,15}$/;
 
 export class UpdateUsuarioDto {
   private constructor(
     public readonly nombre?: string,
     public readonly correo?: string,
     public readonly identificacion?: string,
-    public readonly idRol?: number
+    public readonly idRol?: number,
+    public readonly telefono?: string | null
   ) {}
 
   static create(body: unknown): [string?, UpdateUsuarioDto?] {
@@ -14,13 +16,14 @@ export class UpdateUsuarioDto {
       return ['El cuerpo de la peticion debe ser un objeto', undefined];
     }
 
-    const { nombre, correo, identificacion, idRol } = body as Record<string, unknown>;
+    const { nombre, correo, identificacion, idRol, telefono } = body as Record<string, unknown>;
 
     if (
       nombre === undefined &&
       correo === undefined &&
       identificacion === undefined &&
-      idRol === undefined
+      idRol === undefined &&
+      telefono === undefined
     ) {
       return ['Debe proporcionar al menos un campo para actualizar', undefined];
     }
@@ -61,9 +64,22 @@ export class UpdateUsuarioDto {
       validIdRol = idRol;
     }
 
+    let validTelefono: string | null | undefined;
+    if (telefono !== undefined) {
+      if (telefono === null || String(telefono).trim() === '') {
+        validTelefono = null;
+      } else {
+        const cleaned = String(telefono).trim().replace(/[\s()-]/g, '');
+        if (!PHONE_REGEX.test(cleaned)) {
+          return ['El telefono debe tener entre 7 y 15 digitos (opcionalmente con +)', undefined];
+        }
+        validTelefono = cleaned;
+      }
+    }
+
     return [
       undefined,
-      new UpdateUsuarioDto(validNombre, validCorreo, validIdentificacion, validIdRol),
+      new UpdateUsuarioDto(validNombre, validCorreo, validIdentificacion, validIdRol, validTelefono),
     ];
   }
 }

@@ -1,5 +1,6 @@
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DIGITS_ONLY_REGEX = /^\d{5,15}$/;
+const PHONE_REGEX = /^\+?\d{7,15}$/;
 const MAX_PASSWORD_LENGTH = 64;
 
 export class CreateUsuarioDto {
@@ -8,12 +9,20 @@ export class CreateUsuarioDto {
     public readonly correo: string,
     public readonly identificacion: string,
     public readonly password: string,
-    public readonly idRol: number
+    public readonly idRol: number,
+    public readonly telefono?: string | null
   ) {}
 
   /** Devuelve una copia del dto con otra contrasena (por ejemplo, ya cifrada para guardarla). */
   withPassword(password: string): CreateUsuarioDto {
-    return new CreateUsuarioDto(this.nombre, this.correo, this.identificacion, password, this.idRol);
+    return new CreateUsuarioDto(
+      this.nombre,
+      this.correo,
+      this.identificacion,
+      password,
+      this.idRol,
+      this.telefono
+    );
   }
 
   static create(body: unknown): [string?, CreateUsuarioDto?] {
@@ -21,7 +30,7 @@ export class CreateUsuarioDto {
       return ['El cuerpo de la peticion debe ser un objeto', undefined];
     }
 
-    const { nombre, correo, identificacion, password, idRol } = body as Record<string, unknown>;
+    const { nombre, correo, identificacion, password, idRol, telefono } = body as Record<string, unknown>;
 
     if (typeof nombre !== 'string' || nombre.trim().length < 3) {
       return ['El nombre es requerido y debe tener al menos 3 caracteres', undefined];
@@ -50,6 +59,15 @@ export class CreateUsuarioDto {
       return ['El rol es invalido. Debe ser un numero entero entre 1 y 4', undefined];
     }
 
+    let normalizedTelefono: string | null = null;
+    if (telefono !== undefined && telefono !== null && String(telefono).trim() !== '') {
+      const cleaned = String(telefono).trim().replace(/[\s()-]/g, '');
+      if (!PHONE_REGEX.test(cleaned)) {
+        return ['El telefono debe tener entre 7 y 15 digitos (opcionalmente con +)', undefined];
+      }
+      normalizedTelefono = cleaned;
+    }
+
     return [
       undefined,
       new CreateUsuarioDto(
@@ -57,7 +75,8 @@ export class CreateUsuarioDto {
         normalizedCorreo,
         identificacion.trim(),
         password,
-        idRol
+        idRol,
+        normalizedTelefono
       ),
     ];
   }

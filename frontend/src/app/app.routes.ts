@@ -9,6 +9,7 @@ import { IndicadoresComponent } from './presentation/pages/indicadores';
 import { LoginComponent } from './presentation/pages/login';
 import { MisPqrComponent } from './presentation/pages/mis-pqr';
 import { NotFoundComponent } from './presentation/pages/not-found';
+import { PerfilComponent } from './presentation/pages/perfil';
 import { RegistroPqrComponent } from './presentation/pages/registro-pqr';
 import { RegistroSolicitanteComponent } from './presentation/pages/registro-solicitante';
 
@@ -58,6 +59,12 @@ export const routes: Routes = [
     component: GestionUsuariosComponent,
     title: 'Gestión de Usuarios — MiPQR',
     canActivate: [authGuard(['Directivo'])],
+  },
+  {
+    path: 'perfil',
+    component: PerfilComponent,
+    title: 'Mi Perfil — MiPQR',
+    canActivate: [authGuard(['Solicitante', 'Analista SIAU', 'Responsable', 'Directivo'])],
   },
 
   // Ruta 404

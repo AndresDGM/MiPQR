@@ -72,6 +72,14 @@ export class AuthService {
     this._currentUser.set(null);
   }
 
+  /** Actualiza los datos del usuario en sesión tras editar su perfil */
+  updateCurrentUser(user: User): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+    }
+    this._currentUser.set(user);
+  }
+
   private setSession(session: AuthSession): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(session.usuario));
