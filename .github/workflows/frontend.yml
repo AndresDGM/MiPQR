@@ -53,6 +53,7 @@ jobs:
           DOMAIN: ${{ vars.DOMAIN }}
           API_PREFIX: ${{ github.event.repository.name }}
           DES_KEY: ${{ secrets.DES_KEY }}
+          ADAPTER_MODE: ${{ vars.ADAPTER_MODE || 'node' }}
         run: npm run set-env
 
       # 7. Generar build de Angular

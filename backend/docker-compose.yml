@@ -53,6 +53,13 @@ services:
       MAX_TOTAL_SIZE_MB: ${MAX_TOTAL_SIZE_MB:-25}
       AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8000}
       AI_SERVICE_TIMEOUT_MS: ${AI_SERVICE_TIMEOUT_MS:-3000}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-MiPQR Clinica Dolormed <notificaciones@mipqr.com>}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      APP_URL: ${APP_URL:-http://localhost:4200}
     volumes:
       - mipqr-uploads:/app/uploads
     networks:
