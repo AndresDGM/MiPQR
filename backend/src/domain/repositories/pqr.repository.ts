@@ -67,7 +67,7 @@ export interface PqrResponseRecord {
 
 export interface CreatePqrData {
   tipoPqr: string;
-  idCategoria: number;
+  idCategoria?: number;
   asunto: string;
   descripcion: string;
   nombreSolicitante: string;

@@ -126,11 +126,27 @@ export class PqrDatasource {
     const codigo = `PQR-${year}-${String(seq).padStart(4, '0')}`;
 
     const hasIa = !!data.categoriaSugeridaIa;
-    const catResult = await pool.query<{ nombre: string }>(
-      'SELECT nombre FROM categoria WHERE id_categoria = $1',
-      [data.idCategoria]
-    );
-    const nombreCategoria = catResult.rows[0]?.nombre ?? 'General';
+    let idCategoria = data.idCategoria || 1;
+    let nombreCategoria = 'General';
+
+    if (data.categoriaSugeridaIa) {
+      const iaCat = await pool.query<{ id_categoria: number; nombre: string }>(
+        'SELECT id_categoria, nombre FROM categoria WHERE LOWER(nombre) = LOWER($1) LIMIT 1',
+        [data.categoriaSugeridaIa.trim()]
+      );
+      if (iaCat.rows[0]) {
+        idCategoria = iaCat.rows[0].id_categoria;
+        nombreCategoria = iaCat.rows[0].nombre;
+      } else {
+        nombreCategoria = data.categoriaSugeridaIa.trim();
+      }
+    } else {
+      const catResult = await pool.query<{ nombre: string }>(
+        'SELECT nombre FROM categoria WHERE id_categoria = $1',
+        [idCategoria]
+      );
+      nombreCategoria = catResult.rows[0]?.nombre ?? 'General';
+    }
 
     const { rows } = await pool.query<PqrRow>(
       `INSERT INTO pqr (
@@ -148,7 +164,7 @@ export class PqrDatasource {
         data.correoSolicitante,
         data.identificacionSolicitante,
         data.telefonoSolicitante ?? null,
-        data.idCategoria,
+        idCategoria,
         nombreCategoria,
         data.tipoPqr,
         data.asunto,

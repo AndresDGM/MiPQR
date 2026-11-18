@@ -72,8 +72,8 @@ class InMemoryPqrRepository extends PqrRepository {
       nombreSolicitante: data.nombreSolicitante,
       correoSolicitante: data.correoSolicitante,
       identificacionSolicitante: data.identificacionSolicitante,
-      idCategoria: data.idCategoria,
-      categoria: 'General',
+      idCategoria: data.idCategoria ?? 1,
+      categoria: data.categoriaSugeridaIa || 'General',
       idEstado: 1,
       estado: 'Recibida',
       tipoPqr: data.tipoPqr,
@@ -210,6 +210,27 @@ describe('CreatePqrBackendUseCase con IA', () => {
     assert.ok(pqr.idPqr > 0);
     assert.strictEqual(pqr.categoriaSugeridaIa, null);
     assert.strictEqual(pqr.confianzaIa, null);
+  });
+
+  it('debe permitir radicar la PQR sin idCategoria delegando la asignacion a la IA', async () => {
+    const pqrRepo = new InMemoryPqrRepository();
+    const classRepo = new MockClassificationRepository();
+    const useCase = new CreatePqrBackendUseCase(pqrRepo, classRepo);
+
+    const pqr = await useCase.execute({
+      tipoPqr: 'Reclamo',
+      asunto: 'Demora en cita con especialista',
+      descripcion: 'Llevo mas de un mes esperando autorizacion de cita.',
+      nombreSolicitante: 'Laura Diaz',
+      correoSolicitante: 'laura.diaz@example.com',
+      identificacionSolicitante: '1098765499',
+    });
+
+    assert.ok(pqr.idPqr > 0);
+    assert.strictEqual(pqr.idCategoria, 1);
+    assert.strictEqual(pqr.categoriaSugeridaIa, 'Atención Médica');
+    assert.strictEqual(pqr.categoria, 'Atención Médica');
+    assert.strictEqual(pqr.estadoRevisionIa, 'PENDIENTE');
   });
 });
 
