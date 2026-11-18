@@ -1,6 +1,7 @@
 import {
   appMiddlewares,
   authController,
+  categoriasController,
   documentosController,
   passwordCipher,
   pqrController,
@@ -22,6 +23,7 @@ async function main(): Promise<void> {
       usuariosController,
       documentosController,
       pqrController,
+      categoriasController,
     },
     appMiddlewares
   );

@@ -1,7 +1,10 @@
 import {
   CreatePqrData,
+  PqrHistoryRecord,
   PqrRecord,
   PqrRepository,
+  PqrResponseRecord,
+  PqrStatusName,
 } from '../../domain/repositories/pqr.repository.js';
 import { PqrDatasource } from '../datasources/pqr.datasource.js';
 
@@ -50,5 +53,23 @@ export class PqrRepositoryImpl extends PqrRepository {
       estadoRevisionIa,
       idUsuarioRevision
     );
+  }
+
+  updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName,
+    idUsuario?: number | null,
+    observacion?: string
+  ): Promise<PqrRecord> {
+    return this.datasource.updateEstado(idPqr, idEstado, estado, idUsuario, observacion);
+  }
+
+  getHistorial(idPqr: number): Promise<PqrHistoryRecord[]> {
+    return this.datasource.getHistorial(idPqr);
+  }
+
+  responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord> {
+    return this.datasource.responder(idPqr, idUsuario, contenido);
   }
 }

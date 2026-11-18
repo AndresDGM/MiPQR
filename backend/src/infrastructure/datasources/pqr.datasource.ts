@@ -1,4 +1,10 @@
-import { CreatePqrData, PqrRecord } from '../../domain/repositories/pqr.repository.js';
+import {
+  CreatePqrData,
+  PqrHistoryRecord,
+  PqrRecord,
+  PqrResponseRecord,
+  PqrStatusName,
+} from '../../domain/repositories/pqr.repository.js';
 import { pool } from '../database/postgres.js';
 
 interface PqrRow {
@@ -114,6 +120,12 @@ export class PqrDatasource {
     const codigo = `PQR-${year}-${String(seq).padStart(4, '0')}`;
 
     const hasIa = !!data.categoriaSugeridaIa;
+    const catResult = await pool.query<{ nombre: string }>(
+      'SELECT nombre FROM categoria WHERE id_categoria = $1',
+      [data.idCategoria]
+    );
+    const nombreCategoria = catResult.rows[0]?.nombre ?? 'General';
+
     const { rows } = await pool.query<PqrRow>(
       `INSERT INTO pqr (
          codigo_seguimiento, id_solicitante, nombre_solicitante, correo_solicitante,
@@ -130,7 +142,7 @@ export class PqrDatasource {
         data.correoSolicitante,
         data.identificacionSolicitante,
         data.idCategoria,
-        'General',
+        nombreCategoria,
         data.tipoPqr,
         data.asunto,
         data.descripcion,
@@ -142,7 +154,15 @@ export class PqrDatasource {
       ]
     );
 
-    return this.toRecord(rows[0]!);
+    const created = this.toRecord(rows[0]!);
+
+    await pool.query(
+      `INSERT INTO historial_pqr (id_pqr, id_usuario, id_estado, estado, accion, observacion)
+       VALUES ($1, $2, 1, 'Recibida', 'Radicación', $3)`,
+      [created.idPqr, data.idSolicitante ?? null, `Solicitud radicada con código ${codigo}.`]
+    );
+
+    return created;
   }
 
   async updateCategoria(
@@ -196,6 +216,131 @@ export class PqrDatasource {
     if (!updated) {
       throw new Error(`PQR con ID ${idPqr} no encontrada`);
     }
+
+    await pool.query(
+      `INSERT INTO historial_pqr (id_pqr, id_usuario, id_estado, estado, accion, observacion)
+       VALUES ($1, $2, $3, $4, 'Asignación de responsable', $5)`,
+      [
+        idPqr,
+        idResponsable,
+        updated.idEstado,
+        updated.estado,
+        `Caso asignado a ${updated.nombreResponsable ?? `usuario #${idResponsable}`}.`,
+      ]
+    );
+
     return updated;
+  }
+
+  async updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName,
+    idUsuario?: number | null,
+    observacion?: string
+  ): Promise<PqrRecord> {
+    const fechaCierreSql = estado === 'Cerrada' ? ', fecha_cierre = NOW()' : '';
+    const { rowCount } = await pool.query(
+      `UPDATE pqr
+       SET id_estado = $1,
+           estado = $2
+           ${fechaCierreSql}
+       WHERE id_pqr = $3`,
+      [idEstado, estado, idPqr]
+    );
+
+    if (rowCount === 0) {
+      throw new Error(`PQR con ID ${idPqr} no encontrada`);
+    }
+
+    await pool.query(
+      `INSERT INTO historial_pqr (id_pqr, id_usuario, id_estado, estado, accion, observacion)
+       VALUES ($1, $2, $3, $4, 'Cambio de estado', $5)`,
+      [idPqr, idUsuario ?? null, idEstado, estado, observacion?.trim() || `Estado actualizado a "${estado}".`]
+    );
+
+    const updated = await this.findById(idPqr);
+    if (!updated) {
+      throw new Error(`PQR con ID ${idPqr} no encontrada`);
+    }
+    return updated;
+  }
+
+  async getHistorial(idPqr: number): Promise<PqrHistoryRecord[]> {
+    const { rows } = await pool.query<{
+      id_historial: number;
+      id_pqr: number;
+      id_usuario: number | null;
+      nombre_usuario: string | null;
+      id_estado: number;
+      estado: PqrStatusName;
+      accion: string;
+      observacion: string;
+      fecha: string | Date;
+    }>(
+      `SELECT h.id_historial, h.id_pqr, h.id_usuario, u.nombre AS nombre_usuario,
+              h.id_estado, h.estado, h.accion, h.observacion, h.fecha
+       FROM historial_pqr h
+       LEFT JOIN usuario u ON h.id_usuario = u.id_usuario
+       WHERE h.id_pqr = $1
+       ORDER BY h.fecha ASC, h.id_historial ASC`,
+      [idPqr]
+    );
+
+    return rows.map((row) => ({
+      idHistorial: row.id_historial,
+      idPqr: row.id_pqr,
+      idUsuario: row.id_usuario,
+      nombreUsuario: row.nombre_usuario,
+      idEstado: row.id_estado,
+      estado: row.estado,
+      accion: row.accion,
+      observacion: row.observacion,
+      fecha: new Date(row.fecha),
+    }));
+  }
+
+  async responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord> {
+    const { rows } = await pool.query<{
+      id_respuesta: number;
+      id_pqr: number;
+      id_usuario: number | null;
+      contenido: string;
+      fecha_respuesta: string | Date;
+    }>(
+      `INSERT INTO respuesta_pqr (id_pqr, id_usuario, contenido)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [idPqr, idUsuario, contenido]
+    );
+
+    await pool.query(
+      `UPDATE pqr
+       SET id_estado = 5,
+           estado = 'Respondida'
+       WHERE id_pqr = $1 AND estado != 'Cerrada'`,
+      [idPqr]
+    );
+
+    await pool.query(
+      `INSERT INTO historial_pqr (id_pqr, id_usuario, id_estado, estado, accion, observacion)
+       VALUES ($1, $2, 5, 'Respondida', 'Respuesta emitida', $3)`,
+      [idPqr, idUsuario, contenido]
+    );
+
+    const userRes = await pool.query<{ nombre: string }>(
+      'SELECT nombre FROM usuario WHERE id_usuario = $1',
+      [idUsuario]
+    );
+
+    const created = rows[0]!;
+    return {
+      idRespuesta: created.id_respuesta,
+      idPqr: created.id_pqr,
+      idUsuario: created.id_usuario,
+      nombreUsuario: userRes.rows[0]?.nombre ?? null,
+      contenido: created.contenido,
+      fechaRespuesta: new Date(created.fecha_respuesta),
+    };
   }
 }

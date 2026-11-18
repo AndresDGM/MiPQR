@@ -8,6 +8,9 @@ import {
 } from '../../application/usecases/pqrs/pqr.usecases.js';
 import { ClassifyPqrUseCase } from '../../application/usecases/pqrs/classify-pqr.usecase.js';
 import { AssignPqrResponsableBackendUseCase } from '../../application/usecases/pqrs/assign-responsable.usecase.js';
+import { UpdatePqrEstadoUseCase } from '../../application/usecases/pqrs/update-pqr-estado.usecase.js';
+import { GetPqrHistorialUseCase } from '../../application/usecases/pqrs/get-pqr-historial.usecase.js';
+import { ResponderPqrUseCase } from '../../application/usecases/pqrs/responder-pqr.usecase.js';
 import { CustomError } from '../../domain/errors/custom.error.js';
 
 export class PqrController {
@@ -18,7 +21,10 @@ export class PqrController {
     private readonly createUseCase: CreatePqrBackendUseCase,
     private readonly classifyUseCase?: ClassifyPqrUseCase,
     private readonly updateCategoriaUseCase?: UpdatePqrCategoriaUseCase,
-    private readonly assignResponsableUseCase?: AssignPqrResponsableBackendUseCase
+    private readonly assignResponsableUseCase?: AssignPqrResponsableBackendUseCase,
+    private readonly updateEstadoUseCase?: UpdatePqrEstadoUseCase,
+    private readonly getHistorialUseCase?: GetPqrHistorialUseCase,
+    private readonly responderUseCase?: ResponderPqrUseCase
   ) {}
 
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -154,6 +160,71 @@ export class PqrController {
 
       const updated = await this.assignResponsableUseCase.execute(idPqr, idResp);
       res.json(updated);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateEstado = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const idPqr = Number(req.params.id);
+      if (isNaN(idPqr) || idPqr <= 0) throw CustomError.badRequest('ID de PQR inválido');
+
+      if (!this.updateEstadoUseCase) {
+        throw CustomError.internal('Caso de uso de actualización de estado no configurado');
+      }
+
+      const { estado, observacion } = req.body;
+      const updated = await this.updateEstadoUseCase.execute({
+        idPqr,
+        estado: String(estado || ''),
+        idUsuario: req.user?.idUsuario ?? null,
+        observacion: typeof observacion === 'string' ? observacion : undefined,
+      });
+
+      res.json(updated);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getHistorial = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const idPqr = Number(req.params.id);
+      if (isNaN(idPqr) || idPqr <= 0) throw CustomError.badRequest('ID de PQR inválido');
+
+      if (!this.getHistorialUseCase) {
+        throw CustomError.internal('Caso de uso de historial no configurado');
+      }
+
+      const historial = await this.getHistorialUseCase.execute(idPqr);
+      res.json(historial);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  responder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const idPqr = Number(req.params.id);
+      if (isNaN(idPqr) || idPqr <= 0) throw CustomError.badRequest('ID de PQR inválido');
+
+      if (!this.responderUseCase) {
+        throw CustomError.internal('Caso de uso de respuesta no configurado');
+      }
+
+      if (!req.user) {
+        throw CustomError.unauthorized('Usuario no autenticado');
+      }
+
+      const { contenido } = req.body;
+      const respuesta = await this.responderUseCase.execute({
+        idPqr,
+        idUsuario: req.user.idUsuario,
+        contenido: String(contenido || ''),
+      });
+
+      res.status(201).json(respuesta);
     } catch (error) {
       next(error);
     }
