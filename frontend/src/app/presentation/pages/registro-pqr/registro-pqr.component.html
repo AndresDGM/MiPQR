@@ -10,6 +10,13 @@
       <div class="code-box">
         <span class="code-box__label">Código Único de Seguimiento:</span>
         <span class="code-box__code">{{ state().createdPqr?.codigoSeguimiento }}</span>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline"
+          (click)="copyCodigo(state().createdPqr?.codigoSeguimiento)"
+        >
+          {{ copied() ? '¡Código copiado!' : 'Copiar código' }}
+        </button>
         <span class="code-box__hint">
           Guarde este código para consultar el avance y la respuesta oficial de su caso.
         </span>

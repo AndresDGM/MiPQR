@@ -1,0 +1,125 @@
+@use '../../../../styles/variables' as *;
+
+.usuarios-page {
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0 0 $spacing-xs;
+    color: $color-primary;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-dark, 0.72);
+  }
+}
+
+.user-form-card {
+  padding: $spacing-lg;
+
+  h2 {
+    margin: 0 0 $spacing-md;
+    font-size: $font-size-lg;
+    color: $color-dark;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: $spacing-md;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-dark;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.filters-bar {
+  padding: $spacing-md;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: $spacing-md;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba($color-dark, 0.08);
+    font-size: $font-size-sm;
+  }
+
+  th {
+    background: $color-surface;
+    font-weight: 700;
+    color: $color-dark;
+  }
+}
+
+.role-badge {
+  background: rgba($color-primary, 0.1);
+  color: $color-primary;
+  padding: 0.2rem 0.55rem;
+  border-radius: $border-radius-full;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.status-pill {
+  background: rgba(#059669, 0.12);
+  color: #059669;
+  padding: 0.2rem 0.55rem;
+  border-radius: $border-radius-full;
+  font-weight: 600;
+  font-size: 0.78rem;
+
+  &--inactive {
+    background: rgba($color-danger, 0.12);
+    color: $color-danger;
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}

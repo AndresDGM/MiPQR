@@ -1,0 +1,133 @@
+<div class="container usuarios-page">
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <p>Administra cuentas, roles operativos y estado de acceso de la plataforma.</p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="openCreateForm()">
+      + Nuevo Usuario
+    </button>
+  </div>
+
+  @if (feedback()) {
+    <div class="alert alert-success">{{ feedback() }}</div>
+  }
+  @if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  }
+
+  @if (showForm()) {
+    <section class="card user-form-card">
+      <h2>{{ editingUserId() !== null ? 'Editar Usuario' : 'Crear Nuevo Usuario' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="saveUser()" class="user-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="u-nombre">Nombre completo</label>
+            <input id="u-nombre" type="text" class="form-control" formControlName="nombre" />
+          </div>
+          <div class="form-group">
+            <label for="u-correo">Correo electrónico</label>
+            <input id="u-correo" type="email" class="form-control" formControlName="correo" />
+          </div>
+          <div class="form-group">
+            <label for="u-id">Identificación</label>
+            <input id="u-id" type="text" class="form-control" formControlName="identificacion" />
+          </div>
+          <div class="form-group">
+            <label for="u-rol">Rol</label>
+            <select id="u-rol" class="form-control" formControlName="idRol">
+              @for (r of roles; track r.idRol) {
+                <option [value]="r.idRol">{{ r.nombre }}</option>
+              }
+            </select>
+          </div>
+          @if (editingUserId() === null) {
+            <div class="form-group">
+              <label for="u-pass">Contraseña inicial</label>
+              <input id="u-pass" type="password" class="form-control" formControlName="password" />
+            </div>
+          }
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="cancelForm()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar Usuario' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <div class="filters-bar card">
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Buscar por nombre, correo o identificación..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+    />
+    <select
+      class="form-control"
+      [ngModel]="roleFilter()"
+      (ngModelChange)="roleFilter.set($event)"
+    >
+      <option value="">Todos los roles</option>
+      @for (r of roles; track r.idRol) {
+        <option [value]="r.nombre">{{ r.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner mensaje="Cargando usuarios..." />
+  } @else if (filteredUsers().length === 0) {
+    <app-empty-state
+      titulo="No se encontraron usuarios"
+      descripcion="Ajusta los filtros de búsqueda o registra un nuevo usuario."
+    />
+  } @else {
+    <div class="card table-wrapper">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Identificación</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.idUsuario) {
+            <tr>
+              <td><strong>{{ user.nombre }}</strong></td>
+              <td>{{ user.correo }}</td>
+              <td>{{ user.identificacion }}</td>
+              <td><span class="role-badge">{{ user.rol }}</span></td>
+              <td>
+                <span class="status-pill" [class.status-pill--inactive]="!user.activo">
+                  {{ user.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button type="button" class="btn btn-sm btn-outline" (click)="openEditForm(user)">
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-outline-danger]="user.activo"
+                  [class.btn-primary]="!user.activo"
+                  (click)="toggleActivo(user)"
+                >
+                  {{ user.activo ? 'Inactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

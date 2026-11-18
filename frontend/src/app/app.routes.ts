@@ -3,8 +3,11 @@ import { authGuard } from './core/application/auth';
 import { BandejaSiauComponent } from './presentation/pages/bandeja-siau';
 import { ConsultaPqrComponent } from './presentation/pages/consulta-pqr';
 import { DetallePqrComponent } from './presentation/pages/detalle-pqr';
+import { GestionUsuariosComponent } from './presentation/pages/gestion-usuarios';
 import { HomeComponent } from './presentation/pages/home';
+import { IndicadoresComponent } from './presentation/pages/indicadores';
 import { LoginComponent } from './presentation/pages/login';
+import { MisPqrComponent } from './presentation/pages/mis-pqr';
 import { NotFoundComponent } from './presentation/pages/not-found';
 import { RegistroPqrComponent } from './presentation/pages/registro-pqr';
 import { RegistroSolicitanteComponent } from './presentation/pages/registro-solicitante';
@@ -24,6 +27,12 @@ export const routes: Routes = [
   // Radicación y consulta de PQR
   { path: 'registro-pqr', component: RegistroPqrComponent, title: 'Radicar PQR — MiPQR' },
   { path: 'consulta', component: ConsultaPqrComponent, title: 'Consultar PQR — MiPQR' },
+  {
+    path: 'mis-pqr',
+    component: MisPqrComponent,
+    title: 'Mis PQR — MiPQR',
+    canActivate: [authGuard(['Solicitante'])],
+  },
 
   // Gestión administrativa protegida por roles (SIAU / Responsables / Directivos)
   {
@@ -37,6 +46,18 @@ export const routes: Routes = [
     component: DetallePqrComponent,
     title: 'Detalle de Solicitud — MiPQR',
     canActivate: [authGuard(['Analista SIAU', 'Responsable', 'Directivo'])],
+  },
+  {
+    path: 'indicadores',
+    component: IndicadoresComponent,
+    title: 'Indicadores de Gestión — MiPQR',
+    canActivate: [authGuard(['Analista SIAU', 'Directivo'])],
+  },
+  {
+    path: 'usuarios',
+    component: GestionUsuariosComponent,
+    title: 'Gestión de Usuarios — MiPQR',
+    canActivate: [authGuard(['Directivo'])],
   },
 
   // Ruta 404

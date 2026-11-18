@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { User, UserRoleName } from '../../../domain/models/user.model';
+import { CreateUserPayload, UpdateUserPayload, User, UserRoleName } from '../../../domain/models/user.model';
 
 /**
  * Datasource remoto para la entidad User hacia el backend Node.js.
@@ -30,5 +30,17 @@ export class UserRemoteDatasource {
 
   getByRol(rol: UserRoleName): Observable<User[]> {
     return this.httpClient.get<User[]>(`${this.baseUrl}/api/users/rol/${rol}`);
+  }
+
+  create(payload: CreateUserPayload): Observable<User> {
+    return this.httpClient.post<User>(`${this.baseUrl}/api/users`, payload);
+  }
+
+  update(idUsuario: number, payload: UpdateUserPayload): Observable<User> {
+    return this.httpClient.put<User>(`${this.baseUrl}/api/users/${idUsuario}`, payload);
+  }
+
+  setActivo(idUsuario: number, activo: boolean): Observable<User> {
+    return this.httpClient.patch<User>(`${this.baseUrl}/api/users/${idUsuario}/activo`, { activo });
   }
 }

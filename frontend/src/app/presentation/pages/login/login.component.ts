@@ -45,7 +45,7 @@ export class LoginComponent {
       next: (user) => {
         this.state.set({ loading: false, error: null });
         if (user.rol === 'Solicitante') {
-          this.router.navigate(['/registro-pqr']);
+          this.router.navigate(['/mis-pqr']);
         } else {
           this.router.navigate(['/bandeja']);
         }
