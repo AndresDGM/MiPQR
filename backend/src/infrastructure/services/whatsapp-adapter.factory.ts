@@ -3,13 +3,15 @@ import {
   EvolutionWhatsAppConfig,
   EvolutionWhatsAppService,
 } from './evolution-whatsapp.service.js';
+import { MetaWhatsAppConfig, MetaWhatsAppService } from './meta-whatsapp.service.js';
 import { TwilioConfig, TwilioWhatsAppService } from './twilio-whatsapp.service.js';
 
-export type WhatsAppProvider = 'evolution' | 'twilio' | 'simulated';
+export type WhatsAppProvider = 'evolution' | 'twilio' | 'meta' | 'simulated';
 
 export interface WhatsAppAdapterConfig {
   evolution?: EvolutionWhatsAppConfig;
   twilio?: TwilioConfig;
+  meta?: MetaWhatsAppConfig;
 }
 
 /**
@@ -17,12 +19,13 @@ export interface WhatsAppAdapterConfig {
  * Permite cambiar de proveedor con una sola línea / llamada.
  */
 export function createWhatsAppAdapter(
-  provider: WhatsAppProvider,
+  provider: WhatsAppProvider = 'evolution',
   config: WhatsAppAdapterConfig = {}
 ): WhatsAppService {
   const adapters: Record<WhatsAppProvider, () => WhatsAppService> = {
     evolution: () => new EvolutionWhatsAppService(config.evolution ?? {}),
     twilio: () => new TwilioWhatsAppService(config.twilio ?? { from: 'whatsapp:+14155238886' }),
+    meta: () => new MetaWhatsAppService(config.meta ?? {}),
     simulated: () => new EvolutionWhatsAppService({}),
   };
 

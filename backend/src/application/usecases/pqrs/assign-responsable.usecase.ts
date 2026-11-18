@@ -4,6 +4,7 @@ import { UsuarioRepository } from '../../../domain/repositories/usuario.reposito
 import { EmailService } from '../../../domain/services/email.service.js';
 import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
+import { WhatsAppTemplates } from '../../../infrastructure/services/whatsapp-templates.js';
 
 /**
  * Caso de uso para asignar un profesional responsable a una PQR y notificarle vía correo electrónico y WhatsApp.
@@ -105,17 +106,26 @@ export class AssignPqrResponsableBackendUseCase {
 
     // 5. Enviar notificación por WhatsApp al responsable asignado (no bloqueante)
     if (this.whatsappService && responsable.telefono) {
-      try {
-        const baseUrl = this.appUrl.replace(/\/$/, '');
-        await this.whatsappService.sendMessage({
+      const body = WhatsAppTemplates.buildAsignacion({
+        nombreResponsable: responsable.nombre,
+        codigoSeguimiento: updated.codigoSeguimiento,
+        tipoPqr: updated.tipoPqr,
+        categoria: updated.categoria,
+        fechaLimite: updated.fechaLimite,
+        idPqr: updated.idPqr,
+        appUrl: this.appUrl,
+      });
+
+      void this.whatsappService
+        .sendMessage({
           to: responsable.telefono,
           idPqr: updated.idPqr,
           tipoEvento: 'ASIGNACION_RESPONSABLE',
-          body: `MiPQR | Hola ${responsable.nombre}, se te ha asignado la PQR ${updated.codigoSeguimiento} (${updated.tipoPqr}). Gestiónala en: ${baseUrl}/detalle/${updated.idPqr}`,
+          body,
+        })
+        .catch((err) => {
+          console.error('[AssignPqrResponsableBackendUseCase] Error en notificación WhatsApp:', err);
         });
-      } catch (err) {
-        console.error('[AssignPqrResponsableBackendUseCase] Error en notificación WhatsApp:', err);
-      }
     }
 
     return updated;

@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { TwilioWhatsAppService } from '../src/infrastructure/services/twilio-whatsapp.service.js';
 import { EvolutionWhatsAppService } from '../src/infrastructure/services/evolution-whatsapp.service.js';
+import { MetaWhatsAppService } from '../src/infrastructure/services/meta-whatsapp.service.js';
 import { createWhatsAppAdapter } from '../src/infrastructure/services/whatsapp-adapter.factory.js';
 import { SendWhatsAppOptions, SendWhatsAppResult, WhatsAppService } from '../src/domain/services/whatsapp.service.js';
 import { EmailService, SendEmailOptions, SendEmailResult } from '../src/domain/services/email.service.js';
@@ -150,6 +151,12 @@ describe('EvolutionWhatsAppService y createWhatsAppAdapter', () => {
     const twilio = createWhatsAppAdapter('twilio');
     assert.ok(twilio instanceof TwilioWhatsAppService);
 
+    const meta = createWhatsAppAdapter('meta');
+    assert.ok(meta instanceof MetaWhatsAppService);
+
+    const def = createWhatsAppAdapter();
+    assert.ok(def instanceof EvolutionWhatsAppService);
+
     const res = await evo.sendMessage({ to: '3001234567', body: 'Prueba Evolution' });
     assert.equal(res.success, true);
     assert.equal(res.estado, 'SIMULADO');
@@ -221,9 +228,14 @@ describe('Alertas por Correo y WhatsApp (Respuesta y SLA)', () => {
       telefonoSolicitante: '3159804296',
     });
 
+    // Debe retornar de inmediato mientras las notificaciones corren en segundo plano
+    assert.equal(created.notificacionEmail?.estado, 'PENDIENTE');
+    await new Promise((resolve) => setImmediate(resolve));
+
     assert.equal(waSpy.sent.length, 1);
     assert.equal(waSpy.sent[0]?.to, '3159804296');
     assert.equal(waSpy.sent[0]?.tipoEvento, 'REGISTRO_PQR');
     assert.ok(waSpy.sent[0]?.body.includes(created.codigoSeguimiento));
+    assert.ok(waSpy.sent[0]?.body.includes('Clínica Dolormed'));
   });
 });
