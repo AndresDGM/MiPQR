@@ -63,9 +63,14 @@ services:
       PQR_SLA_DAYS: ${PQR_SLA_DAYS:-8}
       SLA_ALERT_HOURS_BEFORE: ${SLA_ALERT_HOURS_BEFORE:-48}
       SLA_CHECK_INTERVAL_MINUTES: ${SLA_CHECK_INTERVAL_MINUTES:-60}
+      WHATSAPP_PROVIDER: ${WHATSAPP_PROVIDER:-evolution}
+      EVOLUTION_API_URL: ${EVOLUTION_API_URL:-http://evolution-api:8080}
+      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-mipqr-evolution-key}
+      EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE:-mipqr}
       TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}
+      TWILIO_CONTENT_SID: ${TWILIO_CONTENT_SID:-}
     volumes:
       - mipqr-uploads:/app/uploads
     networks:
@@ -99,9 +104,27 @@ services:
     networks:
       - default
 
+  evolution-api:
+    image: atendai/evolution-api:v2.2.3
+    container_name: mipqr-evolution-api
+    restart: unless-stopped
+    ports:
+      - '${EVOLUTION_PORT:-8080}:8080'
+    environment:
+      SERVER_URL: ${EVOLUTION_SERVER_URL:-http://localhost:8080}
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-mipqr-evolution-key}
+      DATABASE_ENABLED: 'false'
+      CACHE_LOCAL_ENABLED: 'true'
+      CACHE_REDIS_ENABLED: 'false'
+    volumes:
+      - mipqr-evolution-instances:/evolution/instances
+    networks:
+      - default
+
 volumes:
   mipqr-pgdata:
   mipqr-uploads:
+  mipqr-evolution-instances:
 
 networks:
   traefik-net:

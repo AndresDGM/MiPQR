@@ -40,7 +40,7 @@ import { PqrDatasource } from '../infrastructure/datasources/pqr.datasource.js';
 import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 import { FileValidatorService } from '../infrastructure/services/file-validator.service.js';
 import { NodemailerEmailService } from '../infrastructure/services/nodemailer-email.service.js';
-import { TwilioWhatsAppService } from '../infrastructure/services/twilio-whatsapp.service.js';
+import { createWhatsAppAdapter } from '../infrastructure/services/whatsapp-adapter.factory.js';
 import { RolRepositoryImpl } from '../infrastructure/repositories/rol.repository.impl.js';
 import { CategoriaRepositoryImpl } from '../infrastructure/repositories/categoria.repository.impl.js';
 import { UsuarioRepositoryImpl } from '../infrastructure/repositories/usuario.repository.impl.js';
@@ -77,10 +77,19 @@ export const emailService = new NodemailerEmailService({
   secure: envs.SMTP_SECURE,
 });
 
-export const whatsappService = new TwilioWhatsAppService({
-  accountSid: envs.TWILIO_ACCOUNT_SID,
-  authToken: envs.TWILIO_AUTH_TOKEN,
-  from: envs.TWILIO_WHATSAPP_FROM,
+// Patrón Adapter: cambiar el proveedor es cambiar `envs.WHATSAPP_PROVIDER` ('evolution' | 'twilio' | 'simulated')
+export const whatsappService = createWhatsAppAdapter(envs.WHATSAPP_PROVIDER, {
+  evolution: {
+    baseUrl: envs.EVOLUTION_API_URL,
+    apiKey: envs.EVOLUTION_API_KEY,
+    instance: envs.EVOLUTION_INSTANCE,
+  },
+  twilio: {
+    accountSid: envs.TWILIO_ACCOUNT_SID,
+    authToken: envs.TWILIO_AUTH_TOKEN,
+    from: envs.TWILIO_WHATSAPP_FROM,
+    contentSid: envs.TWILIO_CONTENT_SID,
+  },
 });
 
 // Servicios
