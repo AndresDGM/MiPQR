@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { TwilioWhatsAppService } from '../src/infrastructure/services/twilio-whatsapp.service.js';
+import { MetaWhatsAppService } from '../src/infrastructure/services/meta-whatsapp.service.js';
 import { SendWhatsAppOptions, SendWhatsAppResult, WhatsAppService } from '../src/domain/services/whatsapp.service.js';
 import { EmailService, SendEmailOptions, SendEmailResult } from '../src/domain/services/email.service.js';
 import {
@@ -125,12 +125,12 @@ class SlaMockUsuarioRepository extends UsuarioRepository {
   async setActivo(): Promise<Usuario> { throw new Error('Not needed'); }
 }
 
-describe('TwilioWhatsAppService', () => {
+describe('MetaWhatsAppService', () => {
   it('debe normalizar numeros colombianos y operar en modo simulado sin credenciales', async () => {
-    assert.equal(TwilioWhatsAppService.formatWhatsAppNumber('3001234567'), 'whatsapp:+573001234567');
-    assert.equal(TwilioWhatsAppService.formatWhatsAppNumber('+573001234567'), 'whatsapp:+573001234567');
+    assert.equal(MetaWhatsAppService.formatPhoneNumber('3001234567'), '573001234567');
+    assert.equal(MetaWhatsAppService.formatPhoneNumber('+573001234567'), '573001234567');
 
-    const service = new TwilioWhatsAppService({ from: 'whatsapp:+14155238886' });
+    const service = new MetaWhatsAppService({});
     const res = await service.sendMessage({ to: '3001234567', body: 'Prueba SLA' });
     assert.equal(res.success, true);
     assert.equal(res.estado, 'SIMULADO');
