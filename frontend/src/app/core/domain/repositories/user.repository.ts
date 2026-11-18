@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { User, UserRoleName } from '../models/user.model';
+import { CreateUserPayload, UpdateUserPayload, User, UserRoleName } from '../models/user.model';
 
 /**
  * Contrato del repositorio de usuarios.
@@ -43,5 +43,11 @@ export abstract class UserRepository {
    * @returns Observable con los usuarios que cumplen el rol
    */
   abstract getByRol(rol: UserRoleName): Observable<User[]>;
+
+  abstract create(payload: CreateUserPayload): Observable<User>;
+
+  abstract update(idUsuario: number, payload: UpdateUserPayload): Observable<User>;
+
+  abstract setActivo(idUsuario: number, activo: boolean): Observable<User>;
 }
 

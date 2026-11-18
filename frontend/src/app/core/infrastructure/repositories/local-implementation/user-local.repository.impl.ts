@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { User, UserRoleName } from '../../../domain/models/user.model';
+import { CreateUserPayload, UpdateUserPayload, User, UserRoleName } from '../../../domain/models/user.model';
 import { UserRepository } from '../../../domain/repositories/user.repository';
 import { UserLocalDatasource } from '../../datasources/local/user-local.datasource';
 
@@ -24,5 +24,17 @@ export class UserLocalRepositoryImpl extends UserRepository {
 
   getByRol(rol: UserRoleName): Observable<User[]> {
     return this.dataSource.getByRol(rol);
+  }
+
+  create(payload: CreateUserPayload): Observable<User> {
+    return this.dataSource.create(payload);
+  }
+
+  update(idUsuario: number, payload: UpdateUserPayload): Observable<User> {
+    return this.dataSource.update(idUsuario, payload);
+  }
+
+  setActivo(idUsuario: number, activo: boolean): Observable<User> {
+    return this.dataSource.setActivo(idUsuario, activo);
   }
 }
