@@ -33,12 +33,13 @@ export const envs = {
   SMTP_FROM: env.get('SMTP_FROM').default('MiPQR Clinica Dolormed <notificaciones@mipqr.com>').asString(),
   SMTP_SECURE: env.get('SMTP_SECURE').default('false').asBool(),
   APP_URL: env.get('APP_URL').default('http://localhost:4200').asString(),
-  // Alertas SLA y WhatsApp (Twilio)
+  // Alertas SLA y WhatsApp (Meta Cloud API)
   PQR_SLA_DAYS: env.get('PQR_SLA_DAYS').default('8').asIntPositive(),
   SLA_ALERT_HOURS_BEFORE: env.get('SLA_ALERT_HOURS_BEFORE').default('48').asIntPositive(),
   SLA_CHECK_INTERVAL_MINUTES: env.get('SLA_CHECK_INTERVAL_MINUTES').default('60').asIntPositive(),
-  TWILIO_ACCOUNT_SID: env.get('TWILIO_ACCOUNT_SID').asString(),
-  TWILIO_AUTH_TOKEN: env.get('TWILIO_AUTH_TOKEN').asString(),
-  TWILIO_WHATSAPP_FROM: env.get('TWILIO_WHATSAPP_FROM').default('whatsapp:+14155238886').asString(),
-  TWILIO_CONTENT_SID: env.get('TWILIO_CONTENT_SID').asString(),
+  WHATSAPP_TOKEN: env.get('WHATSAPP_TOKEN').asString(),
+  WHATSAPP_PHONE_NUMBER_ID: env.get('WHATSAPP_PHONE_NUMBER_ID').asString(),
+  WHATSAPP_API_VERSION: env.get('WHATSAPP_API_VERSION').default('v21.0').asString(),
+  WHATSAPP_TEMPLATE_NAME: env.get('WHATSAPP_TEMPLATE_NAME').asString(),
+  WHATSAPP_TEMPLATE_LANG: env.get('WHATSAPP_TEMPLATE_LANG').default('es').asString(),
 };

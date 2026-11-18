@@ -40,7 +40,7 @@ import { PqrDatasource } from '../infrastructure/datasources/pqr.datasource.js';
 import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 import { FileValidatorService } from '../infrastructure/services/file-validator.service.js';
 import { NodemailerEmailService } from '../infrastructure/services/nodemailer-email.service.js';
-import { TwilioWhatsAppService } from '../infrastructure/services/twilio-whatsapp.service.js';
+import { MetaWhatsAppService } from '../infrastructure/services/meta-whatsapp.service.js';
 import { RolRepositoryImpl } from '../infrastructure/repositories/rol.repository.impl.js';
 import { CategoriaRepositoryImpl } from '../infrastructure/repositories/categoria.repository.impl.js';
 import { UsuarioRepositoryImpl } from '../infrastructure/repositories/usuario.repository.impl.js';
@@ -77,11 +77,12 @@ export const emailService = new NodemailerEmailService({
   secure: envs.SMTP_SECURE,
 });
 
-export const whatsappService = new TwilioWhatsAppService({
-  accountSid: envs.TWILIO_ACCOUNT_SID,
-  authToken: envs.TWILIO_AUTH_TOKEN,
-  from: envs.TWILIO_WHATSAPP_FROM,
-  contentSid: envs.TWILIO_CONTENT_SID,
+export const whatsappService = new MetaWhatsAppService({
+  accessToken: envs.WHATSAPP_TOKEN,
+  phoneNumberId: envs.WHATSAPP_PHONE_NUMBER_ID,
+  apiVersion: envs.WHATSAPP_API_VERSION,
+  templateName: envs.WHATSAPP_TEMPLATE_NAME,
+  templateLang: envs.WHATSAPP_TEMPLATE_LANG,
 });
 
 // Servicios
