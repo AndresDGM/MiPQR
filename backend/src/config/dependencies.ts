@@ -81,6 +81,7 @@ export const whatsappService = new TwilioWhatsAppService({
   accountSid: envs.TWILIO_ACCOUNT_SID,
   authToken: envs.TWILIO_AUTH_TOKEN,
   from: envs.TWILIO_WHATSAPP_FROM,
+  contentSid: envs.TWILIO_CONTENT_SID,
 });
 
 // Servicios

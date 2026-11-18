@@ -4,6 +4,7 @@ export interface TwilioConfig {
   accountSid?: string;
   authToken?: string;
   from: string;
+  contentSid?: string;
 }
 
 /**
@@ -55,8 +56,20 @@ export class TwilioWhatsAppService extends WhatsAppService {
     const bodyParams = new URLSearchParams({
       From: from.startsWith('whatsapp:') ? from : `whatsapp:${from}`,
       To: to,
-      Body: options.body,
     });
+
+    if (this.config.contentSid?.trim()) {
+      bodyParams.set('ContentSid', this.config.contentSid.trim());
+      bodyParams.set(
+        'ContentVariables',
+        JSON.stringify({
+          '1': options.tipoEvento || 'MiPQR',
+          '2': options.body,
+        })
+      );
+    } else {
+      bodyParams.set('Body', options.body);
+    }
 
     try {
       const response = await fetch(endpoint, {

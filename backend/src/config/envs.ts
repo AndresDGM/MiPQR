@@ -40,4 +40,5 @@ export const envs = {
   TWILIO_ACCOUNT_SID: env.get('TWILIO_ACCOUNT_SID').asString(),
   TWILIO_AUTH_TOKEN: env.get('TWILIO_AUTH_TOKEN').asString(),
   TWILIO_WHATSAPP_FROM: env.get('TWILIO_WHATSAPP_FROM').default('whatsapp:+14155238886').asString(),
+  TWILIO_CONTENT_SID: env.get('TWILIO_CONTENT_SID').asString(),
 };
