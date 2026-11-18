@@ -170,6 +170,7 @@ jobs:
       MAX_TOTAL_SIZE_MB: ${{ vars.MAX_TOTAL_SIZE_MB }}
       AI_SERVICE_URL: ${{ vars.AI_SERVICE_URL }}
       AI_SERVICE_TIMEOUT_MS: ${{ vars.AI_SERVICE_TIMEOUT_MS }}
+      AI_SERVICE_PORT: ${{ vars.AI_SERVICE_PORT }}
       SMTP_HOST: ${{ vars.SMTP_HOST }}
       SMTP_PORT: ${{ vars.SMTP_PORT }}
       SMTP_USER: ${{ secrets.SMTP_USER }}
@@ -229,6 +230,7 @@ jobs:
             echo "MAX_TOTAL_SIZE_MB=${MAX_TOTAL_SIZE_MB:-25}"
             echo "AI_SERVICE_URL=${AI_SERVICE_URL:-http://ai-service:8000}"
             echo "AI_SERVICE_TIMEOUT_MS=${AI_SERVICE_TIMEOUT_MS:-5000}"
+            echo "AI_SERVICE_PORT=${AI_SERVICE_PORT:-8000}"
             echo "SMTP_HOST=$SMTP_HOST"
             echo "SMTP_PORT=${SMTP_PORT:-587}"
             echo "SMTP_USER=$SMTP_USER"
