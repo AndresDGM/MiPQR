@@ -99,9 +99,9 @@ services:
     container_name: mipqr-ai-service
     restart: unless-stopped
     ports:
-      - '${AI_SERVICE_PORT:-8000}:8000'
+      - '${AI_SERVICE_PORT:-8000}:${AI_SERVICE_PORT:-8000}'
     environment:
-      PORT: 8000
+      PORT: ${AI_SERVICE_PORT:-8000}
       HOST: 0.0.0.0
       MODEL_PATH: /app/models/modelo.h5
       SCALER_PATH: /app/models/escalador.pkl
