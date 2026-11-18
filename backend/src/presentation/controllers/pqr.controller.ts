@@ -70,6 +70,7 @@ export class PqrController {
         nombreSolicitante,
         correoSolicitante,
         identificacionSolicitante,
+        telefonoSolicitante,
       } = req.body;
 
       if (!tipoPqr || !asunto || !descripcion || !nombreSolicitante || !correoSolicitante) {
@@ -84,6 +85,7 @@ export class PqrController {
         nombreSolicitante: String(nombreSolicitante).trim(),
         correoSolicitante: String(correoSolicitante).trim().toLowerCase(),
         identificacionSolicitante: String(identificacionSolicitante || '').trim(),
+        telefonoSolicitante: telefonoSolicitante ? String(telefonoSolicitante).trim() : null,
         idSolicitante: req.user?.idUsuario ?? null,
       });
 

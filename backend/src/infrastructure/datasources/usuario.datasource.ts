@@ -12,6 +12,7 @@ interface UsuarioRow {
   identificacion: string;
   password: string;
   activo: boolean;
+  telefono?: string | null;
 }
 
 const UNIQUE_VIOLATION = '23505';
@@ -25,7 +26,8 @@ export class UsuarioDatasource {
       row.correo,
       row.identificacion,
       row.password,
-      row.activo
+      row.activo,
+      row.telefono ?? null
     );
   }
 

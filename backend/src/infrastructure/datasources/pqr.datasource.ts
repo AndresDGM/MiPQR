@@ -14,6 +14,7 @@ interface PqrRow {
   nombre_solicitante: string | null;
   correo_solicitante: string | null;
   identificacion_solicitante: string | null;
+  telefono_solicitante?: string | null;
   id_categoria: number;
   categoria: string;
   id_estado: number;
@@ -24,7 +25,9 @@ interface PqrRow {
   asunto: string;
   descripcion: string;
   fecha_registro: string | Date;
+  fecha_limite?: string | Date | null;
   fecha_cierre: string | Date | null;
+  alerta_vencimiento_enviada?: boolean;
   categoria_sugerida_ia?: string | null;
   confianza_ia?: number | null;
   estado_revision_ia?: string | null;
@@ -48,6 +51,7 @@ export class PqrDatasource {
       nombreSolicitante: row.nombre_solicitante,
       correoSolicitante: row.correo_solicitante,
       identificacionSolicitante: row.identificacion_solicitante,
+      telefonoSolicitante: row.telefono_solicitante ?? null,
       idCategoria: row.id_categoria,
       categoria: row.categoria,
       idEstado: row.id_estado,
@@ -58,7 +62,9 @@ export class PqrDatasource {
       asunto: row.asunto,
       descripcion: row.descripcion,
       fechaRegistro: new Date(row.fecha_registro),
+      fechaLimite: row.fecha_limite ? new Date(row.fecha_limite) : null,
       fechaCierre: row.fecha_cierre ? new Date(row.fecha_cierre) : null,
+      alertaVencimientoEnviada: Boolean(row.alerta_vencimiento_enviada),
       categoriaSugeridaIa: row.categoria_sugerida_ia ?? null,
       confianzaIa: row.confianza_ia !== undefined && row.confianza_ia !== null ? Number(row.confianza_ia) : null,
       estadoRevisionIa: (row.estado_revision_ia as any) || 'PENDIENTE',
@@ -129,11 +135,11 @@ export class PqrDatasource {
     const { rows } = await pool.query<PqrRow>(
       `INSERT INTO pqr (
          codigo_seguimiento, id_solicitante, nombre_solicitante, correo_solicitante,
-         identificacion_solicitante, id_categoria, categoria, id_estado, estado,
-         tipo_pqr, asunto, descripcion, fecha_registro,
+         identificacion_solicitante, telefono_solicitante, id_categoria, categoria, id_estado, estado,
+         tipo_pqr, asunto, descripcion, fecha_registro, fecha_limite,
          categoria_sugerida_ia, confianza_ia, estado_revision_ia, fecha_clasificacion_ia, version_modelo_ia
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 1, 'Recibida', $8, $9, $10, NOW(), $11, $12, $13, $14, $15)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 1, 'Recibida', $9, $10, $11, NOW(), $12, $13, $14, $15, $16, $17)
        RETURNING *`,
       [
         codigo,
@@ -141,11 +147,13 @@ export class PqrDatasource {
         data.nombreSolicitante,
         data.correoSolicitante,
         data.identificacionSolicitante,
+        data.telefonoSolicitante ?? null,
         data.idCategoria,
         nombreCategoria,
         data.tipoPqr,
         data.asunto,
         data.descripcion,
+        data.fechaLimite ?? new Date(Date.now() + 8 * 24 * 60 * 60 * 1000),
         data.categoriaSugeridaIa ?? null,
         data.confianzaIa ?? null,
         hasIa ? 'PENDIENTE' : null,
@@ -342,5 +350,27 @@ export class PqrDatasource {
       contenido: created.contenido,
       fechaRespuesta: new Date(created.fecha_respuesta),
     };
+  }
+
+  async findProximasAVencer(horasRestantes: number): Promise<PqrRecord[]> {
+    const { rows } = await pool.query<PqrRow>(
+      `SELECT p.*, r.nombre AS nombre_responsable
+       FROM pqr p
+       LEFT JOIN usuario r ON p.id_responsable = r.id_usuario
+       WHERE p.estado NOT IN ('Respondida', 'Cerrada')
+         AND p.alerta_vencimiento_enviada = FALSE
+         AND p.fecha_limite IS NOT NULL
+         AND p.fecha_limite <= NOW() + ($1 * INTERVAL '1 hour')
+       ORDER BY p.fecha_limite ASC`,
+      [horasRestantes]
+    );
+    return rows.map((row) => this.toRecord(row));
+  }
+
+  async markAlertaVencimientoEnviada(idPqr: number): Promise<void> {
+    await pool.query(
+      'UPDATE pqr SET alerta_vencimiento_enviada = TRUE WHERE id_pqr = $1',
+      [idPqr]
+    );
   }
 }

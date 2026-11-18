@@ -12,6 +12,7 @@ export interface PqrRecord {
   nombreSolicitante?: string | null;
   correoSolicitante?: string | null;
   identificacionSolicitante?: string | null;
+  telefonoSolicitante?: string | null;
   idCategoria: number;
   categoria: string;
   idEstado: number;
@@ -22,7 +23,9 @@ export interface PqrRecord {
   asunto: string;
   descripcion: string;
   fechaRegistro: Date;
+  fechaLimite?: Date | null;
   fechaCierre?: Date | null;
+  alertaVencimientoEnviada?: boolean;
   // Campos IA
   categoriaSugeridaIa?: string | null;
   confianzaIa?: number | null;
@@ -70,7 +73,9 @@ export interface CreatePqrData {
   nombreSolicitante: string;
   correoSolicitante: string;
   identificacionSolicitante: string;
+  telefonoSolicitante?: string | null;
   idSolicitante?: number | null;
+  fechaLimite?: Date | null;
   categoriaSugeridaIa?: string | null;
   confianzaIa?: number | null;
   versionModeloIa?: string | null;
@@ -104,4 +109,6 @@ export abstract class PqrRepository {
   ): Promise<PqrRecord>;
   abstract getHistorial(idPqr: number): Promise<PqrHistoryRecord[]>;
   abstract responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord>;
+  abstract findProximasAVencer(horasRestantes: number): Promise<PqrRecord[]>;
+  abstract markAlertaVencimientoEnviada(idPqr: number): Promise<void>;
 }
