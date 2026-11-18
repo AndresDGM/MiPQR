@@ -108,12 +108,18 @@ services:
     image: evoapicloud/evolution-api:latest
     container_name: mipqr-evolution-api
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - '${EVOLUTION_PORT:-8080}:8080'
     environment:
       SERVER_URL: ${EVOLUTION_SERVER_URL:-http://localhost:8080}
       AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-mipqr-evolution-key}
-      DATABASE_ENABLED: 'false'
+      DATABASE_ENABLED: 'true'
+      DATABASE_PROVIDER: 'postgresql'
+      DATABASE_CONNECTION_URI: 'postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-mipqr}?schema=evolution'
+      DATABASE_CONNECTION_CLIENT_NAME: 'evolution'
       CACHE_LOCAL_ENABLED: 'true'
       CACHE_REDIS_ENABLED: 'false'
     volumes:
