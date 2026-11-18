@@ -3,6 +3,7 @@ import { PqrRepository, PqrResponseRecord } from '../../../domain/repositories/p
 import { EmailService } from '../../../domain/services/email.service.js';
 import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
+import { WhatsAppTemplates } from '../../../infrastructure/services/whatsapp-templates.js';
 
 export interface ResponderPqrDTO {
   idPqr: number;
@@ -59,17 +60,23 @@ export class ResponderPqrUseCase {
     }
 
     if (this.whatsappService && pqr.telefonoSolicitante) {
-      try {
-        const baseUrl = this.appUrl.replace(/\/$/, '');
-        await this.whatsappService.sendMessage({
+      const body = WhatsAppTemplates.buildRespuesta({
+        nombreSolicitante: pqr.nombreSolicitante || 'Solicitante',
+        codigoSeguimiento: pqr.codigoSeguimiento,
+        tipoPqr: pqr.tipoPqr,
+        appUrl: this.appUrl,
+      });
+
+      void this.whatsappService
+        .sendMessage({
           to: pqr.telefonoSolicitante,
           idPqr: pqr.idPqr,
           tipoEvento: 'RESPUESTA_PQR',
-          body: `MiPQR | Hola ${pqr.nombreSolicitante || 'Solicitante'}, tu solicitud ${pqr.codigoSeguimiento} ya tiene respuesta oficial. Consúltala en: ${baseUrl}/consulta?codigo=${encodeURIComponent(pqr.codigoSeguimiento)}`,
+          body,
+        })
+        .catch((err) => {
+          console.error('[ResponderPqrUseCase] Error en notificación WhatsApp:', err);
         });
-      } catch (err) {
-        console.error('[ResponderPqrUseCase] Error en notificación WhatsApp:', err);
-      }
     }
 
     return respuesta;

@@ -3,6 +3,7 @@ import { UsuarioRepository } from '../../../domain/repositories/usuario.reposito
 import { EmailService } from '../../../domain/services/email.service.js';
 import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
+import { WhatsAppTemplates } from '../../../infrastructure/services/whatsapp-templates.js';
 
 export interface SlaAlertSummary {
   revisadas: number;
@@ -37,7 +38,6 @@ export class CheckSlaAlertsUseCase {
 
       const fechaLimite = pqr.fechaLimite ? new Date(pqr.fechaLimite) : new Date();
       const horasRestantes = (fechaLimite.getTime() - Date.now()) / (1000 * 60 * 60);
-      const baseUrl = this.appUrl.replace(/\/$/, '');
 
       for (const dest of destinatarios) {
         if (this.emailService && dest.correo) {
@@ -68,15 +68,21 @@ export class CheckSlaAlertsUseCase {
 
         if (this.whatsappService && dest.telefono) {
           try {
-            const estadoPlazo =
-              horasRestantes <= 0
-                ? 'con plazo vencido'
-                : `por vencer en ~${Math.ceil(horasRestantes)}h`;
+            const body = WhatsAppTemplates.buildAlertaVencimiento({
+              nombreDestinatario: dest.nombre,
+              codigoSeguimiento: pqr.codigoSeguimiento,
+              tipoPqr: pqr.tipoPqr,
+              estadoActual: pqr.estado,
+              horasRestantes,
+              fechaLimite,
+              idPqr: pqr.idPqr,
+              appUrl: this.appUrl,
+            });
             await this.whatsappService.sendMessage({
               to: dest.telefono,
               idPqr: pqr.idPqr,
               tipoEvento: 'ALERTA_VENCIMIENTO',
-              body: `MiPQR [ALERTA SLA] | La PQR ${pqr.codigoSeguimiento} (${pqr.estado}) está ${estadoPlazo}. Gestionar en: ${baseUrl}/detalle/${pqr.idPqr}`,
+              body,
             });
           } catch (err) {
             console.error('[CheckSlaAlertsUseCase] Error enviando WhatsApp SLA:', err);
