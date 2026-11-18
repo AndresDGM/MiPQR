@@ -79,11 +79,11 @@
   </div>
 
   @if (loading()) {
-    <app-loading-spinner message="Cargando usuarios..." />
+    <app-loading-spinner mensaje="Cargando usuarios..." />
   } @else if (filteredUsers().length === 0) {
     <app-empty-state
-      title="No se encontraron usuarios"
-      message="Ajusta los filtros de búsqueda o registra un nuevo usuario."
+      titulo="No se encontraron usuarios"
+      descripcion="Ajusta los filtros de búsqueda o registra un nuevo usuario."
     />
   } @else {
     <div class="card table-wrapper">

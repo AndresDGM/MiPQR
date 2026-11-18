@@ -8,7 +8,7 @@
   </div>
 
   @if (loading()) {
-    <app-loading-spinner message="Calculando indicadores..." />
+    <app-loading-spinner mensaje="Calculando indicadores..." />
   } @else if (error()) {
     <div class="alert alert-danger">{{ error() }}</div>
   } @else {

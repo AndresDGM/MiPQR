@@ -43,13 +43,13 @@
   </div>
 
   @if (loading()) {
-    <app-loading-spinner message="Cargando tus solicitudes..." />
+    <app-loading-spinner mensaje="Cargando tus solicitudes..." />
   } @else if (error()) {
     <div class="alert alert-danger">{{ error() }}</div>
   } @else if (filteredPqrs().length === 0) {
     <app-empty-state
-      title="No tienes solicitudes para mostrar"
-      message="Radica una nueva PQR o ajusta los filtros de búsqueda."
+      titulo="No tienes solicitudes para mostrar"
+      descripcion="Radica una nueva PQR o ajusta los filtros de búsqueda."
     />
   } @else {
     <div class="pqr-list">
