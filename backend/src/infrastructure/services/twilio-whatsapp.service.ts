@@ -75,6 +75,10 @@ export class TwilioWhatsAppService extends WhatsAppService {
         return { success: false, estado: 'FALLIDO', error: errorMsg };
       }
 
+      console.log(
+        `[TwilioWhatsAppService] Mensaje enviado a ${to} | Evento: ${options.tipoEvento || 'NOTIFICACION'} | SID: ${data.sid || 'N/A'}`
+      );
+
       return {
         success: true,
         sid: data.sid,
