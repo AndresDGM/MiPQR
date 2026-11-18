@@ -28,6 +28,7 @@ export const routes: Routes = [
   // Radicación y consulta de PQR
   { path: 'registro-pqr', component: RegistroPqrComponent, title: 'Radicar PQR — MiPQR' },
   { path: 'consulta', component: ConsultaPqrComponent, title: 'Consultar PQR — MiPQR' },
+  { path: 'consulta-pqr', redirectTo: 'consulta' },
   {
     path: 'mis-pqr',
     component: MisPqrComponent,
