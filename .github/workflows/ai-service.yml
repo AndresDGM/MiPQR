@@ -1,4 +1,4 @@
-name: Deploy AI Service to Server
+name: Publish AI Service
 
 on:
   pull_request:
@@ -90,32 +90,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: publish
-    env:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_PORT: ${{ secrets.SSH_PORT }}
-      IMAGE_NAME: ${{ vars.IMAGE_NAME }}
-      IMAGE_TAG: ${{ vars.IMAGE_TAG }}
-      IMAGE_AUTOR: ghcr.io/${{ github.actor }}
-
-    steps:
-      - name: Configurar llave SSH
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-      - name: Pull and restart AI service on remote server
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USER@$SSH_HOST << EOF
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          docker pull ${IMAGE_AUTOR,,}/${IMAGE_NAME}-ai:${IMAGE_TAG}
-          cd ~/deployments/${IMAGE_NAME}
-          docker compose up -d --no-build ai-service
-          EOF
