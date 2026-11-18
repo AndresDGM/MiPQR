@@ -12,8 +12,11 @@ import {
 } from '../src/domain/repositories/pqr-classification.repository.js';
 import {
   CreatePqrData,
+  PqrHistoryRecord,
   PqrRecord,
   PqrRepository,
+  PqrResponseRecord,
+  PqrStatusName,
 } from '../src/domain/repositories/pqr.repository.js';
 import { CustomError } from '../src/domain/errors/custom.error.js';
 
@@ -101,6 +104,30 @@ class InMemoryPqrRepository extends PqrRepository {
     pqr.estadoRevisionIa = estadoRevisionIa;
     pqr.idUsuarioRevisionIa = idUsuarioRevision ?? null;
     return pqr;
+  }
+
+  async assignResponsable(): Promise<PqrRecord> {
+    throw new Error('Not implemented in mock');
+  }
+
+  async updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName
+  ): Promise<PqrRecord> {
+    const pqr = await this.findById(idPqr);
+    if (!pqr) throw new Error('No encontrada');
+    pqr.idEstado = idEstado;
+    pqr.estado = estado;
+    return pqr;
+  }
+
+  async getHistorial(): Promise<PqrHistoryRecord[]> {
+    return [];
+  }
+
+  async responder(): Promise<PqrResponseRecord> {
+    throw new Error('Not implemented in mock');
   }
 }
 

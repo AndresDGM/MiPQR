@@ -33,6 +33,35 @@ export interface PqrRecord {
   notificacionEmail?: NotificacionEmailRecord;
 }
 
+export type PqrStatusName =
+  | 'Recibida'
+  | 'En revision'
+  | 'Asignada'
+  | 'En gestion'
+  | 'Respondida'
+  | 'Cerrada';
+
+export interface PqrHistoryRecord {
+  idHistorial: number;
+  idPqr: number;
+  idUsuario: number | null;
+  nombreUsuario?: string | null;
+  idEstado: number;
+  estado: PqrStatusName;
+  accion: string;
+  observacion: string;
+  fecha: Date;
+}
+
+export interface PqrResponseRecord {
+  idRespuesta: number;
+  idPqr: number;
+  idUsuario: number | null;
+  nombreUsuario?: string | null;
+  contenido: string;
+  fechaRespuesta: Date;
+}
+
 export interface CreatePqrData {
   tipoPqr: string;
   idCategoria: number;
@@ -66,4 +95,13 @@ export abstract class PqrRepository {
     estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA',
     idUsuarioRevision?: number | null
   ): Promise<PqrRecord>;
+  abstract updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName,
+    idUsuario?: number | null,
+    observacion?: string
+  ): Promise<PqrRecord>;
+  abstract getHistorial(idPqr: number): Promise<PqrHistoryRecord[]>;
+  abstract responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord>;
 }

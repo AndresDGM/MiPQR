@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import { NodemailerEmailService } from '../src/infrastructure/services/nodemailer-email.service.js';
 import { CreatePqrBackendUseCase } from '../src/application/usecases/pqrs/pqr.usecases.js';
 import { AssignPqrResponsableBackendUseCase } from '../src/application/usecases/pqrs/assign-responsable.usecase.js';
-import { CreatePqrData, PqrRecord, PqrRepository } from '../src/domain/repositories/pqr.repository.js';
+import {
+  CreatePqrData,
+  PqrHistoryRecord,
+  PqrRecord,
+  PqrRepository,
+  PqrResponseRecord,
+  PqrStatusName,
+} from '../src/domain/repositories/pqr.repository.js';
 import { UsuarioRepository } from '../src/domain/repositories/usuario.repository.js';
 import { EmailService, SendEmailOptions, SendEmailResult } from '../src/domain/services/email.service.js';
 import { CustomError } from '../src/domain/errors/custom.error.js';
@@ -80,6 +87,30 @@ class MockPqrRepository extends PqrRepository {
     p.idEstado = 3;
     p.estado = 'Asignada';
     return { ...p };
+  }
+
+  async updateCategoria(): Promise<PqrRecord> {
+    throw new Error('Not implemented in mock');
+  }
+
+  async updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName
+  ): Promise<PqrRecord> {
+    const p = await this.findById(idPqr);
+    if (!p) throw new Error('Not found');
+    p.idEstado = idEstado;
+    p.estado = estado;
+    return { ...p };
+  }
+
+  async getHistorial(): Promise<PqrHistoryRecord[]> {
+    return [];
+  }
+
+  async responder(): Promise<PqrResponseRecord> {
+    throw new Error('Not implemented in mock');
   }
 }
 
