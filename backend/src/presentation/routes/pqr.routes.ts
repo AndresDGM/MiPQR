@@ -20,15 +20,16 @@ export class PqrRoutes {
     const router = Router();
     const { authenticate, optionalAuthenticate, authorize } = middlewares;
     const gestionPqr = authorize('Analista SIAU', 'Responsable', 'Directivo');
+    const siauODirectivo = authorize('Analista SIAU', 'Directivo');
 
-    router.get('/', optionalAuthenticate, controller.getAll);
+    router.get('/', authenticate, controller.getAll);
     router.get('/codigo/:codigo', optionalAuthenticate, controller.getByCodigo);
-    router.get('/:id', optionalAuthenticate, controller.getById);
+    router.get('/:id', authenticate, controller.getById);
     router.get('/:id/historial', optionalAuthenticate, controller.getHistorial);
     router.post('/', optionalAuthenticate, controller.create);
     router.post('/classify', optionalAuthenticate, controller.classify);
-    router.patch('/:id/categoria', optionalAuthenticate, controller.updateCategoria);
-    router.patch('/:id/responsable', authenticate, controller.assignResponsable);
+    router.patch('/:id/categoria', authenticate, siauODirectivo, controller.updateCategoria);
+    router.patch('/:id/responsable', authenticate, siauODirectivo, controller.assignResponsable);
     router.patch('/:id/estado', authenticate, gestionPqr, controller.updateEstado);
     router.post('/:id/respuestas', authenticate, gestionPqr, controller.responder);
 

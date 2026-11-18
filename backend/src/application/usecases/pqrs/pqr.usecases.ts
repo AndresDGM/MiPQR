@@ -3,19 +3,37 @@ import { PQRClassificationRepository } from '../../../domain/repositories/pqr-cl
 import { CustomError } from '../../../domain/errors/custom.error.js';
 import { EmailService } from '../../../domain/services/email.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
+import { Actor } from '../../types/actor.type.js';
 
 export class GetAllPqrsBackendUseCase {
   constructor(private readonly repository: PqrRepository) {}
-  execute(limit?: number): Promise<PqrRecord[]> {
-    return this.repository.getAll(limit);
+
+  async execute(limit?: number, actor?: Actor): Promise<PqrRecord[]> {
+    const pqrs = await this.repository.getAll(limit);
+    if (!actor || actor.rol === 'Analista SIAU' || actor.rol === 'Directivo') {
+      return pqrs;
+    }
+    if (actor.rol === 'Responsable') {
+      return pqrs.filter((p) => p.idResponsable === actor.idUsuario);
+    }
+    return pqrs.filter((p) => p.idSolicitante === actor.idUsuario);
   }
 }
 
 export class GetPqrByIdBackendUseCase {
   constructor(private readonly repository: PqrRepository) {}
-  async execute(idPqr: number): Promise<PqrRecord> {
+
+  async execute(idPqr: number, actor?: Actor): Promise<PqrRecord> {
     const pqr = await this.repository.findById(idPqr);
     if (!pqr) throw CustomError.notFound(`PQR con ID ${idPqr} no encontrada`);
+
+    if (actor?.rol === 'Solicitante' && pqr.idSolicitante !== actor.idUsuario) {
+      throw CustomError.forbidden('No tiene permisos para consultar esta PQR');
+    }
+    if (actor?.rol === 'Responsable' && pqr.idResponsable !== actor.idUsuario) {
+      throw CustomError.forbidden('No tiene permisos para consultar esta PQR');
+    }
+
     return pqr;
   }
 }
