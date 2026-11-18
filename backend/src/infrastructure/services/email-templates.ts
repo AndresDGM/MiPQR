@@ -59,7 +59,7 @@ export class EmailTemplates {
   } {
     const subject = `MiPQR - Confirmación de registro de tu solicitud [${data.codigoSeguimiento}]`;
     const formattedFecha = formatDate(data.fechaRegistro);
-    const consultaUrl = `${data.appUrl.replace(/\/$/, '')}/consulta-pqr?codigo=${encodeURIComponent(
+    const consultaUrl = `${data.appUrl.replace(/\/$/, '')}/consulta?codigo=${encodeURIComponent(
       data.codigoSeguimiento
     )}`;
 
