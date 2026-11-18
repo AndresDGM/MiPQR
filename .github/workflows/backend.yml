@@ -40,6 +40,12 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./backend
+        env:
+          JWT_SECRET: test-jwt-secret-for-ci
+          DES_KEY: claveDES
+          RSA_N: "1234567890abcdef"
+          RSA_E: "10001"
+          RSA_D: "1234567890abcdef"
         run: npm test
 
       - name: Build TypeScript
