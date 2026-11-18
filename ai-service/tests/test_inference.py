@@ -65,3 +65,39 @@ def test_api_predict_validation_error():
     # Vector con dimensión incorrecta (debe ser 7)
     response_invalid = client.post("/predict", json={"features": [1.0, 2.0, 3.0]})
     assert response_invalid.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("texto", "categoria_esperada", "indice_esperado"),
+    [
+        (
+            "Demora en entrega de medicamentos Llevo cinco días esperando mis medicamentos formulados en consulta y en farmacia informan que no hay existencias disponibles.",
+            "Farmacia",
+            2,
+        ),
+        (
+            "Cobro indebido de cuota moderadora Se me realizó un cobro de copago en ventanilla por una consulta que contaba con exoneración de pago.",
+            "Facturación",
+            1,
+        ),
+        (
+            "Solicitud de reprogramación de cita con especialista Requiero asignación prioritaria de cita con medicina interna debido a cancelación de agenda.",
+            "Atención Médica",
+            0,
+        ),
+        (
+            "Comentario general sin palabras clave clínicas",
+            "Atención Médica",
+            0,
+        ),
+    ],
+)
+def test_api_predict_semantic_categories(texto: str, categoria_esperada: str, indice_esperado: int):
+    client = TestClient(app)
+    response = client.post("/predict", json={"texto": texto})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["categoria_predicha"] == categoria_esperada
+    assert data["indice_clase"] == indice_esperado
+    assert data["metodo_inferencia"] == "adaptacion_texto"
+    assert data["confianza"] >= 0.7
