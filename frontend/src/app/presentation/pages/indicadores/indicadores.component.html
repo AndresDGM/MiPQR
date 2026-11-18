@@ -1,0 +1,106 @@
+<div class="container indicadores-page">
+  <div class="page-header">
+    <div>
+      <h1>Indicadores de Gestión PQR</h1>
+      <p>Comportamiento consolidado, tiempos de atención y distribución de solicitudes.</p>
+    </div>
+    <a routerLink="/bandeja" class="btn btn-outline">Ir a Bandeja de Gestión</a>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner message="Calculando indicadores..." />
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else {
+    <div class="kpi-grid">
+      <div class="kpi-card card">
+        <span class="kpi-label">Total PQR</span>
+        <strong class="kpi-value">{{ kpis().total }}</strong>
+      </div>
+      <div class="kpi-card card">
+        <span class="kpi-label">En Proceso</span>
+        <strong class="kpi-value kpi-value--accent">{{ kpis().enProceso }}</strong>
+      </div>
+      <div class="kpi-card card">
+        <span class="kpi-label">Sin Responsable</span>
+        <strong class="kpi-value kpi-value--danger">{{ kpis().sinAsignar }}</strong>
+      </div>
+      <div class="kpi-card card">
+        <span class="kpi-label">Tasa de Respuesta / Cierre</span>
+        <strong class="kpi-value kpi-value--primary">{{ kpis().tasaResolucion | number: '1.0-1' }}%</strong>
+      </div>
+      <div class="kpi-card card">
+        <span class="kpi-label">Promedio de Cierre</span>
+        <strong class="kpi-value">{{ kpis().promedioDias | number: '1.1-1' }} días</strong>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <section class="card metric-panel">
+        <h2>Distribución por Estado</h2>
+        @for (row of porEstado(); track row.label) {
+          <div class="metric-row">
+            <div class="metric-row__head">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.count }} ({{ row.percent }}%)</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill--primary" [style.width.%]="row.percent"></div>
+            </div>
+          </div>
+        }
+      </section>
+
+      <section class="card metric-panel">
+        <h2>Distribución por Tipo</h2>
+        @for (row of porTipo(); track row.label) {
+          <div class="metric-row">
+            <div class="metric-row__head">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.count }} ({{ row.percent }}%)</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill--accent" [style.width.%]="row.percent"></div>
+            </div>
+          </div>
+        }
+      </section>
+
+      <section class="card metric-panel">
+        <h2>Distribución por Categoría</h2>
+        @for (row of porCategoria(); track row.label) {
+          <div class="metric-row">
+            <div class="metric-row__head">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.count }} ({{ row.percent }}%)</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill--danger" [style.width.%]="row.percent"></div>
+            </div>
+          </div>
+        }
+      </section>
+    </div>
+
+    @if (pendientesAsignacion().length > 0) {
+      <section class="card pending-panel">
+        <h2>Solicitudes Prioritarias sin Responsable</h2>
+        <div class="pending-list">
+          @for (item of pendientesAsignacion(); track item.idPqr) {
+            <div class="pending-item">
+              <div class="pending-item__info">
+                <span class="codigo-pill">{{ item.codigoSeguimiento }}</span>
+                <app-badge-tipo [tipo]="item.tipoPqr" />
+                <app-badge-estado [estado]="item.estado" />
+                <span class="pending-item__subject">{{ item.asunto }}</span>
+              </div>
+              <a [routerLink]="['/detalle', item.idPqr]" class="btn btn-sm btn-primary">
+                Gestionar →
+              </a>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

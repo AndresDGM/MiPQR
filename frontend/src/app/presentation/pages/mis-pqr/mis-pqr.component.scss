@@ -1,0 +1,156 @@
+@use '../../../../styles/variables' as *;
+
+.mis-pqr-page {
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0 0 $spacing-xs;
+    color: $color-primary;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-dark, 0.72);
+  }
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: $spacing-md;
+}
+
+.kpi-card {
+  padding: $spacing-md $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.kpi-label {
+  font-size: $font-size-sm;
+  color: rgba($color-dark, 0.7);
+}
+
+.kpi-value {
+  font-size: $font-size-2xl;
+  color: $color-dark;
+
+  &--accent {
+    color: $color-accent;
+  }
+
+  &--primary {
+    color: $color-primary;
+  }
+}
+
+.filters-bar {
+  padding: $spacing-md;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: $spacing-md;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pqr-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.pqr-item {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+  }
+
+  &__date {
+    font-size: $font-size-sm;
+    color: rgba($color-dark, 0.65);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $font-size-lg;
+    color: $color-dark;
+  }
+
+  &__desc {
+    margin: 0;
+    color: rgba($color-dark, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+    margin-top: $spacing-xs;
+    padding-top: $spacing-sm;
+    border-top: 1px solid rgba($color-dark, 0.08);
+  }
+
+  &__meta {
+    font-size: $font-size-sm;
+    color: rgba($color-dark, 0.75);
+  }
+}
+
+.codigo-pill {
+  font-family: monospace;
+  font-weight: 700;
+  background: $color-surface;
+  padding: 0.2rem 0.55rem;
+  border-radius: $border-radius-sm;
+  color: $color-primary;
+}
+
+.btn-copy {
+  border: 1px solid rgba($color-primary, 0.3);
+  background: transparent;
+  color: $color-primary;
+  border-radius: $border-radius-sm;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba($color-primary, 0.08);
+  }
+}
