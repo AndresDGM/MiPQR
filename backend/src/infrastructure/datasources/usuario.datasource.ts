@@ -88,10 +88,10 @@ export class UsuarioDatasource {
   async create(dto: CreateUsuarioDto): Promise<Usuario> {
     try {
       const { rows } = await pool.query<UsuarioRow>(
-        `INSERT INTO usuario (id_rol, nombre, correo, identificacion, password, activo)
-         VALUES ($1, $2, $3, $4, $5, TRUE)
+        `INSERT INTO usuario (id_rol, nombre, correo, identificacion, password, telefono, activo)
+         VALUES ($1, $2, $3, $4, $5, $6, TRUE)
          RETURNING *`,
-        [dto.idRol, dto.nombre, dto.correo, dto.identificacion, dto.password]
+        [dto.idRol, dto.nombre, dto.correo, dto.identificacion, dto.password, dto.telefono ?? null]
       );
       return this.toEntity(rows[0]);
     } catch (error) {
@@ -101,16 +101,26 @@ export class UsuarioDatasource {
 
   async update(idUsuario: number, dto: UpdateUsuarioDto): Promise<Usuario | null> {
     try {
+      const updateTelefono = dto.telefono !== undefined;
       // COALESCE conserva el valor actual de los campos que no se envian
       const { rows } = await pool.query<UsuarioRow>(
         `UPDATE usuario SET
            id_rol         = COALESCE($2, id_rol),
            nombre         = COALESCE($3, nombre),
            correo         = COALESCE($4, correo),
-           identificacion = COALESCE($5, identificacion)
+           identificacion = COALESCE($5, identificacion),
+           telefono       = CASE WHEN $6::boolean THEN $7 ELSE telefono END
          WHERE id_usuario = $1
          RETURNING *`,
-        [idUsuario, dto.idRol ?? null, dto.nombre ?? null, dto.correo ?? null, dto.identificacion ?? null]
+        [
+          idUsuario,
+          dto.idRol ?? null,
+          dto.nombre ?? null,
+          dto.correo ?? null,
+          dto.identificacion ?? null,
+          updateTelefono,
+          dto.telefono ?? null,
+        ]
       );
       return rows[0] ? this.toEntity(rows[0]) : null;
     } catch (error) {

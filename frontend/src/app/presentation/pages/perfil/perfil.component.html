@@ -1,0 +1,60 @@
+<div class="container perfil-page">
+  <div class="page-header">
+    <div>
+      <h1>Mi Perfil</h1>
+      <p>Actualiza tus datos de contacto y número de WhatsApp para recibir notificaciones.</p>
+    </div>
+    @if (authService.currentUser(); as user) {
+      <div class="role-summary">
+        <span class="role-badge">{{ user.rol }}</span>
+        <span class="status-pill">{{ user.activo ? 'Cuenta activa' : 'Inactiva' }}</span>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner mensaje="Cargando perfil..." />
+  } @else {
+    <section class="card perfil-card">
+      @if (feedback()) {
+        <div class="alert alert-success">{{ feedback() }}</div>
+      }
+      @if (error()) {
+        <div class="alert alert-danger">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="saveProfile()" class="perfil-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="p-nombre">Nombre completo</label>
+            <input id="p-nombre" type="text" class="form-control" formControlName="nombre" />
+          </div>
+          <div class="form-group">
+            <label for="p-correo">Correo electrónico</label>
+            <input id="p-correo" type="email" class="form-control" formControlName="correo" />
+          </div>
+          <div class="form-group">
+            <label for="p-id">Identificación</label>
+            <input id="p-id" type="text" class="form-control" formControlName="identificacion" />
+          </div>
+          <div class="form-group">
+            <label for="p-tel">Teléfono / WhatsApp</label>
+            <input
+              id="p-tel"
+              type="tel"
+              class="form-control"
+              formControlName="telefono"
+              placeholder="Ej: 3001234567"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</div>

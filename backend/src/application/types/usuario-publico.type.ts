@@ -8,6 +8,7 @@ export interface UsuarioPublico {
   nombre: string;
   correo: string;
   identificacion: string;
+  telefono: string | null;
   activo: boolean;
 }
 
@@ -19,6 +20,7 @@ export function toUsuarioPublico(usuario: Usuario, rolNombre: RolNombre): Usuari
     nombre: usuario.nombre,
     correo: usuario.correo,
     identificacion: usuario.identificacion,
+    telefono: usuario.telefono ?? null,
     activo: usuario.activo,
   };
 }

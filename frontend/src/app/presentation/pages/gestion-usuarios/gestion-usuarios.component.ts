@@ -42,6 +42,7 @@ export class GestionUsuariosComponent implements OnInit {
     nombre: new FormControl('', [Validators.required, Validators.minLength(3)]),
     correo: new FormControl('', [Validators.required, Validators.email]),
     identificacion: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    telefono: new FormControl(''),
     idRol: new FormControl<number>(3, [Validators.required]),
     password: new FormControl(''),
   });
@@ -81,7 +82,7 @@ export class GestionUsuariosComponent implements OnInit {
 
   openCreateForm(): void {
     this.editingUserId.set(null);
-    this.form.reset({ nombre: '', correo: '', identificacion: '', idRol: 3, password: '' });
+    this.form.reset({ nombre: '', correo: '', identificacion: '', telefono: '', idRol: 3, password: '' });
     this.form.controls.password.setValidators([Validators.required, Validators.minLength(4)]);
     this.form.controls.password.updateValueAndValidity();
     this.showForm.set(true);
@@ -95,6 +96,7 @@ export class GestionUsuariosComponent implements OnInit {
       nombre: user.nombre,
       correo: user.correo,
       identificacion: user.identificacion,
+      telefono: user.telefono ?? '',
       idRol: user.idRol,
       password: '',
     });
@@ -127,6 +129,7 @@ export class GestionUsuariosComponent implements OnInit {
           nombre: val.nombre!.trim(),
           correo: val.correo!.trim(),
           identificacion: val.identificacion!.trim(),
+          telefono: val.telefono?.trim() || null,
           idRol: Number(val.idRol),
         })
         .subscribe({
@@ -151,6 +154,7 @@ export class GestionUsuariosComponent implements OnInit {
         nombre: val.nombre!.trim(),
         correo: val.correo!.trim(),
         identificacion: val.identificacion!.trim(),
+        telefono: val.telefono?.trim() || null,
         idRol: Number(val.idRol),
         password: val.password!,
       })

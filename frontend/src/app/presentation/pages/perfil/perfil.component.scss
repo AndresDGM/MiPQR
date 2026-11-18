@@ -1,0 +1,83 @@
+@use '../../../../styles/variables' as *;
+
+.perfil-page {
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  max-width: 820px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0 0 $spacing-xs;
+    color: $color-primary;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-dark, 0.72);
+  }
+}
+
+.role-summary {
+  display: flex;
+  gap: $spacing-xs;
+  align-items: center;
+}
+
+.role-badge {
+  background: rgba($color-primary, 0.1);
+  color: $color-primary;
+  padding: 0.25rem 0.7rem;
+  border-radius: $border-radius-full;
+  font-weight: 600;
+  font-size: $font-size-sm;
+}
+
+.status-pill {
+  background: rgba(#059669, 0.12);
+  color: #059669;
+  padding: 0.25rem 0.7rem;
+  border-radius: $border-radius-full;
+  font-weight: 600;
+  font-size: $font-size-sm;
+}
+
+.perfil-card {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: $spacing-md;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-dark;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacing-md;
+}

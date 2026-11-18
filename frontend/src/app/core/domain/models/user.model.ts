@@ -68,6 +68,9 @@ export interface User {
   /** Cédula o documento de identificación */
   identificacion: string;
 
+  /** Número de teléfono o WhatsApp para alertas */
+  telefono?: string | null;
+
   /** Indica si la cuenta se encuentra habilitada para operar */
   activo: boolean;
 }
@@ -78,6 +81,7 @@ export interface CreateUserPayload {
   correo: string;
   identificacion: string;
   password: string;
+  telefono?: string | null;
 }
 
 export interface UpdateUserPayload {
@@ -85,5 +89,6 @@ export interface UpdateUserPayload {
   nombre?: string;
   correo?: string;
   identificacion?: string;
+  telefono?: string | null;
 }
 

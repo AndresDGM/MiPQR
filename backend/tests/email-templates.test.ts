@@ -24,7 +24,7 @@ describe('EmailTemplates', () => {
     assert.ok(template.html.includes('Peticion'));
     assert.ok(template.html.includes('Recibida'));
     assert.ok(template.html.includes('siau@dolormed.com.co'));
-    assert.ok(template.html.includes('http://localhost:4200/consulta-pqr?codigo=PQR-2026-0042'));
+    assert.ok(template.html.includes('http://localhost:4200/consulta?codigo=PQR-2026-0042'));
     assert.ok(template.html.includes('Aviso de Privacidad y Confidencialidad Medica'));
 
     // Garantizar privacidad: NO debe incluir asunto ni descripcion medica sensible
