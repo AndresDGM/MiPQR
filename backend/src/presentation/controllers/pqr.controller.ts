@@ -30,7 +30,7 @@ export class PqrController {
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const limit = req.query.limit ? Number(req.query.limit) : undefined;
-      const pqrs = await this.getAllUseCase.execute(limit);
+      const pqrs = await this.getAllUseCase.execute(limit, req.user);
       res.json(pqrs);
     } catch (error) {
       next(error);
@@ -41,7 +41,7 @@ export class PqrController {
     try {
       const id = Number(req.params.id);
       if (isNaN(id) || id <= 0) throw CustomError.badRequest('ID de PQR inválido');
-      const pqr = await this.getByIdUseCase.execute(id);
+      const pqr = await this.getByIdUseCase.execute(id, req.user);
       res.json(pqr);
     } catch (error) {
       next(error);
