@@ -53,6 +53,13 @@ export class ConsultaPqrComponent implements OnInit, OnDestroy {
 
   previewAttachment = signal<PqrAttachment | null>(null);
   previewBlobUrl = signal<string | null>(null);
+  copied = signal(false);
+
+  copyCodigo(codigo: string): void {
+    navigator.clipboard?.writeText(codigo);
+    this.copied.set(true);
+    setTimeout(() => this.copied.set(false), 2000);
+  }
 
   state = signal<VmConsultaPqr>({
     loading: false,

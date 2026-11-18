@@ -41,6 +41,14 @@ export class RegistroPqrComponent implements OnInit {
 
   tiposPqr: PqrType[] = ['Peticion', 'Queja', 'Reclamo', 'Sugerencia'];
   selectedFiles = signal<File[]>([]);
+  copied = signal(false);
+
+  copyCodigo(codigo?: string): void {
+    if (!codigo) return;
+    navigator.clipboard?.writeText(codigo);
+    this.copied.set(true);
+    setTimeout(() => this.copied.set(false), 2000);
+  }
 
   state = signal<VmRegistroPqr>({
     loadingCategories: true,
