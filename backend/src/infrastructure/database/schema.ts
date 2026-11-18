@@ -5,6 +5,13 @@ CREATE TABLE IF NOT EXISTS rol (
   descripcion VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS categoria (
+  id_categoria INTEGER PRIMARY KEY,
+  nombre       VARCHAR(100) NOT NULL UNIQUE,
+  descripcion  VARCHAR(255) NOT NULL,
+  activa       BOOLEAN NOT NULL DEFAULT TRUE
+);
+
 CREATE TABLE IF NOT EXISTS usuario (
   id_usuario     SERIAL PRIMARY KEY,
   id_rol         INTEGER NOT NULL REFERENCES rol (id_rol),
@@ -97,6 +104,41 @@ CREATE TABLE IF NOT EXISTS registro_correo (
 
 CREATE INDEX IF NOT EXISTS idx_registro_correo_id_pqr ON registro_correo (id_pqr);
 CREATE INDEX IF NOT EXISTS idx_registro_correo_estado ON registro_correo (estado);
+
+-- Tabla de Historial y Trazabilidad de PQR: PQR (1) ---- (N) HISTORIAL_PQR
+CREATE TABLE IF NOT EXISTS historial_pqr (
+  id_historial SERIAL PRIMARY KEY,
+  id_pqr       INTEGER NOT NULL REFERENCES pqr (id_pqr) ON DELETE CASCADE,
+  id_usuario   INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL,
+  id_estado    INTEGER NOT NULL,
+  estado       VARCHAR(50) NOT NULL,
+  accion       VARCHAR(100) NOT NULL,
+  observacion  TEXT NOT NULL,
+  fecha        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_historial_pqr_id_pqr ON historial_pqr (id_pqr);
+
+-- Tabla de Respuestas Formales de PQR: PQR (1) ---- (N) RESPUESTA_PQR
+CREATE TABLE IF NOT EXISTS respuesta_pqr (
+  id_respuesta    SERIAL PRIMARY KEY,
+  id_pqr          INTEGER NOT NULL REFERENCES pqr (id_pqr) ON DELETE CASCADE,
+  id_usuario      INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL,
+  contenido       TEXT NOT NULL,
+  fecha_respuesta TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_respuesta_pqr_id_pqr ON respuesta_pqr (id_pqr);
+`;
+
+export const seedCategoriasSql = `
+INSERT INTO categoria (id_categoria, nombre, descripcion, activa) VALUES
+  (1, 'Atención Médica', 'Atención médica general, consulta externa y con especialistas.', TRUE),
+  (2, 'Facturación', 'Liquidación de cuentas, cobros, copagos y autorizaciones EPS.', TRUE),
+  (3, 'Farmacia', 'Dispensación y entrega de medicamentos y fórmulas médicas.', TRUE),
+  (4, 'Urgencias', 'Atención de emergencias y triage médico.', TRUE),
+  (5, 'Laboratorio e Imágenes', 'Toma de muestras, exámenes diagnósticos y entrega de resultados.', TRUE)
+ON CONFLICT (id_categoria) DO NOTHING;
 `;
 
 export const seedRolesSql = `
