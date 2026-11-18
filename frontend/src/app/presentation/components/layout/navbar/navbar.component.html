@@ -77,10 +77,10 @@
           Iniciar Sesión
         </a>
       } @else {
-        <div class="navbar__user-info">
+        <a routerLink="/perfil" class="navbar__user-info" title="Ver o editar mi perfil" (click)="closeMenu()">
           <span class="navbar__user-name">{{ authService.currentUser()?.nombre }}</span>
           <span class="navbar__user-role badge">{{ authService.userRol() }}</span>
-        </div>
+        </a>
         <button type="button" class="btn btn-sm btn-outline-danger" (click)="logout()">
           Cerrar Sesión
         </button>
