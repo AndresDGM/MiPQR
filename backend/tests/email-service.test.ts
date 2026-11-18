@@ -112,6 +112,12 @@ class MockPqrRepository extends PqrRepository {
   async responder(): Promise<PqrResponseRecord> {
     throw new Error('Not implemented in mock');
   }
+
+  async findProximasAVencer(): Promise<PqrRecord[]> {
+    return [];
+  }
+
+  async markAlertaVencimientoEnviada(): Promise<void> {}
 }
 
 class MockUsuarioRepository extends UsuarioRepository {

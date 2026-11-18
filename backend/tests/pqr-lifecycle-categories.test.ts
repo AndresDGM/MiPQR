@@ -142,6 +142,12 @@ class LifecyclePqrRepository extends PqrRepository {
       fechaRespuesta: new Date(),
     };
   }
+
+  async findProximasAVencer(): Promise<PqrRecord[]> {
+    return [];
+  }
+
+  async markAlertaVencimientoEnviada(): Promise<void> {}
 }
 
 describe('Categorias UseCases', () => {
