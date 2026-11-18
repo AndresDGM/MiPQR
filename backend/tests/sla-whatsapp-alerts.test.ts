@@ -71,7 +71,7 @@ class SlaMockPqrRepository extends PqrRepository {
     const created: PqrRecord = {
       idPqr: this.pqrs.length + 1,
       codigoSeguimiento: `PQR-2026-000${this.pqrs.length + 1}`,
-      idCategoria: data.idCategoria,
+      idCategoria: data.idCategoria ?? 1,
       categoria: 'Atención Médica',
       idEstado: 1,
       estado: 'Recibida',
