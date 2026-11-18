@@ -166,5 +166,8 @@ export interface CreatePqrPayload {
 
   /** Número de documento o identificación del solicitante */
   identificacionSolicitante: string;
+
+  /** Número de teléfono o WhatsApp para alertas (opcional) */
+  telefonoSolicitante?: string | null;
 }
 

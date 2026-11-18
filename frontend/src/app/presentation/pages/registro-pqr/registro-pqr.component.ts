@@ -74,6 +74,7 @@ export class RegistroPqrComponent implements OnInit {
       Validators.required,
       Validators.minLength(6),
     ]),
+    telefonoSolicitante: new FormControl(''),
   });
 
   ngOnInit(): void {
@@ -88,6 +89,7 @@ export class RegistroPqrComponent implements OnInit {
         nombreSolicitante: user.nombre,
         correoSolicitante: user.correo,
         identificacionSolicitante: user.identificacion,
+        telefonoSolicitante: user.telefono ?? '',
       });
     }
   }
@@ -135,6 +137,7 @@ export class RegistroPqrComponent implements OnInit {
       nombreSolicitante: raw.nombreSolicitante!.trim(),
       correoSolicitante: raw.correoSolicitante!.trim(),
       identificacionSolicitante: raw.identificacionSolicitante!.trim(),
+      telefonoSolicitante: raw.telefonoSolicitante?.trim() || null,
     };
 
     this.createPqrUseCase.execute(payload).subscribe({
