@@ -3,7 +3,6 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/application/auth';
 import { CreatePqrUseCase } from '../../../core/application/usecases/create-pqr.usecase';
-import { GetAllCategoriesUseCase } from '../../../core/application/usecases/get-all-categories.usecase';
 import { UploadPqrAttachmentsUseCase } from '../../../core/application/usecases/upload-pqr-attachments.usecase';
 import { CreatePqrPayload, PqrType } from '../../../core/domain/models/pqr.model';
 import {
@@ -34,7 +33,6 @@ import { VmRegistroPqr } from '../../interfaces/vm-registro-pqr.interface';
 })
 export class RegistroPqrComponent implements OnInit {
   private createPqrUseCase = inject(CreatePqrUseCase);
-  private getAllCategoriesUseCase = inject(GetAllCategoriesUseCase);
   private uploadPqrAttachmentsUseCase = inject(UploadPqrAttachmentsUseCase);
   authService = inject(AuthService);
   private router = inject(Router);
@@ -51,7 +49,7 @@ export class RegistroPqrComponent implements OnInit {
   }
 
   state = signal<VmRegistroPqr>({
-    loadingCategories: true,
+    loadingCategories: false,
     submitting: false,
     categories: [],
     createdPqr: null,
@@ -61,7 +59,6 @@ export class RegistroPqrComponent implements OnInit {
 
   form = new FormGroup({
     tipoPqr: new FormControl<PqrType>('Peticion', [Validators.required]),
-    idCategoria: new FormControl<number | null>(null, [Validators.required]),
     asunto: new FormControl('', [
       Validators.required,
       Validators.minLength(5),
@@ -78,7 +75,6 @@ export class RegistroPqrComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadCategories();
     this.prefillUserIfAuthenticated();
   }
 
@@ -92,28 +88,6 @@ export class RegistroPqrComponent implements OnInit {
         telefonoSolicitante: user.telefono ?? '',
       });
     }
-  }
-
-  private loadCategories(): void {
-    this.getAllCategoriesUseCase.execute().subscribe({
-      next: (categories) => {
-        this.state.update((s) => ({
-          ...s,
-          loadingCategories: false,
-          categories,
-        }));
-        if (categories.length > 0) {
-          this.form.patchValue({ idCategoria: categories[0].idCategoria });
-        }
-      },
-      error: () => {
-        this.state.update((s) => ({
-          ...s,
-          loadingCategories: false,
-          error: 'Error al cargar las categorías del sistema.',
-        }));
-      },
-    });
   }
 
   onFilesSelected(files: File[]): void {
@@ -131,7 +105,6 @@ export class RegistroPqrComponent implements OnInit {
 
     const payload: CreatePqrPayload = {
       tipoPqr: raw.tipoPqr!,
-      idCategoria: Number(raw.idCategoria),
       asunto: raw.asunto!.trim(),
       descripcion: raw.descripcion!.trim(),
       nombreSolicitante: raw.nombreSolicitante!.trim(),
@@ -191,7 +164,6 @@ export class RegistroPqrComponent implements OnInit {
     this.state.update((s) => ({ ...s, createdPqr: null, error: null, attachedFilesCount: 0 }));
     this.form.reset({
       tipoPqr: 'Peticion',
-      idCategoria: this.state().categories[0]?.idCategoria ?? null,
     });
     this.prefillUserIfAuthenticated();
   }

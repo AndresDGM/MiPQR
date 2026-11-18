@@ -149,8 +149,8 @@ export interface CreatePqrPayload {
   /** Tipo de solicitud */
   tipoPqr: PqrType;
 
-  /** Identificador de la categoría */
-  idCategoria: number;
+  /** Identificador de la categoría (opcional; si no se envía, la IA clasifica automáticamente) */
+  idCategoria?: number;
 
   /** Asunto breve */
   asunto: string;

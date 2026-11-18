@@ -28,6 +28,10 @@
           <app-badge-tipo [tipo]="state().createdPqr!.tipoPqr" />
         </div>
         <div class="summary-item">
+          <span class="summary-item__label">Categoría asignada (IA):</span>
+          <span>{{ state().createdPqr?.categoriaSugeridaIa || state().createdPqr?.categoria || 'General' }}</span>
+        </div>
+        <div class="summary-item">
           <span class="summary-item__label">Asunto:</span>
           <span>{{ state().createdPqr?.asunto }}</span>
         </div>
@@ -170,12 +174,10 @@
               </div>
 
               <div class="form-group">
-                <label for="idCategoria">Categoría / Área del Servicio *</label>
-                <select id="idCategoria" formControlName="idCategoria">
-                  @for (cat of state().categories; track cat.idCategoria) {
-                    <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
-                  }
-                </select>
+                <label>Categoría / Área del Servicio</label>
+                <div class="text-muted" style="padding: 0.65rem 0.85rem; background: #f2f4f7; border-radius: 6px; font-size: 0.875rem;">
+                  Clasificación automática mediante IA según el asunto y descripción de tu solicitud.
+                </div>
               </div>
             </div>
           </div>
