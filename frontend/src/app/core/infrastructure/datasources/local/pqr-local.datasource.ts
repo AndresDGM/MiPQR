@@ -157,7 +157,8 @@ export class PqrLocalDatasource {
     const categories = this.categoryDatasource.getCategoriesSync();
     const newId = this.pqrs.length + 1;
     const codigo = `PQR-2026-${String(newId).padStart(4, '0')}`;
-    const categoria = categories.find((c) => c.idCategoria === payload.idCategoria);
+    const idCategoria = payload.idCategoria ?? 1;
+    const categoria = categories.find((c) => c.idCategoria === idCategoria);
     const fecha = new Date().toISOString();
 
     const nueva: Pqr = {
@@ -166,7 +167,7 @@ export class PqrLocalDatasource {
       idSolicitante: 100 + newId,
       nombreSolicitante: payload.nombreSolicitante,
       correoSolicitante: payload.correoSolicitante,
-      idCategoria: payload.idCategoria,
+      idCategoria,
       categoria: categoria?.nombre ?? 'General',
       idEstado: 1,
       estado: 'Recibida',

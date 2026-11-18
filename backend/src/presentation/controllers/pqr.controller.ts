@@ -79,7 +79,7 @@ export class PqrController {
 
       const pqr = await this.createUseCase.execute({
         tipoPqr,
-        idCategoria: Number(idCategoria) || 1,
+        ...(idCategoria ? { idCategoria: Number(idCategoria) } : {}),
         asunto: String(asunto).trim(),
         descripcion: String(descripcion).trim(),
         nombreSolicitante: String(nombreSolicitante).trim(),
