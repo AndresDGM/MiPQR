@@ -82,6 +82,7 @@ services:
       - "traefik.http.services.${CONTAINER_NAME:-mipqr-backend}.loadbalancer.server.port=${PORT:-3000}"
 
   ai-service:
+    profiles: ["ai"]
     build:
       context: ../ai-service
       dockerfile: Dockerfile
