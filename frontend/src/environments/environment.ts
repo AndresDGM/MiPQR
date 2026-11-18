@@ -10,8 +10,8 @@ export const environment = {
   adapter: {
     auth: 'node' as const,
     users: 'node' as const,
-    pqrs: 'local' as const,
-    categories: 'local' as const,
-    attachments: 'local' as const,
+    pqrs: 'node' as const,
+    categories: 'node' as const,
+    attachments: 'node' as const,
   },
 };

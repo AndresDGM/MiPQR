@@ -8,31 +8,60 @@
       </div>
     </a>
 
-    <nav class="navbar__nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar__link">
+    <button
+      type="button"
+      class="navbar__toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-label="Abrir menú de navegación"
+    >
+      {{ menuOpen() ? '✕' : '☰' }}
+    </button>
+
+    <nav class="navbar__nav" [class.navbar__nav--open]="menuOpen()">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="navbar__link"
+        (click)="closeMenu()"
+      >
         Inicio
       </a>
 
       @if (!authService.isAuthenticated()) {
-        <a routerLink="/consulta" routerLinkActive="active" class="navbar__link">
+        <a routerLink="/consulta" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
           Consultar PQR
         </a>
-        <a routerLink="/registro-pqr" routerLinkActive="active" class="navbar__link">
+        <a routerLink="/registro-pqr" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
           Radicar PQR
         </a>
       } @else {
         @if (authService.userRol() === 'Solicitante') {
-          <a routerLink="/registro-pqr" routerLinkActive="active" class="navbar__link">
+          <a routerLink="/mis-pqr" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
+            Mis PQR
+          </a>
+          <a routerLink="/registro-pqr" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
             Nueva PQR
           </a>
-          <a routerLink="/consulta" routerLinkActive="active" class="navbar__link">
+          <a routerLink="/consulta" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
             Consultar PQR
           </a>
         } @else {
-          <a routerLink="/bandeja" routerLinkActive="active" class="navbar__link">
+          <a routerLink="/bandeja" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
             Bandeja de Gestión
           </a>
-          <a routerLink="/consulta" routerLinkActive="active" class="navbar__link">
+          @if (authService.userRol() === 'Analista SIAU' || authService.userRol() === 'Directivo') {
+            <a routerLink="/indicadores" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
+              Indicadores
+            </a>
+          }
+          @if (authService.userRol() === 'Directivo') {
+            <a routerLink="/usuarios" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
+              Usuarios
+            </a>
+          }
+          <a routerLink="/consulta" routerLinkActive="active" class="navbar__link" (click)="closeMenu()">
             Búsqueda
           </a>
         }

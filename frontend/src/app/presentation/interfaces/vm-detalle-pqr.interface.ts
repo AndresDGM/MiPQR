@@ -1,3 +1,4 @@
+import { Category } from '../../core/domain/models/category.model';
 import { PqrAttachment } from '../../core/domain/models/pqr-attachment.model';
 import { PqrHistory } from '../../core/domain/models/pqr-history.model';
 import { Pqr } from '../../core/domain/models/pqr.model';
@@ -17,6 +18,13 @@ export interface VmDetallePqr {
   attachments?: PqrAttachment[];
   loadingAttachments?: boolean;
   responsables: User[];
+  categories?: Category[];
+  emailDeliveryStatus?: {
+    enviado: boolean;
+    estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+    simulated?: boolean;
+    mensaje?: string;
+  } | null;
   successMessage: string | null;
   error: string | null;
 }

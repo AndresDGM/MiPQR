@@ -5,6 +5,13 @@ CREATE TABLE IF NOT EXISTS rol (
   descripcion VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS categoria (
+  id_categoria INTEGER PRIMARY KEY,
+  nombre       VARCHAR(100) NOT NULL UNIQUE,
+  descripcion  VARCHAR(255) NOT NULL,
+  activa       BOOLEAN NOT NULL DEFAULT TRUE
+);
+
 CREATE TABLE IF NOT EXISTS usuario (
   id_usuario     SERIAL PRIMARY KEY,
   id_rol         INTEGER NOT NULL REFERENCES rol (id_rol),
@@ -13,13 +20,18 @@ CREATE TABLE IF NOT EXISTS usuario (
   identificacion VARCHAR(20) NOT NULL UNIQUE,
   -- Valor cifrado con RSA (formato "rsa1:<base64>"); nunca texto plano
   password       TEXT NOT NULL,
+  telefono       VARCHAR(30),
   activo         BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- Bases creadas antes del cifrado tenian la contrasena como VARCHAR(255)
 ALTER TABLE usuario ALTER COLUMN password TYPE TEXT;
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS telefono VARCHAR(30);
 
 CREATE INDEX IF NOT EXISTS idx_usuario_id_rol ON usuario (id_rol);
+
+-- Secuencia atómica para generación segura y concurrente de códigos de seguimiento
+CREATE SEQUENCE IF NOT EXISTS pqr_codigo_seq START WITH 1;
 
 -- Tabla principal de PQR
 CREATE TABLE IF NOT EXISTS pqr (
@@ -29,6 +41,7 @@ CREATE TABLE IF NOT EXISTS pqr (
   nombre_solicitante         VARCHAR(120),
   correo_solicitante         VARCHAR(160),
   identificacion_solicitante VARCHAR(20),
+  telefono_solicitante       VARCHAR(30),
   id_categoria               INTEGER NOT NULL DEFAULT 1,
   categoria                  VARCHAR(100) NOT NULL DEFAULT 'General',
   id_estado                  INTEGER NOT NULL DEFAULT 1,
@@ -38,8 +51,28 @@ CREATE TABLE IF NOT EXISTS pqr (
   asunto                     VARCHAR(200) NOT NULL,
   descripcion                TEXT NOT NULL,
   fecha_registro             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  fecha_cierre               TIMESTAMP WITH TIME ZONE
+  fecha_limite               TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (NOW() + INTERVAL '8 days'),
+  fecha_cierre               TIMESTAMP WITH TIME ZONE,
+  alerta_vencimiento_enviada BOOLEAN NOT NULL DEFAULT FALSE,
+  -- Campos de sugerencia y auditoría de Inteligencia Artificial
+  categoria_sugerida_ia      VARCHAR(100),
+  confianza_ia               REAL,
+  estado_revision_ia         VARCHAR(20) DEFAULT 'PENDIENTE',
+  fecha_clasificacion_ia     TIMESTAMP WITH TIME ZONE,
+  version_modelo_ia          VARCHAR(50),
+  id_usuario_revision_ia     INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL
 );
+
+-- Asegurar compatibilidad si la tabla pqr ya existía
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS categoria_sugerida_ia VARCHAR(100);
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS confianza_ia REAL;
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS estado_revision_ia VARCHAR(20) DEFAULT 'PENDIENTE';
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS fecha_clasificacion_ia TIMESTAMP WITH TIME ZONE;
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS version_modelo_ia VARCHAR(50);
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS id_usuario_revision_ia INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL;
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS telefono_solicitante VARCHAR(30);
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS fecha_limite TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '8 days');
+ALTER TABLE pqr ADD COLUMN IF NOT EXISTS alerta_vencimiento_enviada BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE INDEX IF NOT EXISTS idx_pqr_codigo ON pqr (codigo_seguimiento);
 CREATE INDEX IF NOT EXISTS idx_pqr_id_solicitante ON pqr (id_solicitante);
@@ -61,6 +94,59 @@ CREATE TABLE IF NOT EXISTS documento_adjunto (
 
 CREATE INDEX IF NOT EXISTS idx_documento_adjunto_id_pqr ON documento_adjunto (id_pqr);
 CREATE INDEX IF NOT EXISTS idx_documento_adjunto_id_usuario ON documento_adjunto (id_usuario);
+
+-- Tabla de Registro y Auditoría de Notificaciones por Correo Electrónico
+CREATE TABLE IF NOT EXISTS registro_correo (
+  id_correo       SERIAL PRIMARY KEY,
+  id_pqr          INTEGER REFERENCES pqr (id_pqr) ON DELETE CASCADE,
+  destinatario    VARCHAR(160) NOT NULL,
+  tipo_evento     VARCHAR(50) NOT NULL,
+  asunto          VARCHAR(255) NOT NULL,
+  estado          VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
+  mensaje_id      VARCHAR(255),
+  mensaje_error   TEXT,
+  intentos        INTEGER NOT NULL DEFAULT 1,
+  fecha_creacion  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  fecha_envio     TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS idx_registro_correo_id_pqr ON registro_correo (id_pqr);
+CREATE INDEX IF NOT EXISTS idx_registro_correo_estado ON registro_correo (estado);
+
+-- Tabla de Historial y Trazabilidad de PQR: PQR (1) ---- (N) HISTORIAL_PQR
+CREATE TABLE IF NOT EXISTS historial_pqr (
+  id_historial SERIAL PRIMARY KEY,
+  id_pqr       INTEGER NOT NULL REFERENCES pqr (id_pqr) ON DELETE CASCADE,
+  id_usuario   INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL,
+  id_estado    INTEGER NOT NULL,
+  estado       VARCHAR(50) NOT NULL,
+  accion       VARCHAR(100) NOT NULL,
+  observacion  TEXT NOT NULL,
+  fecha        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_historial_pqr_id_pqr ON historial_pqr (id_pqr);
+
+-- Tabla de Respuestas Formales de PQR: PQR (1) ---- (N) RESPUESTA_PQR
+CREATE TABLE IF NOT EXISTS respuesta_pqr (
+  id_respuesta    SERIAL PRIMARY KEY,
+  id_pqr          INTEGER NOT NULL REFERENCES pqr (id_pqr) ON DELETE CASCADE,
+  id_usuario      INTEGER REFERENCES usuario (id_usuario) ON DELETE SET NULL,
+  contenido       TEXT NOT NULL,
+  fecha_respuesta TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_respuesta_pqr_id_pqr ON respuesta_pqr (id_pqr);
+`;
+
+export const seedCategoriasSql = `
+INSERT INTO categoria (id_categoria, nombre, descripcion, activa) VALUES
+  (1, 'Atención Médica', 'Atención médica general, consulta externa y con especialistas.', TRUE),
+  (2, 'Facturación', 'Liquidación de cuentas, cobros, copagos y autorizaciones EPS.', TRUE),
+  (3, 'Farmacia', 'Dispensación y entrega de medicamentos y fórmulas médicas.', TRUE),
+  (4, 'Urgencias', 'Atención de emergencias y triage médico.', TRUE),
+  (5, 'Laboratorio e Imágenes', 'Toma de muestras, exámenes diagnósticos y entrega de resultados.', TRUE)
+ON CONFLICT (id_categoria) DO NOTHING;
 `;
 
 export const seedRolesSql = `
@@ -82,5 +168,10 @@ ON CONFLICT (id_pqr) DO NOTHING;
 SELECT setval(
   pg_get_serial_sequence('pqr', 'id_pqr'),
   GREATEST((SELECT COALESCE(MAX(id_pqr), 1) FROM pqr), 1)
+);
+
+SELECT setval(
+  'pqr_codigo_seq',
+  GREATEST((SELECT COALESCE(MAX(id_pqr), 0) FROM pqr), 1)
 );
 `;

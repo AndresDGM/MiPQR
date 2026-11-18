@@ -22,4 +22,22 @@ export const envs = {
   MAX_FILE_SIZE_MB: env.get('MAX_FILE_SIZE_MB').default('10').asIntPositive(),
   MAX_FILES_PER_REQUEST: env.get('MAX_FILES_PER_REQUEST').default('5').asIntPositive(),
   MAX_TOTAL_SIZE_MB: env.get('MAX_TOTAL_SIZE_MB').default('25').asIntPositive(),
+  // Microservicio de Inteligencia Artificial (FastAPI / TensorFlow)
+  AI_SERVICE_URL: env.get('AI_SERVICE_URL').default('http://localhost:8000').asString(),
+  AI_SERVICE_TIMEOUT_MS: env.get('AI_SERVICE_TIMEOUT_MS').default('5000').asIntPositive(),
+  // Configuracion del servicio de correo electronico (SMTP)
+  SMTP_HOST: env.get('SMTP_HOST').asString(),
+  SMTP_PORT: env.get('SMTP_PORT').default('587').asPortNumber(),
+  SMTP_USER: env.get('SMTP_USER').asString(),
+  SMTP_PASS: env.get('SMTP_PASS').asString(),
+  SMTP_FROM: env.get('SMTP_FROM').default('MiPQR Clinica Dolormed <notificaciones@mipqr.com>').asString(),
+  SMTP_SECURE: env.get('SMTP_SECURE').default('false').asBool(),
+  APP_URL: env.get('APP_URL').default('http://localhost:4200').asString(),
+  // Alertas SLA y WhatsApp (Twilio)
+  PQR_SLA_DAYS: env.get('PQR_SLA_DAYS').default('8').asIntPositive(),
+  SLA_ALERT_HOURS_BEFORE: env.get('SLA_ALERT_HOURS_BEFORE').default('48').asIntPositive(),
+  SLA_CHECK_INTERVAL_MINUTES: env.get('SLA_CHECK_INTERVAL_MINUTES').default('60').asIntPositive(),
+  TWILIO_ACCOUNT_SID: env.get('TWILIO_ACCOUNT_SID').asString(),
+  TWILIO_AUTH_TOKEN: env.get('TWILIO_AUTH_TOKEN').asString(),
+  TWILIO_WHATSAPP_FROM: env.get('TWILIO_WHATSAPP_FROM').default('whatsapp:+14155238886').asString(),
 };

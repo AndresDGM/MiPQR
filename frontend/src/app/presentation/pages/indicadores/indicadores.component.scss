@@ -1,0 +1,166 @@
+@use '../../../../styles/variables' as *;
+
+.indicadores-page {
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0 0 $spacing-xs;
+    color: $color-primary;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-dark, 0.72);
+  }
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: $spacing-md;
+}
+
+.kpi-card {
+  padding: $spacing-md $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.kpi-label {
+  font-size: $font-size-sm;
+  color: rgba($color-dark, 0.7);
+}
+
+.kpi-value {
+  font-size: $font-size-2xl;
+  color: $color-dark;
+
+  &--primary {
+    color: $color-primary;
+  }
+
+  &--accent {
+    color: $color-accent;
+  }
+
+  &--danger {
+    color: $color-danger;
+  }
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $spacing-md;
+}
+
+.metric-panel {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  h2 {
+    margin: 0;
+    font-size: $font-size-lg;
+    color: $color-dark;
+  }
+}
+
+.metric-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    font-size: $font-size-sm;
+  }
+}
+
+.progress-track {
+  height: 8px;
+  border-radius: $border-radius-full;
+  background: $color-surface;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: $border-radius-full;
+  transition: width 0.3s ease;
+
+  &--primary {
+    background: $color-primary;
+  }
+
+  &--accent {
+    background: $color-accent;
+  }
+
+  &--danger {
+    background: $color-danger;
+  }
+}
+
+.pending-panel {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  h2 {
+    margin: 0;
+    font-size: $font-size-lg;
+    color: $color-dark;
+  }
+}
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.pending-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: $color-surface;
+  border-radius: $border-radius-md;
+  flex-wrap: wrap;
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+  }
+
+  &__subject {
+    font-weight: 500;
+    color: $color-dark;
+  }
+}
+
+.codigo-pill {
+  font-family: monospace;
+  font-weight: 700;
+  color: $color-primary;
+}

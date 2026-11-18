@@ -1,3 +1,10 @@
+export interface NotificacionEmailRecord {
+  enviado: boolean;
+  estado: 'ENVIADO' | 'PENDIENTE' | 'FALLIDO' | 'SIMULADO';
+  simulated?: boolean;
+  mensaje?: string;
+}
+
 export interface PqrRecord {
   idPqr: number;
   codigoSeguimiento: string;
@@ -5,6 +12,7 @@ export interface PqrRecord {
   nombreSolicitante?: string | null;
   correoSolicitante?: string | null;
   identificacionSolicitante?: string | null;
+  telefonoSolicitante?: string | null;
   idCategoria: number;
   categoria: string;
   idEstado: number;
@@ -15,7 +23,46 @@ export interface PqrRecord {
   asunto: string;
   descripcion: string;
   fechaRegistro: Date;
+  fechaLimite?: Date | null;
   fechaCierre?: Date | null;
+  alertaVencimientoEnviada?: boolean;
+  // Campos IA
+  categoriaSugeridaIa?: string | null;
+  confianzaIa?: number | null;
+  estadoRevisionIa?: 'PENDIENTE' | 'CONFIRMADA' | 'MODIFICADA';
+  fechaClasificacionIa?: Date | null;
+  versionModeloIa?: string | null;
+  idUsuarioRevisionIa?: number | null;
+  notificacionEmail?: NotificacionEmailRecord;
+}
+
+export type PqrStatusName =
+  | 'Recibida'
+  | 'En revision'
+  | 'Asignada'
+  | 'En gestion'
+  | 'Respondida'
+  | 'Cerrada';
+
+export interface PqrHistoryRecord {
+  idHistorial: number;
+  idPqr: number;
+  idUsuario: number | null;
+  nombreUsuario?: string | null;
+  idEstado: number;
+  estado: PqrStatusName;
+  accion: string;
+  observacion: string;
+  fecha: Date;
+}
+
+export interface PqrResponseRecord {
+  idRespuesta: number;
+  idPqr: number;
+  idUsuario: number | null;
+  nombreUsuario?: string | null;
+  contenido: string;
+  fechaRespuesta: Date;
 }
 
 export interface CreatePqrData {
@@ -26,7 +73,12 @@ export interface CreatePqrData {
   nombreSolicitante: string;
   correoSolicitante: string;
   identificacionSolicitante: string;
+  telefonoSolicitante?: string | null;
   idSolicitante?: number | null;
+  fechaLimite?: Date | null;
+  categoriaSugeridaIa?: string | null;
+  confianzaIa?: number | null;
+  versionModeloIa?: string | null;
 }
 
 /**
@@ -40,4 +92,23 @@ export abstract class PqrRepository {
   abstract findById(idPqr: number): Promise<PqrRecord | null>;
   abstract findByCodigo(codigo: string): Promise<PqrRecord | null>;
   abstract create(data: CreatePqrData): Promise<PqrRecord>;
+  abstract assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord>;
+  abstract updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA',
+    idUsuarioRevision?: number | null
+  ): Promise<PqrRecord>;
+  abstract updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName,
+    idUsuario?: number | null,
+    observacion?: string
+  ): Promise<PqrRecord>;
+  abstract getHistorial(idPqr: number): Promise<PqrHistoryRecord[]>;
+  abstract responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord>;
+  abstract findProximasAVencer(horasRestantes: number): Promise<PqrRecord[]>;
+  abstract markAlertaVencimientoEnviada(idPqr: number): Promise<void>;
 }

@@ -2,6 +2,7 @@ import { Provider } from '@angular/core';
 import {
   AssignPqrResponsableUseCase,
   CreatePqrUseCase,
+  CreateUserUseCase,
   GetAllCategoriesUseCase,
   GetAllPqrsUseCase,
   GetAllUsersUseCase,
@@ -12,11 +13,14 @@ import {
   GetUserByIdUseCase,
   GetUsersByRolUseCase,
   ResponderPqrUseCase,
+  SetUserActivoUseCase,
   UpdatePqrEstadoUseCase,
+  UpdateUserUseCase,
   UploadPqrAttachmentsUseCase,
   GetPqrAttachmentsUseCase,
   DownloadPqrAttachmentUseCase,
   DeletePqrAttachmentUseCase,
+  UpdatePqrCategoriaUseCase,
 } from '../usecases';
 
 /**
@@ -35,6 +39,7 @@ export const PQR_USE_CASES: Provider[] = [
   GetPqrAttachmentsUseCase,
   DownloadPqrAttachmentUseCase,
   DeletePqrAttachmentUseCase,
+  UpdatePqrCategoriaUseCase,
 ];
 
 /**
@@ -44,6 +49,9 @@ export const USER_CATEGORY_USE_CASES: Provider[] = [
   GetAllUsersUseCase,
   GetUserByIdUseCase,
   GetUsersByRolUseCase,
+  CreateUserUseCase,
+  UpdateUserUseCase,
+  SetUserActivoUseCase,
   GetAllCategoriesUseCase,
   GetCategoryByIdUseCase,
 ];

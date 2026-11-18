@@ -72,3 +72,18 @@ export interface User {
   activo: boolean;
 }
 
+export interface CreateUserPayload {
+  idRol: number;
+  nombre: string;
+  correo: string;
+  identificacion: string;
+  password: string;
+}
+
+export interface UpdateUserPayload {
+  idRol?: number;
+  nombre?: string;
+  correo?: string;
+  identificacion?: string;
+}
+

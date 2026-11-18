@@ -58,4 +58,17 @@ export class PqrRemoteDatasource {
       contenido,
     });
   }
+
+  updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA'
+  ): Observable<Pqr> {
+    return this.httpClient.patch<Pqr>(`${this.baseUrl}/api/pqrs/${idPqr}/categoria`, {
+      idCategoria,
+      categoria,
+      estadoRevisionIa,
+    });
+  }
 }

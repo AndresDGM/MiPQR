@@ -174,6 +174,11 @@ export class PqrLocalDatasource {
       asunto: payload.asunto,
       descripcion: payload.descripcion,
       fechaRegistro: fecha,
+      notificacionEmail: {
+        enviado: true,
+        estado: 'ENVIADO',
+        mensaje: `Confirmación de radicación enviada a ${payload.correoSolicitante}`,
+      },
     };
 
     this.pqrs.unshift(nueva);
@@ -235,6 +240,11 @@ export class PqrLocalDatasource {
       idResponsable,
       nombreResponsable: responsable?.nombre ?? 'Responsable Asignado',
       estado: 'Asignada',
+      notificacionEmail: {
+        enviado: true,
+        estado: 'ENVIADO',
+        mensaje: `Correo de notificación enviado exitosamente a ${responsable?.correo ?? 'responsable@dolormed.com'}`,
+      },
     };
     this.pqrs[index] = updated;
 
@@ -271,5 +281,41 @@ export class PqrLocalDatasource {
 
     this.updateEstado(idPqr, 'Respondida', 'Se emitió respuesta formal al caso.');
     return of(response).pipe(delay(350));
+  }
+
+  updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA'
+  ): Observable<Pqr> {
+    const index = this.pqrs.findIndex((p) => p.idPqr === idPqr);
+    if (index === -1) {
+      return throwError(() => new PqrNotFoundError(idPqr));
+    }
+
+    const current = this.pqrs[index]!;
+    const updated: Pqr = {
+      ...current,
+      idCategoria,
+      categoria,
+      estadoRevisionIa,
+      fechaClasificacionIa: current.fechaClasificacionIa || new Date().toISOString(),
+    };
+    this.pqrs[index] = updated;
+
+    this.history.push({
+      idHistorial: this.history.length + 1,
+      idPqr,
+      idUsuario: 2,
+      nombreUsuario: 'Analista SIAU',
+      idEstado: updated.idEstado,
+      estado: updated.estado,
+      accion: `Revisión IA de categoría: ${estadoRevisionIa}`,
+      observacion: `Categoría establecida en: ${categoria} (${estadoRevisionIa})`,
+      fecha: new Date().toISOString(),
+    });
+
+    return of(updated).pipe(delay(250));
   }
 }

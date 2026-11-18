@@ -1,7 +1,10 @@
 import {
   CreatePqrData,
+  PqrHistoryRecord,
   PqrRecord,
   PqrRepository,
+  PqrResponseRecord,
+  PqrStatusName,
 } from '../../domain/repositories/pqr.repository.js';
 import { PqrDatasource } from '../datasources/pqr.datasource.js';
 
@@ -30,5 +33,51 @@ export class PqrRepositoryImpl extends PqrRepository {
 
   create(data: CreatePqrData): Promise<PqrRecord> {
     return this.datasource.create(data);
+  }
+
+  assignResponsable(idPqr: number, idResponsable: number): Promise<PqrRecord> {
+    return this.datasource.assignResponsable(idPqr, idResponsable);
+  }
+
+  updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA',
+    idUsuarioRevision?: number | null
+  ): Promise<PqrRecord> {
+    return this.datasource.updateCategoria(
+      idPqr,
+      idCategoria,
+      categoria,
+      estadoRevisionIa,
+      idUsuarioRevision
+    );
+  }
+
+  updateEstado(
+    idPqr: number,
+    idEstado: number,
+    estado: PqrStatusName,
+    idUsuario?: number | null,
+    observacion?: string
+  ): Promise<PqrRecord> {
+    return this.datasource.updateEstado(idPqr, idEstado, estado, idUsuario, observacion);
+  }
+
+  getHistorial(idPqr: number): Promise<PqrHistoryRecord[]> {
+    return this.datasource.getHistorial(idPqr);
+  }
+
+  responder(idPqr: number, idUsuario: number, contenido: string): Promise<PqrResponseRecord> {
+    return this.datasource.responder(idPqr, idUsuario, contenido);
+  }
+
+  findProximasAVencer(horasRestantes: number): Promise<PqrRecord[]> {
+    return this.datasource.findProximasAVencer(horasRestantes);
+  }
+
+  markAlertaVencimientoEnviada(idPqr: number): Promise<void> {
+    return this.datasource.markAlertaVencimientoEnviada(idPqr);
   }
 }

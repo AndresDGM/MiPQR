@@ -143,6 +143,21 @@ jobs:
       MAX_FILE_SIZE_MB: ${{ vars.MAX_FILE_SIZE_MB }}
       MAX_FILES_PER_REQUEST: ${{ vars.MAX_FILES_PER_REQUEST }}
       MAX_TOTAL_SIZE_MB: ${{ vars.MAX_TOTAL_SIZE_MB }}
+      AI_SERVICE_URL: ${{ vars.AI_SERVICE_URL }}
+      AI_SERVICE_TIMEOUT_MS: ${{ vars.AI_SERVICE_TIMEOUT_MS }}
+      SMTP_HOST: ${{ vars.SMTP_HOST }}
+      SMTP_PORT: ${{ vars.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      SMTP_FROM: ${{ vars.SMTP_FROM }}
+      SMTP_SECURE: ${{ vars.SMTP_SECURE }}
+      APP_URL: ${{ vars.APP_URL }}
+      PQR_SLA_DAYS: ${{ vars.PQR_SLA_DAYS }}
+      SLA_ALERT_HOURS_BEFORE: ${{ vars.SLA_ALERT_HOURS_BEFORE }}
+      SLA_CHECK_INTERVAL_MINUTES: ${{ vars.SLA_CHECK_INTERVAL_MINUTES }}
+      TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+      TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TWILIO_WHATSAPP_FROM: ${{ vars.TWILIO_WHATSAPP_FROM }}
 
     steps:
       # 1. Descargar el código (para obtener docker-compose.yml)
@@ -177,6 +192,21 @@ jobs:
             echo "MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-10}"
             echo "MAX_FILES_PER_REQUEST=${MAX_FILES_PER_REQUEST:-5}"
             echo "MAX_TOTAL_SIZE_MB=${MAX_TOTAL_SIZE_MB:-25}"
+            echo "AI_SERVICE_URL=${AI_SERVICE_URL:-http://ai-service:8000}"
+            echo "AI_SERVICE_TIMEOUT_MS=${AI_SERVICE_TIMEOUT_MS:-5000}"
+            echo "SMTP_HOST=$SMTP_HOST"
+            echo "SMTP_PORT=${SMTP_PORT:-587}"
+            echo "SMTP_USER=$SMTP_USER"
+            echo "SMTP_PASS=$SMTP_PASS"
+            echo "SMTP_FROM=${SMTP_FROM:-MiPQR Clinica Dolormed <notificaciones@mipqr.com>}"
+            echo "SMTP_SECURE=${SMTP_SECURE:-false}"
+            echo "APP_URL=${APP_URL:-https://${DOMAIN}}"
+            echo "PQR_SLA_DAYS=${PQR_SLA_DAYS:-8}"
+            echo "SLA_ALERT_HOURS_BEFORE=${SLA_ALERT_HOURS_BEFORE:-48}"
+            echo "SLA_CHECK_INTERVAL_MINUTES=${SLA_CHECK_INTERVAL_MINUTES:-60}"
+            echo "TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID"
+            echo "TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN"
+            echo "TWILIO_WHATSAPP_FROM=${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}"
           } > .env
           echo "Variables cargadas correctamente"
 

@@ -254,3 +254,160 @@
   border-radius: $border-radius-md;
   border: 1px solid #e2e8f0;
 }
+
+/* Estilos de Clasificación Asistida por IA */
+.ia-verified-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $color-accent;
+  background-color: rgba($color-accent, 0.12);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.ia-card {
+  border: 1px solid rgba($color-primary, 0.25);
+  box-shadow: 0 4px 14px rgba($color-primary, 0.08);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba($color-primary, 0.12);
+  }
+
+  &__badge {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.15rem 0.5rem;
+    border-radius: $border-radius-full;
+    background-color: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+}
+
+.ia-suggestion-box {
+  background-color: $color-surface;
+  border-radius: $border-radius-md;
+  padding: 0.875rem;
+  border-left: 3px solid $color-accent;
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+}
+
+.ia-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $color-dark;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+.ia-confidence-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $color-accent;
+  background-color: rgba($color-accent, 0.12);
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+}
+
+.ia-category-name {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: $color-primary;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.ia-review-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.ia-status-label {
+  color: $color-dark;
+  opacity: 0.7;
+}
+
+.ia-status-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+
+  &--pendiente {
+    background-color: rgba(#d97706, 0.15);
+    color: #b45309;
+  }
+
+  &--confirmada {
+    background-color: rgba(#059669, 0.15);
+    color: #047857;
+  }
+
+  &--modificada {
+    background-color: rgba($color-primary, 0.15);
+    color: $color-primary;
+  }
+}
+
+.ia-divider {
+  text-align: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    right: 0;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  span {
+    position: relative;
+    background-color: $color-white;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    color: $color-dark;
+    opacity: 0.6;
+  }
+}
+
+.ia-unavailable-box {
+  background-color: $color-surface;
+  padding: 0.75rem;
+  border-radius: $border-radius-md;
+  border-left: 3px solid rgba($color-dark, 0.3);
+}
+
+.ia-unavailable-text {
+  font-size: 0.8125rem;
+  color: $color-dark;
+  opacity: 0.8;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border: 1px solid $color-primary;
+  color: $color-primary;
+
+  &:hover:not(:disabled) {
+    background-color: $color-primary;
+    color: $color-white;
+  }
+}

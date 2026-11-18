@@ -49,7 +49,16 @@
       <div class="card pqr-result-card">
         <div class="pqr-result-card__header">
           <div>
-            <div class="pqr-result-card__code">{{ pqr.codigoSeguimiento }}</div>
+            <div class="pqr-result-card__code">
+              {{ pqr.codigoSeguimiento }}
+              <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                (click)="copyCodigo(pqr.codigoSeguimiento)"
+              >
+                {{ copied() ? '¡Copiado!' : 'Copiar' }}
+              </button>
+            </div>
             <div class="pqr-result-card__tags">
               <app-badge-tipo [tipo]="pqr.tipoPqr" />
               @if (pqr.categoria) {

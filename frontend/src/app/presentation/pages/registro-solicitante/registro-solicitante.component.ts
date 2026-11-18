@@ -75,7 +75,7 @@ export class RegistroSolicitanteComponent {
         next: () => {
           this.state.set({ loading: false, error: null, success: true });
           setTimeout(() => {
-            this.router.navigate(['/registro-pqr']);
+            this.router.navigate(['/mis-pqr']);
           }, 1200);
         },
         error: (err) => {

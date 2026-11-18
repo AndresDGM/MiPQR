@@ -1,0 +1,94 @@
+<div class="container mis-pqr-page">
+  <div class="page-header">
+    <div>
+      <h1>Mis Solicitudes PQR</h1>
+      <p>Consulta el estado, historial y respuestas de todas tus PQR radicadas.</p>
+    </div>
+    <a routerLink="/registro-pqr" class="btn btn-primary">+ Nueva PQR</a>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card card">
+      <span class="kpi-label">Total Radicadas</span>
+      <strong class="kpi-value">{{ stats().total }}</strong>
+    </div>
+    <div class="kpi-card card">
+      <span class="kpi-label">En Trámite</span>
+      <strong class="kpi-value kpi-value--accent">{{ stats().enTramite }}</strong>
+    </div>
+    <div class="kpi-card card">
+      <span class="kpi-label">Respondidas / Cerradas</span>
+      <strong class="kpi-value kpi-value--primary">{{ stats().finalizadas }}</strong>
+    </div>
+  </div>
+
+  <div class="filters-bar card">
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Buscar por código (ej: PQR-2026-0001) o asunto..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+    />
+    <select
+      class="form-control"
+      [ngModel]="estadoFilter()"
+      (ngModelChange)="estadoFilter.set($event)"
+    >
+      <option value="">Todos los estados</option>
+      @for (estado of estados; track estado) {
+        <option [value]="estado">{{ estado }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner mensaje="Cargando tus solicitudes..." />
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (filteredPqrs().length === 0) {
+    <app-empty-state
+      titulo="No tienes solicitudes para mostrar"
+      descripcion="Radica una nueva PQR o ajusta los filtros de búsqueda."
+    />
+  } @else {
+    <div class="pqr-list">
+      @for (item of filteredPqrs(); track item.idPqr) {
+        <article class="card pqr-item">
+          <div class="pqr-item__top">
+            <div class="pqr-item__badges">
+              <span class="codigo-pill">{{ item.codigoSeguimiento }}</span>
+              <button
+                type="button"
+                class="btn-copy"
+                (click)="copyCodigo(item.codigoSeguimiento)"
+                title="Copiar código de seguimiento"
+              >
+                {{ copiedCode() === item.codigoSeguimiento ? '¡Copiado!' : 'Copiar' }}
+              </button>
+              <app-badge-tipo [tipo]="item.tipoPqr" />
+              <app-badge-estado [estado]="item.estado" />
+            </div>
+            <span class="pqr-item__date">{{ item.fechaRegistro | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <h2 class="pqr-item__title">{{ item.asunto }}</h2>
+          <p class="pqr-item__desc">{{ item.descripcion }}</p>
+
+          <div class="pqr-item__footer">
+            <span class="pqr-item__meta">
+              Categoría: <strong>{{ item.categoria || 'General' }}</strong>
+            </span>
+            <a
+              routerLink="/consulta"
+              [queryParams]="{ codigo: item.codigoSeguimiento }"
+              class="btn btn-sm btn-outline"
+            >
+              Ver Seguimiento y Respuesta →
+            </a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>

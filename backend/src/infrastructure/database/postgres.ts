@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import { envs } from '../../config/envs.js';
 import { CipherService } from '../../domain/services/cipher.service.js';
 import { RSA_FORMAT_PREFIX } from '../services/rsa-cipher.adapter.js';
-import { schemaSql, seedPqrSql, seedRolesSql } from './schema.js';
+import { schemaSql, seedCategoriasSql, seedPqrSql, seedRolesSql } from './schema.js';
 
 export const pool = new Pool({
   host: envs.DB_HOST,
@@ -31,6 +31,7 @@ const USUARIOS_SEED: [number, number, string, string, string, boolean][] = [
 export async function initDatabase(passwordCipher: CipherService): Promise<void> {
   await pool.query(schemaSql);
   await pool.query(seedRolesSql);
+  await pool.query(seedCategoriasSql);
   await seedUsuarios(passwordCipher);
   await encryptLegacyPasswords(passwordCipher);
   await pool.query(seedPqrSql);

@@ -4,10 +4,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/application/auth';
 import { AssignPqrResponsableUseCase } from '../../../core/application/usecases/assign-pqr-responsable.usecase';
+import { GetAllCategoriesUseCase } from '../../../core/application/usecases/get-all-categories.usecase';
 import { GetPqrByIdUseCase } from '../../../core/application/usecases/get-pqr-by-id.usecase';
 import { GetPqrHistorialUseCase } from '../../../core/application/usecases/get-pqr-historial.usecase';
 import { GetUsersByRolUseCase } from '../../../core/application/usecases/get-users-by-rol.usecase';
 import { ResponderPqrUseCase } from '../../../core/application/usecases/responder-pqr.usecase';
+import { UpdatePqrCategoriaUseCase } from '../../../core/application/usecases/update-pqr-categoria.usecase';
 import { UpdatePqrEstadoUseCase } from '../../../core/application/usecases/update-pqr-estado.usecase';
 import { GetPqrAttachmentsUseCase } from '../../../core/application/usecases/get-pqr-attachments.usecase';
 import { DownloadPqrAttachmentUseCase } from '../../../core/application/usecases/download-pqr-attachment.usecase';
@@ -61,6 +63,8 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
   private downloadPqrAttachmentUseCase = inject(DownloadPqrAttachmentUseCase);
   private deletePqrAttachmentUseCase = inject(DeletePqrAttachmentUseCase);
   private uploadPqrAttachmentsUseCase = inject(UploadPqrAttachmentsUseCase);
+  private updatePqrCategoriaUseCase = inject(UpdatePqrCategoriaUseCase);
+  private getAllCategoriesUseCase = inject(GetAllCategoriesUseCase);
   authService = inject(AuthService);
 
   idPqr!: number;
@@ -111,6 +115,7 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
     attachments: [],
     loadingAttachments: false,
     responsables: [],
+    categories: [],
     successMessage: null,
     error: null,
   });
@@ -122,6 +127,10 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
 
   responsableForm = new FormGroup({
     idResponsable: new FormControl<number | null>(null, [Validators.required]),
+  });
+
+  categoriaForm = new FormGroup({
+    idCategoria: new FormControl<number | null>(null, [Validators.required]),
   });
 
   respuestaForm = new FormGroup({
@@ -143,9 +152,10 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
 
     this.loadDetails();
 
-    // Solo quien puede asignar necesita (y puede consultar) la lista de responsables
+    // Solo quien puede asignar necesita (y puede consultar) la lista de responsables y categorias
     if (this.puedeAsignar()) {
       this.loadResponsables();
+      this.loadCategorias();
     }
   }
 
@@ -372,11 +382,28 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
 
     this.assignPqrResponsableUseCase.execute(this.idPqr, idResp).subscribe({
       next: (updated) => {
+        const emailStatus = updated.notificacionEmail;
+        let successMsg: string | null = null;
+        let errorMsg: string | null = null;
+
+        if (emailStatus?.estado === 'ENVIADO') {
+          successMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito. Correo de notificación confirmado y enviado correctamente.`;
+        } else if (emailStatus?.estado === 'PENDIENTE') {
+          // No mostrar mensaje de éxito del correo si el proveedor no lo ha confirmado
+          successMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito. El correo de notificación está pendiente de confirmación por el proveedor.`;
+        } else if (emailStatus?.estado === 'FALLIDO') {
+          errorMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito, pero ocurrió un error durante el envío del correo de notificación (${emailStatus.mensaje || 'Error del servidor SMTP'}).`;
+        } else {
+          successMsg = `Responsable "${updated.nombreResponsable}" asignado con éxito.`;
+        }
+
         this.state.update((s) => ({
           ...s,
           actionLoading: false,
           pqr: updated,
-          successMessage: `Responsable "${updated.nombreResponsable}" asignado con éxito.`,
+          emailDeliveryStatus: emailStatus ?? null,
+          successMessage: successMsg,
+          error: errorMsg,
         }));
         this.loadHistory();
       },
@@ -384,6 +411,7 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
         this.state.update((s) => ({
           ...s,
           actionLoading: false,
+          emailDeliveryStatus: null,
           error: err.message || 'Error al asignar responsable.',
         }));
       },
@@ -420,5 +448,89 @@ export class DetallePqrComponent implements OnInit, OnDestroy {
         }));
       },
     });
+  }
+
+  loadCategorias(): void {
+    this.getAllCategoriesUseCase.execute().subscribe({
+      next: (categories) => {
+        this.state.update((s) => ({ ...s, categories }));
+        if (categories.length > 0) {
+          const currentPqr = this.state().pqr;
+          const initialId = currentPqr?.idCategoria || categories[0].idCategoria;
+          this.categoriaForm.patchValue({ idCategoria: initialId });
+        }
+      },
+    });
+  }
+
+  formatConfianza(confianza?: number | null): string {
+    if (confianza === undefined || confianza === null) return 'N/A';
+    return `${(confianza * 100).toFixed(1)}%`;
+  }
+
+  onConfirmarSugerenciaIa(): void {
+    const pqr = this.state().pqr;
+    if (!pqr || !pqr.categoriaSugeridaIa) return;
+
+    this.state.update((s) => ({ ...s, actionLoading: true, successMessage: null, error: null }));
+
+    const cats = this.state().categories || [];
+    const matched = cats.find(
+      (c) => c.nombre.toLowerCase().trim() === pqr.categoriaSugeridaIa!.toLowerCase().trim()
+    );
+    const idCat = matched ? matched.idCategoria : (pqr.idCategoria || 1);
+
+    this.updatePqrCategoriaUseCase
+      .execute(this.idPqr, idCat, pqr.categoriaSugeridaIa, 'CONFIRMADA')
+      .subscribe({
+        next: (updated) => {
+          this.state.update((s) => ({
+            ...s,
+            actionLoading: false,
+            pqr: updated,
+            successMessage: `Categoría "${pqr.categoriaSugeridaIa}" confirmada exitosamente.`,
+          }));
+          this.loadHistory();
+        },
+        error: (err) => {
+          this.state.update((s) => ({
+            ...s,
+            actionLoading: false,
+            error: err.message || 'Error al confirmar la categoría sugerida.',
+          }));
+        },
+      });
+  }
+
+  onModificarCategoria(): void {
+    if (this.categoriaForm.invalid) return;
+
+    const idCat = Number(this.categoriaForm.getRawValue().idCategoria);
+    const cats = this.state().categories || [];
+    const catObj = cats.find((c) => c.idCategoria === idCat);
+    const nombreCat = catObj ? catObj.nombre : 'Categoría asignada';
+
+    this.state.update((s) => ({ ...s, actionLoading: true, successMessage: null, error: null }));
+
+    this.updatePqrCategoriaUseCase
+      .execute(this.idPqr, idCat, nombreCat, 'MODIFICADA')
+      .subscribe({
+        next: (updated) => {
+          this.state.update((s) => ({
+            ...s,
+            actionLoading: false,
+            pqr: updated,
+            successMessage: `Categoría actualizada a "${nombreCat}" correctamente.`,
+          }));
+          this.loadHistory();
+        },
+        error: (err) => {
+          this.state.update((s) => ({
+            ...s,
+            actionLoading: false,
+            error: err.message || 'Error al modificar la categoría.',
+          }));
+        },
+      });
   }
 }

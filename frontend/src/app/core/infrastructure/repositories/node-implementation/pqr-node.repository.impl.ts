@@ -51,4 +51,13 @@ export class PqrNodeRepositoryImpl extends PqrRepository {
   responder(idPqr: number, contenido: string): Observable<PqrResponse> {
     return this.dataSource.responder(idPqr, contenido);
   }
+
+  updateCategoria(
+    idPqr: number,
+    idCategoria: number,
+    categoria: string,
+    estadoRevisionIa: 'CONFIRMADA' | 'MODIFICADA'
+  ): Observable<Pqr> {
+    return this.dataSource.updateCategoria(idPqr, idCategoria, categoria, estadoRevisionIa);
+  }
 }

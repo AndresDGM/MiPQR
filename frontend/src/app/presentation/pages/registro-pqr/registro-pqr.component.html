@@ -10,6 +10,13 @@
       <div class="code-box">
         <span class="code-box__label">Código Único de Seguimiento:</span>
         <span class="code-box__code">{{ state().createdPqr?.codigoSeguimiento }}</span>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline"
+          (click)="copyCodigo(state().createdPqr?.codigoSeguimiento)"
+        >
+          {{ copied() ? '¡Código copiado!' : 'Copiar código' }}
+        </button>
         <span class="code-box__hint">
           Guarde este código para consultar el avance y la respuesta oficial de su caso.
         </span>
@@ -28,6 +35,28 @@
           <span class="summary-item__label">Solicitante:</span>
           <span>{{ state().createdPqr?.nombreSolicitante }}</span>
         </div>
+        <div class="summary-item">
+          <span class="summary-item__label">Correo de Contacto:</span>
+          <span>{{ state().createdPqr?.correoSolicitante }}</span>
+        </div>
+        @if (state().createdPqr?.notificacionEmail) {
+          <div class="summary-item">
+            <span class="summary-item__label">Confirmación por Correo:</span>
+            @if (state().createdPqr?.notificacionEmail?.estado === 'ENVIADO') {
+              <span style="color: #279BAF; font-weight: 500;">
+                Hemos enviado un correo con el código de seguimiento e información de contacto a su dirección.
+              </span>
+            } @else if (state().createdPqr?.notificacionEmail?.estado === 'PENDIENTE') {
+              <span style="color: #718096;">
+                El correo de confirmación se encuentra en proceso de despacho.
+              </span>
+            } @else {
+              <span style="color: #D54877;">
+                Su solicitud quedó registrada, pero no fue posible enviar el correo de confirmación. Conserve su código de seguimiento.
+              </span>
+            }
+          </div>
+        }
         @if (state().attachedFilesCount && state().attachedFilesCount! > 0) {
           <div class="summary-item">
             <span class="summary-item__label">Documentos de soporte:</span>

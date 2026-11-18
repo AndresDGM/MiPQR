@@ -66,10 +66,40 @@
     opacity: 0.7;
   }
 
+  &__toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid rgba($color-dark, 0.2);
+    border-radius: $border-radius-md;
+    padding: 0.35rem 0.65rem;
+    font-size: 1.15rem;
+    color: $color-dark;
+    cursor: pointer;
+
+    @media (max-width: 768px) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   &__nav {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    @media (max-width: 768px) {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba($color-dark, 0.08);
+
+      &--open {
+        display: flex;
+      }
+    }
   }
 
   &__link {
