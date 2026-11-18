@@ -230,8 +230,9 @@ describe('NodemailerEmailService & Casos de Uso con Notificación', () => {
     });
 
     assert.ok(result.idPqr);
-    assert.equal(result.notificacionEmail?.enviado, true);
-    assert.equal(result.notificacionEmail?.estado, 'ENVIADO');
+    assert.equal(result.notificacionEmail?.enviado, false);
+    assert.equal(result.notificacionEmail?.estado, 'PENDIENTE');
+    await new Promise((resolve) => setImmediate(resolve));
     assert.ok(sentOptions);
     assert.equal((sentOptions as SendEmailOptions).to, 'ana.maria@test.com');
     assert.equal((sentOptions as SendEmailOptions).tipoEvento, 'REGISTRO_PQR');
@@ -257,13 +258,12 @@ describe('NodemailerEmailService & Casos de Uso con Notificación', () => {
       identificacionSolicitante: '99887766',
     });
 
-    // La PQR se crea con éxito
+    // La PQR se crea con éxito sin esperar ni bloquearse por el envío en segundo plano
     assert.ok(result.idPqr);
     assert.equal(result.asunto, 'Cobro de cita');
-    // Se registra el fallo del correo sin arrojar error fatal
     assert.equal(result.notificacionEmail?.enviado, false);
-    assert.equal(result.notificacionEmail?.estado, 'FALLIDO');
-    assert.ok(result.notificacionEmail?.mensaje?.includes('SMTP connection timeout'));
+    assert.equal(result.notificacionEmail?.estado, 'PENDIENTE');
+    await new Promise((resolve) => setImmediate(resolve));
   });
 
   it('AssignPqrResponsableBackendUseCase debe asignar la PQR y despachar correo al responsable', async () => {
