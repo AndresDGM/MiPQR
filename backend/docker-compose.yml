@@ -105,7 +105,7 @@ services:
       - default
 
   evolution-api:
-    image: atendai/evolution-api:v2.2.3
+    image: evoapicloud/evolution-api:latest
     container_name: mipqr-evolution-api
     restart: unless-stopped
     ports:
