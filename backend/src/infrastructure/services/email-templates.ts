@@ -395,4 +395,93 @@ ${detalleUrl}
 
     return { subject, html, text };
   }
+
+  static buildRespuestaEmitida(data: {
+    nombreSolicitante: string;
+    codigoSeguimiento: string;
+    tipoPqr: string;
+    fechaRespuesta: Date;
+    appUrl: string;
+  }): { subject: string; html: string; text: string } {
+    const baseUrl = data.appUrl.replace(/\/$/, '');
+    const consultaUrl = `${baseUrl}/consulta?codigo=${encodeURIComponent(data.codigoSeguimiento)}`;
+    const formattedFecha = new Date(data.fechaRespuesta).toLocaleString('es-CO', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+      timeZone: 'America/Bogota',
+    });
+
+    const subject = `Respuesta oficial disponible - ${data.codigoSeguimiento} | MiPQR Clinica Dolormed`;
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<body style="font-family: Arial, sans-serif; background-color: #F2F4F7; padding: 24px; color: #283447;">
+  <div style="max-width: 600px; margin: 0 auto; background: #FFFFFF; border-radius: 8px; padding: 28px; border-top: 4px solid #673E93;">
+    <h2 style="margin-top: 0; color: #673E93;">Su solicitud ha sido respondida</h2>
+    <p>Apreciado(a) <strong>${escapeHtml(data.nombreSolicitante)}</strong>,</p>
+    <p>El equipo de <strong>Clínica Dolormed</strong> ha emitido la respuesta oficial a su ${escapeHtml(data.tipoPqr)} con código <strong>${escapeHtml(data.codigoSeguimiento)}</strong> (${formattedFecha}).</p>
+    <p style="font-size: 13px; color: #4A5568;">Por confidencialidad y protección de datos (Ley 1581 de 2012), el contenido completo de la respuesta se consulta en nuestro portal.</p>
+    <p style="margin: 24px 0;">
+      <a href="${consultaUrl}" target="_blank" style="background-color: #279BAF; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: 600;">Ver Respuesta Oficial</a>
+    </p>
+  </div>
+</body>
+</html>`.trim();
+
+    const text = [
+      'MiPQR | Clinica Dolormed',
+      `Su solicitud ${data.codigoSeguimiento} ha sido respondida (${formattedFecha}).`,
+      `Consulte la respuesta oficial en: ${consultaUrl}`,
+    ].join('\n');
+
+    return { subject, html, text };
+  }
+
+  static buildAlertaVencimiento(data: {
+    nombreDestinatario: string;
+    codigoSeguimiento: string;
+    tipoPqr: string;
+    estadoActual: string;
+    fechaLimite: Date;
+    horasRestantes: number;
+    idPqr: number;
+    appUrl: string;
+  }): { subject: string; html: string; text: string } {
+    const baseUrl = data.appUrl.replace(/\/$/, '');
+    const detalleUrl = `${baseUrl}/detalle/${data.idPqr}`;
+    const formattedLimite = new Date(data.fechaLimite).toLocaleString('es-CO', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+      timeZone: 'America/Bogota',
+    });
+    const vencida = data.horasRestantes <= 0;
+    const urgencia = vencida
+      ? 'Plazo vencido'
+      : `Vence en aproximadamente ${Math.ceil(data.horasRestantes)} horas`;
+
+    const subject = `[ALERTA SLA] ${data.codigoSeguimiento} - ${urgencia} | MiPQR`;
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<body style="font-family: Arial, sans-serif; background-color: #F2F4F7; padding: 24px; color: #283447;">
+  <div style="max-width: 600px; margin: 0 auto; background: #FFFFFF; border-radius: 8px; padding: 28px; border-top: 4px solid #D54877;">
+    <h2 style="margin-top: 0; color: #D54877;">Alerta de vencimiento de PQR (${urgencia})</h2>
+    <p>Apreciado(a) <strong>${escapeHtml(data.nombreDestinatario)}</strong>,</p>
+    <p>La solicitud <strong>${escapeHtml(data.codigoSeguimiento)}</strong> (${escapeHtml(data.tipoPqr)}) en estado <strong>${escapeHtml(data.estadoActual)}</strong> tiene fecha límite <strong>${formattedLimite}</strong>.</p>
+    <p style="margin: 24px 0;">
+      <a href="${detalleUrl}" target="_blank" style="background-color: #673E93; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: 600;">Gestionar Caso Ahora</a>
+    </p>
+  </div>
+</body>
+</html>`.trim();
+
+    const text = [
+      `MiPQR | Alerta SLA (${urgencia})`,
+      `Caso: ${data.codigoSeguimiento} (${data.tipoPqr}) - Estado: ${data.estadoActual}`,
+      `Fecha límite: ${formattedLimite}`,
+      `Gestionar en: ${detalleUrl}`,
+    ].join('\n');
+
+    return { subject, html, text };
+  }
 }

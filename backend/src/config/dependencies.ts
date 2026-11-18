@@ -29,6 +29,7 @@ import { AssignPqrResponsableBackendUseCase } from '../application/usecases/pqrs
 import { UpdatePqrEstadoUseCase } from '../application/usecases/pqrs/update-pqr-estado.usecase.js';
 import { GetPqrHistorialUseCase } from '../application/usecases/pqrs/get-pqr-historial.usecase.js';
 import { ResponderPqrUseCase } from '../application/usecases/pqrs/responder-pqr.usecase.js';
+import { CheckSlaAlertsUseCase } from '../application/usecases/pqrs/check-sla-alerts.usecase.js';
 import { DesCipherAdapter } from '../infrastructure/services/des-cipher.adapter.js';
 import { RsaCipherAdapter } from '../infrastructure/services/rsa-cipher.adapter.js';
 import { RolDatasource } from '../infrastructure/datasources/rol.datasource.js';
@@ -39,6 +40,7 @@ import { PqrDatasource } from '../infrastructure/datasources/pqr.datasource.js';
 import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 import { FileValidatorService } from '../infrastructure/services/file-validator.service.js';
 import { NodemailerEmailService } from '../infrastructure/services/nodemailer-email.service.js';
+import { TwilioWhatsAppService } from '../infrastructure/services/twilio-whatsapp.service.js';
 import { RolRepositoryImpl } from '../infrastructure/repositories/rol.repository.impl.js';
 import { CategoriaRepositoryImpl } from '../infrastructure/repositories/categoria.repository.impl.js';
 import { UsuarioRepositoryImpl } from '../infrastructure/repositories/usuario.repository.impl.js';
@@ -73,6 +75,12 @@ export const emailService = new NodemailerEmailService({
   pass: envs.SMTP_PASS,
   from: envs.SMTP_FROM,
   secure: envs.SMTP_SECURE,
+});
+
+export const whatsappService = new TwilioWhatsAppService({
+  accountSid: envs.TWILIO_ACCOUNT_SID,
+  authToken: envs.TWILIO_AUTH_TOKEN,
+  from: envs.TWILIO_WHATSAPP_FROM,
 });
 
 // Servicios
@@ -149,13 +157,28 @@ const assignPqrResponsableBackendUseCase = new AssignPqrResponsableBackendUseCas
   pqrRepository,
   usuarioRepository,
   emailService,
-  envs.APP_URL
+  envs.APP_URL,
+  whatsappService
 );
 const updatePqrCategoriaUseCase = new UpdatePqrCategoriaUseCase(pqrRepository);
 const classifyPqrUseCase = new ClassifyPqrUseCase(pqrClassificationRepository);
 const updatePqrEstadoUseCase = new UpdatePqrEstadoUseCase(pqrRepository);
 const getPqrHistorialUseCase = new GetPqrHistorialUseCase(pqrRepository);
-const responderPqrUseCase = new ResponderPqrUseCase(pqrRepository);
+const responderPqrUseCase = new ResponderPqrUseCase(
+  pqrRepository,
+  emailService,
+  whatsappService,
+  envs.APP_URL
+);
+
+export const checkSlaAlertsUseCase = new CheckSlaAlertsUseCase(
+  pqrRepository,
+  usuarioRepository,
+  emailService,
+  whatsappService,
+  envs.APP_URL,
+  envs.SLA_ALERT_HOURS_BEFORE
+);
 
 // 4. Controladores
 export const rolesController = new RolesController(
