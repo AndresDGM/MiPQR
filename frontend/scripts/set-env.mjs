@@ -44,5 +44,23 @@ if (desKey) {
   updated = updated.replace(/desKey:\s*['"][^'"]*['"]/, `desKey: '${desKey}'`);
 }
 
+const VALID_ADAPTERS = new Set(['local', 'node']);
+const globalAdapter = process.env.ADAPTER_MODE?.trim().toLowerCase();
+const adapterModules = [
+  ['auth', process.env.ADAPTER_AUTH],
+  ['users', process.env.ADAPTER_USERS],
+  ['pqrs', process.env.ADAPTER_PQRS],
+  ['categories', process.env.ADAPTER_CATEGORIES],
+  ['attachments', process.env.ADAPTER_ATTACHMENTS],
+];
+
+for (const [moduleName, rawValue] of adapterModules) {
+  const value = (rawValue?.trim().toLowerCase() || globalAdapter);
+  if (value && VALID_ADAPTERS.has(value)) {
+    const pattern = new RegExp(`(${moduleName}:\\s*)['"](?:local|node)['"](\\s*as const)`);
+    updated = updated.replace(pattern, `$1'${value}'$2`);
+  }
+}
+
 writeFileSync(envFilePath, updated, 'utf8');
 console.log(`environment.ts actualizado con baseUrlNode: ${baseUrl}`);
