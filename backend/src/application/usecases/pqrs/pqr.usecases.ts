@@ -4,6 +4,7 @@ import { CustomError } from '../../../domain/errors/custom.error.js';
 import { EmailService } from '../../../domain/services/email.service.js';
 import { WhatsAppService } from '../../../domain/services/whatsapp.service.js';
 import { EmailTemplates } from '../../../infrastructure/services/email-templates.js';
+import { WhatsAppTemplates } from '../../../infrastructure/services/whatsapp-templates.js';
 import { Actor } from '../../types/actor.type.js';
 
 export class GetAllPqrsBackendUseCase {
@@ -64,21 +65,22 @@ export class CreatePqrBackendUseCase {
   ) {
     this.repository = repository;
     this.whatsappService = arg5;
-    if (arg2 && 'classify' in arg2) {
-      this.classificationRepo = arg2 as PQRClassificationRepository;
-      if (arg3 && typeof arg3 === 'object' && 'sendEmail' in arg3) {
-        this.emailService = arg3 as EmailService;
-        this.appUrl = arg4 || 'http://localhost:4200';
-      } else if (typeof arg3 === 'string') {
-        this.appUrl = arg3;
-      } else {
-        this.appUrl = 'http://localhost:4200';
-      }
-    } else if (arg2 && 'sendEmail' in arg2) {
+    if (arg2 && 'sendEmail' in arg2) {
       this.emailService = arg2 as EmailService;
       this.appUrl = typeof arg3 === 'string' ? arg3 : 'http://localhost:4200';
     } else {
-      this.appUrl = typeof arg4 === 'string' ? arg4 : typeof arg3 === 'string' ? arg3 : 'http://localhost:4200';
+      if (arg2 && 'classify' in arg2) {
+        this.classificationRepo = arg2 as PQRClassificationRepository;
+      }
+      if (arg3 && typeof arg3 === 'object' && 'sendEmail' in arg3) {
+        this.emailService = arg3 as EmailService;
+      }
+      this.appUrl =
+        typeof arg4 === 'string'
+          ? arg4
+          : typeof arg3 === 'string'
+            ? arg3
+            : 'http://localhost:4200';
     }
   }
 
@@ -101,64 +103,78 @@ export class CreatePqrBackendUseCase {
     // 2. Persistir la PQR en la base de datos
     const pqr = await this.repository.create(data);
 
-    // 3. Notificación por correo electrónico al solicitante (no bloqueante)
+    // 3. Despachar correo y WhatsApp en segundo plano para no bloquear la respuesta HTTP
     if (this.emailService && pqr.correoSolicitante) {
-      try {
-        const { subject, html, text } = EmailTemplates.buildSolicitanteRegistro({
-          nombreSolicitante: pqr.nombreSolicitante || 'Solicitante',
-          codigoSeguimiento: pqr.codigoSeguimiento,
-          tipoPqr: pqr.tipoPqr,
-          asunto: pqr.asunto,
-          descripcion: pqr.descripcion,
-          fechaRegistro: pqr.fechaRegistro,
-          estadoInicial: pqr.estado,
-          appUrl: this.appUrl,
-        });
-
-        const sendResult = await this.emailService.sendEmail({
-          to: pqr.correoSolicitante,
-          subject,
-          html,
-          text,
-          idPqr: pqr.idPqr,
-          tipoEvento: 'REGISTRO_PQR',
-        });
-
-        pqr.notificacionEmail = {
-          enviado: sendResult.success,
-          estado: sendResult.estado,
-          mensaje:
-            sendResult.error ||
-            (sendResult.simulated
-              ? 'Notificación simulada correctamente (SMTP no configurado)'
-              : 'Correo de confirmación enviado exitosamente'),
-        };
-      } catch (err: any) {
-        console.error('[CreatePqrBackendUseCase] Error inesperado en notificación por correo:', err);
-        pqr.notificacionEmail = {
-          enviado: false,
-          estado: 'FALLIDO',
-          mensaje: err?.message || 'Error al procesar correo de confirmación',
-        };
-      }
+      pqr.notificacionEmail = {
+        enviado: false,
+        estado: 'PENDIENTE',
+        mensaje: 'El correo de confirmación se encuentra en proceso de despacho.',
+      };
     }
 
-    // 4. Notificación por WhatsApp al solicitante (no bloqueante)
-    if (this.whatsappService && pqr.telefonoSolicitante) {
-      try {
-        const baseUrl = this.appUrl.replace(/\/$/, '');
-        await this.whatsappService.sendMessage({
-          to: pqr.telefonoSolicitante,
-          idPqr: pqr.idPqr,
-          tipoEvento: 'REGISTRO_PQR',
-          body: `MiPQR | Hola ${pqr.nombreSolicitante || 'Solicitante'}, tu ${pqr.tipoPqr} fue radicada con el código ${pqr.codigoSeguimiento}. Consulta su estado en: ${baseUrl}/consulta?codigo=${encodeURIComponent(pqr.codigoSeguimiento)}`,
-        });
-      } catch (err) {
-        console.error('[CreatePqrBackendUseCase] Error en notificación WhatsApp:', err);
-      }
-    }
+    this.dispatchRegistrationNotifications(pqr);
 
     return pqr;
+  }
+
+  private dispatchRegistrationNotifications(pqr: PqrRecord): void {
+    const tasks: Promise<unknown>[] = [];
+
+    if (this.emailService && pqr.correoSolicitante) {
+      const { subject, html, text } = EmailTemplates.buildSolicitanteRegistro({
+        nombreSolicitante: pqr.nombreSolicitante || 'Solicitante',
+        codigoSeguimiento: pqr.codigoSeguimiento,
+        tipoPqr: pqr.tipoPqr,
+        asunto: pqr.asunto,
+        descripcion: pqr.descripcion,
+        fechaRegistro: pqr.fechaRegistro,
+        estadoInicial: pqr.estado,
+        appUrl: this.appUrl,
+      });
+
+      tasks.push(
+        this.emailService
+          .sendEmail({
+            to: pqr.correoSolicitante,
+            subject,
+            html,
+            text,
+            idPqr: pqr.idPqr,
+            tipoEvento: 'REGISTRO_PQR',
+          })
+          .catch((err) => {
+            console.error('[CreatePqrBackendUseCase] Error en notificación por correo:', err);
+          })
+      );
+    }
+
+    if (this.whatsappService && pqr.telefonoSolicitante) {
+      const body = WhatsAppTemplates.buildRegistro({
+        nombreSolicitante: pqr.nombreSolicitante || 'Solicitante',
+        codigoSeguimiento: pqr.codigoSeguimiento,
+        tipoPqr: pqr.tipoPqr,
+        categoria: pqr.categoria,
+        fechaLimite: pqr.fechaLimite,
+        appUrl: this.appUrl,
+      });
+
+      tasks.push(
+        this.whatsappService
+          .sendMessage({
+            to: pqr.telefonoSolicitante,
+            idPqr: pqr.idPqr,
+            tipoEvento: 'REGISTRO_PQR',
+            body,
+          })
+          .catch((err) => {
+            console.error('[CreatePqrBackendUseCase] Error en notificación WhatsApp:', err);
+          })
+      );
+    }
+
+    if (tasks.length > 0) {
+      void Promise.allSettled(tasks);
+    }
   }
 }
 

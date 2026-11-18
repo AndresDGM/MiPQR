@@ -71,6 +71,11 @@ services:
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}
       TWILIO_CONTENT_SID: ${TWILIO_CONTENT_SID:-}
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN:-}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+      WHATSAPP_API_VERSION: ${WHATSAPP_API_VERSION:-v21.0}
+      WHATSAPP_TEMPLATE_NAME: ${WHATSAPP_TEMPLATE_NAME:-}
+      WHATSAPP_TEMPLATE_LANG: ${WHATSAPP_TEMPLATE_LANG:-es}
     volumes:
       - mipqr-uploads:/app/uploads
     networks:
@@ -94,9 +99,9 @@ services:
     container_name: mipqr-ai-service
     restart: unless-stopped
     ports:
-      - '${AI_SERVICE_PORT:-8000}:8000'
+      - '${AI_SERVICE_PORT:-8000}:${AI_SERVICE_PORT:-8000}'
     environment:
-      PORT: 8000
+      PORT: ${AI_SERVICE_PORT:-8000}
       HOST: 0.0.0.0
       MODEL_PATH: /app/models/modelo.h5
       SCALER_PATH: /app/models/escalador.pkl

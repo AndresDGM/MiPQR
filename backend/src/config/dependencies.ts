@@ -77,7 +77,7 @@ export const emailService = new NodemailerEmailService({
   secure: envs.SMTP_SECURE,
 });
 
-// Patrón Adapter: cambiar el proveedor es cambiar `envs.WHATSAPP_PROVIDER` ('evolution' | 'twilio' | 'simulated')
+// Patrón Adapter: cambiar el proveedor es cambiar `envs.WHATSAPP_PROVIDER` ('evolution' | 'twilio' | 'meta' | 'simulated')
 export const whatsappService = createWhatsAppAdapter(envs.WHATSAPP_PROVIDER, {
   evolution: {
     baseUrl: envs.EVOLUTION_API_URL,
@@ -89,6 +89,13 @@ export const whatsappService = createWhatsAppAdapter(envs.WHATSAPP_PROVIDER, {
     authToken: envs.TWILIO_AUTH_TOKEN,
     from: envs.TWILIO_WHATSAPP_FROM,
     contentSid: envs.TWILIO_CONTENT_SID,
+  },
+  meta: {
+    accessToken: envs.WHATSAPP_TOKEN,
+    phoneNumberId: envs.WHATSAPP_PHONE_NUMBER_ID,
+    apiVersion: envs.WHATSAPP_API_VERSION,
+    templateName: envs.WHATSAPP_TEMPLATE_NAME,
+    templateLang: envs.WHATSAPP_TEMPLATE_LANG,
   },
 });
 
